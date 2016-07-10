@@ -3,16 +3,13 @@
 #ifndef MAINAPP_LINETRACER_OHS_H_
 #define MAINAPP_LINETRACER_OHS_H_
 
-#include "LineMonitor.h"
-#include "BalancingWalker.h"
 
 class LineTracer {
 public:
     //生成
     LineTracer();
     //デストラクタ 死ぬときあるよ
-        virtual ~LineTracer();
-
+    virtual ~LineTracer();
     void execLineTraceConduct();
     void callLineTraceAct();
     void execLineEdgeTrace();
