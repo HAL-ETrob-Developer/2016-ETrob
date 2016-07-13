@@ -1,13 +1,10 @@
 /* by ohs50465 T.UENO   */
 /*    ohs50247 S.TANAKA */
 
-#ifndef DEVICEOPE_RAYREFLECTADMIN_OHS_H_
-#define DEVICEOPE_RAYREFLECTADMIN_OHS_H_
+#ifndef DEVICEOPE_RAY_REFLECT_ADMIN_OHS_H_
+#define DEVICEOPE_RAY_REFLECT_ADMIN_OHS_H_
 
-#ifndef HAL_EV3_STD_H_
-#define HAL_EV3_STD_H_
 #include "../hal_ev3_std.h"
-#endif	//HAL_EV3_STD_H_
 
 #include <queue>
 
