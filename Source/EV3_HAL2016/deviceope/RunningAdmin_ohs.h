@@ -19,7 +19,10 @@ public:
     void getTheRunningVector();
 
 private:
-
+	int32_t rightRotary;
+	int32_t leftRotary;
+	int rightPwm;
+	int leftPwm;
 };
 
 #endif  // DEVICEOPE_RUNNINGADMIN_OHS_H_
