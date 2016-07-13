@@ -3,30 +3,34 @@
 /**
  * コンストラクタ
  */
-Balancer_ohs::Balancer_ohs()
+GyroAdmin_ohs::GyroAdmin_ohs()
     : m() {
 }
 
 /**
  * デストラクタ
  */
-Balancer_ohs::~Balancer_ohs() {
+GyroAdmin_ohs::~GyroAdmin_ohs()
+{
 }
 
 /**
- * ジャイロ値更新
+ * ジャイロセンサの値の更新
  */
-void Balancer_ohs::callGyroUpDate() {
+void GyroAdmin_ohs::callValueUpdate( void )
+{
 }
 
 /**
- * 値の取得
+ * ジャイロセンサの値の取得
  */
-void Balancer_ohs::getValue() {
+int16_t GyroAdmin_ohs::getValue( void )
+{
 }
 
 /**
- * 状態の取得
+ * ジャイロセンサの状態の取得
  */
-void Balancer_ohs::getState() {
+ enum GYRO_STATE GyroAdmin_ohs::getState( void )
+{
 }
