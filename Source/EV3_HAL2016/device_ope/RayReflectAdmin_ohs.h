@@ -4,9 +4,18 @@
 #ifndef DEVICEOPE_RAY_REFLECT_ADMIN_OHS_H_
 #define DEVICEOPE_RAY_REFLECT_ADMIN_OHS_H_
 
+#include <string.h>
 #include "../hal_ev3_std.h"
 
-#include <queue>
+#define QUEUE_MAX	(  127 )		/* キュー個数 */	
+
+/* ゲイン値 */
+#define GAIN_NOW	( 0.1F )		/* 現在 */
+#define GAIN_OLD	( 0.9F )		/* 過去 */
+
+/* 閾値 */
+#define	THRESHOLD_BLACK	( 20 )		/* ブラック */
+#define	THRESHOLD_WHITE	( 40 )		/* ホワイト */
 
 class RayReflectAdmin_ohs
 {
@@ -15,7 +24,7 @@ class RayReflectAdmin_ohs
 		RayReflectAdmin_ohs();
 		
 		/* デストラクタ */
-		virtual ~RayReflectAdmin_ohs();
+		~RayReflectAdmin_ohs();
 
 		/* メソッド */
 		void 		callValueUpDate( void );		//光学センサ反射値の更新
@@ -24,9 +33,12 @@ class RayReflectAdmin_ohs
 
 	private:
 		/* メンバ */
-		int8_t	Brightness;
-		enum COLOR	State;
-		queue<int8_t> Qu;
+		ev3api::ColorSensor& mColorSensor;
+		int8_t	mNowReflValue;
+		int8_t 	mOldReflValue;
+		enum COLOR	mState;
+		int8_t mQueue[QUEUE_MAX];
+		int8_t mNowQNo;
 		
 		/* メソッド */
 		void setLowPassFilter( void );				//ローパスフィルタ
