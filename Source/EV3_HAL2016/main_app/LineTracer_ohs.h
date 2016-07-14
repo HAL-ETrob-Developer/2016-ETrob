@@ -8,7 +8,7 @@ public:
     //生成
     LineTracer_ohs();
     //デストラクタ 死ぬときあるよ
-    virtual ~LineTracer_ohs();
+        virtual ~LineTracer_ohs();
 
     void postLineTraceConduct();
     void callLineTraceAct();
@@ -16,7 +16,7 @@ public:
     void execLineSearch();
 
 private:
-    
+
 };
 
 #endif  // MAINAPP_LINETRACER_OHS_H_

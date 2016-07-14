@@ -3,10 +3,11 @@
 /**
  * コンストラクタ
  */
-LineTracer_ohs::LineTracer_ohs( RayReflectAdomin_ohs* ray_reflect_adomin )
+LineTracer_ohs::LineTracer_ohs( RayReflectAdomin_ohs* ray_reflect_adomin, RunningLineCalculator_ohs* running_line_calculator )
 {
-    mRayReflectAdomin = ray_reflect_adomin;
-
+public:
+    mRayReflectAdomin     = ray_reflect_adomin;
+    mRunningLineCalclator = running_line_calclator;
 }
 
 /**
@@ -21,9 +22,9 @@ LineTracer_ohs::~LineTracer_ohs() {
 void LineTracer_ohs::postLineTraceConduct() {
     public:
     /* 光学反射値の取得 */
-    numColor = mRayReflectAdomin -> getState();
+    SENC_CLR = mRayReflectAdomin -> getReflectValue();
     /* ラインが白か否かの判別 */
-    if(numColor == COLOR_WHITE) {
+    if(SENC_CLR == SCLR_WHITE) {
     /* 白ならラインエッジトレースへ */
     execLineEdgeTrace();
     }
@@ -32,6 +33,7 @@ void LineTracer_ohs::postLineTraceConduct() {
     execLineSearch();
     }
     private:
+    
 }
 
 /**
@@ -46,14 +48,16 @@ void LineTracer_ohs::callLineTraceAct() {
  */
 void LineTracer_ohs::execLineEdgeTrace() {
     /* ライン探索ゲインのリセット */
-
+    mGain = 0;
     /* 光学センサ値の取得 */
-    
-    /* 左右モータの実指示値を取得 */
+    mRayReflectAdomin -> getReflectState();
+    /* 左右モータの実指示値を取得(保留) */
 
     /* PID計算 */
-
+    mRunningLineCalculator -> calcRunningLine;
     /* 走行速度・角度の決定 */
+    mRunningAdmin -> getTheRunningPWM;
+    mRunningAdmin -> getRunningAngle;
 }
 
 /**
