@@ -1,18 +1,20 @@
+#include "ev3api.h"
+#include "hal_ev3_std.h"
+#include "GyroSensor.h"
+
 #include "GyroAdmin_ohs.h"
 
 /**
  * コンストラクタ
  */
 GyroAdmin_ohs::GyroAdmin_ohs( ev3api::GyroSensor& gyro_sensor )
+:mGyroSensor( gyro_sensor )
 {
-	mGyroSensor = gyro_sensor;
 	mNowGyroValue = 0;
 	mOldGyroValue = 0;
 	
-	memset( mQueue, 0, sizeof( mQueue ) );
-	int8_t mQNo = 0;
-	
-	
+	memset( mQueue, 0, sizeof( mQueue ));
+	mQNo = 0;
 }
 
 /**
@@ -30,7 +32,7 @@ void GyroAdmin_ohs::callValueUpdate( void )
 	int16_t sVelocity;
 	static int8_t cNo = 0;
 	
-	sVelocity = mGyroSensor->getAnglerVelocity();
+	sVelocity = mGyroSensor.getAnglerVelocity();
 	
 	//記録キューの更新
 	mQNo = cNo % QUEUE_MAX;
@@ -52,12 +54,12 @@ int16_t GyroAdmin_ohs::getValue( void )
 /**
  * ジャイロセンサの状態の取得
  */
- enum GYRO_STATE GyroAdmin_ohs::getState( void )
+GYRO_STATE GyroAdmin_ohs::getState( void )
 {
 	SINT iIdx = 0;
 	
 	//安定値チェック
-	for(　iIdx = 0; iIdx < QUEUE_MAX; iIdx++){
+	for( iIdx = 0; iIdx < QUEUE_MAX; iIdx++){
 		if( mQueue[iIdx] < -THRESHOLD_STABILITY && mQueue[iIdx] > THRESHOLD_STABILITY ){
 			//ジャイロ値確認
 			mNowGyroValue = mQueue[mQNo] * GAIN_NOW + mOldGyroValue * GAIN_OLD;

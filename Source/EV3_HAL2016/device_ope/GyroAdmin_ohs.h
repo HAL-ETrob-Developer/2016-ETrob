@@ -5,7 +5,6 @@
 #define DEVICEOPE_GYRO_ADMIN_OHS_H_
 
 #include <string.h>
-#include "../hal_ev3_std.h"
 
 #define QUEUE_MAX	(  127 )		/* キュー個数 */
 
@@ -21,24 +20,24 @@ class GyroAdmin_ohs
 {
 	public:
 		/* コンストラクタ ( インスタンス生成時に呼び出される ) */
-		GyroAdmin_ohs();
+		GyroAdmin_ohs( ev3api::GyroSensor& gyro_sensor );
 		
 		/* デストラクタ */
 		~GyroAdmin_ohs();
 
 		/* メソッド */
-		void 			callValueUpdate( void );		//ジャイロセンサの値の更新
-		int16_t 		getValue( void );				//ジャイロセンサの値の取得
-		enum GYRO_STATE	getState( void );				//ジャイロセンサ状態の取得
+		void 		callValueUpdate( void );	//ジャイロセンサの値の更新
+		int16_t 	getValue( void );			//ジャイロセンサの値の取得
+		GYRO_STATE	getState( void );				//ジャイロセンサ状態の取得
 
 	private:
 		/* メンバ */
 		ev3api::GyroSensor& mGyroSensor;
 		int16_t mNowGyroValue;
 		int16_t mOldGyroValue;
-		enum GYRO_STATE	mState;
+		GYRO_STATE	mState;
 		int8_t mQueue[QUEUE_MAX];
-		int8_t mQNo;
+		uint8_t mQNo;
 
 };
 
