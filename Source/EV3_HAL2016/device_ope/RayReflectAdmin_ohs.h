@@ -38,7 +38,7 @@ class RayReflectAdmin_ohs
 		int8_t 	mOldReflValue;
 		enum COLOR	mState;
 		int8_t mQueue[QUEUE_MAX];
-		int8_t mNowQNo;
+		int8_t mQNo;
 		
 		/* メソッド */
 		void setLowPassFilter( void );				//ローパスフィルタ

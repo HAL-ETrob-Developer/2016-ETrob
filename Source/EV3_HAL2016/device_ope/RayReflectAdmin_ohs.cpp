@@ -30,15 +30,16 @@ void RayReflectAdmin_ohs::callValueUpdate( void )
 	static int8_t cNo = 0;
 
 	cBrightness = mColorSensor->getBrightness();	//光学センサの反射値の取得
-
+	
+	//記録キューの更新
 	mQNo = cNo % QUEUE_MAX;
 	mQueue[mQNo] = cBrightness;
-
-	setLowPassFilter();
-
 	cNo %= QUEUE_MAX;
 	cNo++;
 	
+	//ローパスフィルタ
+	setLowPassFilter();
+
 }
 
 /**
@@ -54,16 +55,28 @@ int8_t RayReflectAdmin_ohs::getValue( void )
  */
 enum COLOR RayReflectAdmin_ohs::getState( void )
 {
+	SINT iIdx = 0;
+	
 	//中間値範囲チェック
-
-	//反射値チェック
-	if( mNowReflValue < THRESHOLD_BLACK ){
-		/* 状態：ブラック */
-		mState = COLOR_BLACK;
-	}else if( mNowReflValue > THRESHOLD_WHITE ){
-		/* 状態：ブラック */
-		mState = COLOR_WHITE;
+	for(　iIdx = 0; iIdx < QUEUE_MAX; iIdx++){
+		if( mQueue[iIdx] <= THRESHOLD_BLACK || mQueue[iIdx] >= THRESHOLD_WHITE ){
+			//反射値チェック
+			if( mNowReflValue <= THRESHOLD_BLACK ){
+				/* 状態：ブラック */
+				mState = COLOR_BLACK;
+				break;
+			}else if( mNowReflValue >= THRESHOLD_WHITE ){
+				/* 状態：ホワイト */
+				mState = COLOR_WHITE;
+			}	
+		}		
 	}
+	
+	if( iIdx == QUEUE_MAX ){
+		/* 状態：グレー */
+		mState = COLOR_GRAY;
+	}
+	
 	return mState;
 }
 
@@ -72,5 +85,7 @@ enum COLOR RayReflectAdmin_ohs::getState( void )
  */
  void setLowPassFilter( void ){
 	mNowReflValue = mQueue[mQNo] * GAIN_NOW + mOldReflValue * GAIN_OLD;	
+	
+	//反射値を過去反射値に記録
 	mOldReflValue = mNowReflValue;
  }

@@ -32,8 +32,9 @@ void GyroAdmin_ohs::callValueUpdate( void )
 	
 	sVelocity = mGyroSensor->getAnglerVelocity();
 	
+	//記録キューの更新
 	mQNo = cNo % QUEUE_MAX;
-	mQueue[mQNo] = mNowGyrolValue;
+	mQueue[mQNo] = sVelocity;
 	cNo %= QUEUE_MAX;
 	cNo++;
 	
@@ -44,7 +45,7 @@ void GyroAdmin_ohs::callValueUpdate( void )
  */
 int16_t GyroAdmin_ohs::getValue( void )
 {
-	mNowGyroValue = mQueue[mQNo];
+	mNowGyroValue = mQueue[mQNo];		//現在のキューからジャイロ値を取得
 	return mNowGyroValue; 
 }
 
@@ -53,18 +54,30 @@ int16_t GyroAdmin_ohs::getValue( void )
  */
  enum GYRO_STATE GyroAdmin_ohs::getState( void )
 {
-	//安定値チェック
-
-	mNowGyroValue = mQueue[mQNo] * GAIN_NOW + mOldGyroValue * GAIN_OLD;
+	SINT iIdx = 0;
 	
-	//ジャイロ値確認
-	if( mNowGyroValue >= THRESHOLD ){
-		mState = GSTA_FALLING;
-	}else{
-		mState = GSTA_UNSTABLE;
+	//安定値チェック
+	for(　iIdx = 0; iIdx < QUEUE_MAX; iIdx++){
+		if( mQueue[iIdx] < -THRESHOLD_STABILITY && mQueue[iIdx] > THRESHOLD_STABILITY ){
+			//ジャイロ値確認
+			mNowGyroValue = mQueue[mQNo] * GAIN_NOW + mOldGyroValue * GAIN_OLD;
+			if( mNowGyroValue >= THRESHOLD_FALLING || mNowGyroValue <= -THRESHOLD_FALLING ){
+				/* 状態：転倒 */
+				mState = GSTA_FALLING;
+			}else{
+				/* 状態：不安定 */
+				mState = GSTA_UNSTABLE;
+			}
+		}		
 	}
 	
+	if( iIdx == QUEUE_MAX ){
+		/* 状態：安定 */
+		mState = GSTA_STABILITY;
+	}
+	
+	//ジャイロ値を過去ジャイロ値に記録
 	mOldGyroValue = mNowGyroValue;
 	
-	return mNowGyroValue;
+	return mState;
 }
