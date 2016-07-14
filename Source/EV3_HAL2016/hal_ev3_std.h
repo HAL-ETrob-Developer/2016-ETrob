@@ -57,6 +57,7 @@ typedef          int    SINT;					/* int						 */
 typedef unsigned int    UINT;					/* unsigned int				 */
 typedef          float  FLOT;					/* float					 */
 typedef          double DBLE;					/* double					 */
+typedef          bool   BOOL;					/* bool					 */
 
 typedef          long long   SLLG;				/* long	long				 */
 typedef unsigned long long   ULLG;				/* unsigned long long		 */
@@ -70,25 +71,25 @@ enum GYRO_STATE {
 	GSTA_UNSTABLE,								/* 不安定					 */
 	GSTA_STABILITY,								/* 安定						 */
 	GSTA_FALLING								/* 転倒						 */
-}
+};
 
 /* カラーセンサカラー ------------------------------------------------------ */
-enum COLOR {
-	COLOR_BLACK,								/* ブラック					 */
-	COLOR_GRAY,									/* グレー					 */
-	COLOR_WHITE									/* ホワイト					 */
-}
+enum SENC_CLR {
+	SCLR_BLACK,									/* ブラック					 */
+	SCLR_GRAY,									/* グレー					 */
+	SCLR_WHITE									/* ホワイト					 */
+};
 /* 選択走行ルート ---------------------------------------------------------- */
 enum RUNNING_ROUTE {
 	RROUTE_WAITING,								/* 不安定					 */
 	RROUTE_RIGHT,								/* 右コース					 */
 	RROUTE_LEFT									/* 左コース					 */
-}
+};
 /* トレースモード ---------------------------------------------------------- */
 enum TRACE_MODE {
 	TMODE_EDGE,									/* エッジトレース			 */
 	TMODE_SEARCH								/* 探索						 */
-}
+};
 
 /* ------------------------------------------------------------------------- */
 /*              Copyright HAL Collage of Technology & Design                 */

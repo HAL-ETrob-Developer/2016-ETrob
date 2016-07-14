@@ -3,15 +3,15 @@
 #ifndef DEVICEOPE_TAILADMIN_OHS_H_
 #define DEVICEOPE_TAILADMIN_OHS_H_
 
-#define GAIN		( 2.5F);
-#define MAX_TARGET	(  100);
-#define MIN_TARGET	( -100);
+#define GAIN		( 2.5F)
+#define MAX_TARGET	(  100)
+#define MIN_TARGET	( -100)
 
 class TailAdmin_ohs
 {
-	public:
+    public:
     //生成
-    TailAdmin_ohs();
+    TailAdmin_ohs( ev3api::Motor& tail_wheel );
     //デストラクタ 死ぬときあるよ
     ~TailAdmin_ohs();
 
@@ -22,9 +22,9 @@ class TailAdmin_ohs
 
 
 	private:
-		ev3api::Motor& mTailWheel;
-		int32_t mTailDeg;
-		SINT mTailTarget;
+    ev3api::Motor& mTailWheel;
+    int32_t mTailDeg;
+    SINT mTailTarget;
 };
 
 #endif  // DEVICEOPE_TAILADMIN_OHS_H_
