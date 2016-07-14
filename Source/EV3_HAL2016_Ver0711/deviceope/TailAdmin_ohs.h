@@ -1,23 +1,30 @@
-/* by ohs50465 T.UENO */
+﻿/* by ohs50465 T.UENO */
 
 #ifndef DEVICEOPE_TAILADMIN_OHS_H_
 #define DEVICEOPE_TAILADMIN_OHS_H_
 
-class TailAdmin_ohs {
-public:
+#define GAIN		( 2.5F);
+#define MAX_TARGET	(  100);
+#define MIN_TARGET	( -100);
+
+class TailAdmin_ohs
+{
+	public:
     //生成
     TailAdmin_ohs();
     //デストラクタ 死ぬときあるよ
-        virtual ~TailAdmin_ohs();
+    ~TailAdmin_ohs();
 
-    void callTailDegreeUpDate();
-    void postTailDegree();
+    void callTailDegreeUpdate();
+	BOOL postTailDegree( int32_t postTailDeg );
     void callTailDegree();
-    void getTailDegree();
+    int32_t getTailDegree();
 
 
-private:
-
+	private:
+		ev3api::Motor& mTailWheel;
+		int32_t mTailDeg;
+		SINT mTailTarget;
 };
 
 #endif  // DEVICEOPE_TAILADMIN_OHS_H_
