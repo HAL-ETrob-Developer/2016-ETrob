@@ -8,11 +8,17 @@ public:
     //生成
     Balancer_ohs();
     //デストラクタ 死ぬときあるよ
-        virtual ~Balancer_ohs();
+    ~Balancer_ohs();
 
-    void getPWM();
-
+    BOOL calcPWM( int8_t spd, int8_t deg );
+    int8_t isRightDeg( void );
+    int8_t isLeftDeg( void );
 private:
+    RunningAdmin_ohs* mRunningAdmin;
+    GyroAdmin_ohs* mGyroAdmin;
+    int8_t mRightPwm;
+    int8_t mLeftPwm;
+
 
 };
 

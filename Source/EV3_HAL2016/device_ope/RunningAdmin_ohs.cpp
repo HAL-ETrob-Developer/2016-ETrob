@@ -63,3 +63,14 @@ void RayReflectAdmin_ohs::getTheRunningPWM() {
 void RayReflectAdmin_ohs::getTheRunningVector() {
 	return ( rightPwm - leftPwm );
 }
+
+/**
+ * 実指示走行角度取得
+ */
+void RunningAdmin_ohs::isRightRotary() {
+	return ( mRightRotary );
+}
+
+void RunningAdmin_ohs::isLeftRotary() {
+	return ( mLeftRotary );
+}

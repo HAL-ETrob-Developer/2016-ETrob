@@ -17,12 +17,14 @@ public:
     void getRunningAngle();
     void getTheRunningPWM();
     void getTheRunningVector();
+    int32_t isRightRotary();
+    int32_t isLeftRotary();
 
 private:
-	int32_t rightRotary;
-	int32_t leftRotary;
-	int rightPwm;
-	int leftPwm;
+	int32_t mRightRotary;
+	int32_t mLeftRotary;
+	int32_t mRightPwm;
+	int32_t mLeftPwm;
 };
 
 #endif  // DEVICEOPE_RUNNINGADMIN_OHS_H_
