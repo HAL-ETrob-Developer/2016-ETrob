@@ -23,7 +23,7 @@ Balancer_ohs::~Balancer_ohs() {
 /**
  * モータ出力値計算
  */
-BOOL Balancer_ohs::getPWM( int8_t spd, int8_t deg ) {
+BOOL Balancer_ohs::calcPWM( int8_t spd, int8_t deg ) {
     FLOT fGyroValue = 0;
     FLOT fOffSet = 0;
     FLOT fNowRDeg = 0;
@@ -59,13 +59,13 @@ BOOL Balancer_ohs::getPWM( int8_t spd, int8_t deg ) {
 /**
  * モータ出力値計算
  */
-int8_t Balancer_ohs::isRightDeg() {
+int8_t Balancer_ohs::isRightPWM() {
     return ( mRightPwm );
 }
 
 /**
  * モータ出力値計算
  */
-int8_t Balancer_ohs::isLeftDeg() {
+int8_t Balancer_ohs::isLeftPWM() {
     return ( mLeftPwm );
 }
