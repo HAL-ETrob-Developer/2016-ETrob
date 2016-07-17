@@ -3,3 +3,4 @@ ET2016_rev0.4.2.asta.lock
 #vscode
 .vscode
 .DS_store
+.clang-format

@@ -9,14 +9,15 @@
 /**
  * コンストラクタ
  */
-LineTracer_ohs::LineTracer_ohs( RunningAdmin_ohs* running_admin,,RayReflectAdomin_ohs* ray_reflect_adomin, RunningLineCalculator_ohs* running_line_calculator )
+LineTracer_ohs::LineTracer_ohs( RunningAdmin_ohs* running_admin,,RayReflectAdmin_ohs* ray_reflect_admin, RunLineCalculator_ohs* run_line_calculator )
 :mRunningAdmin(running_admin)
- mRayReflectAdomin( ray_reflect_adomin ),
- mRunningLineCalclator( running_line_calclator )
+ mRayReflectAdmin( ray_reflect_admin ),
+ mRunLineCalculator( run_line_calculator )
 {
     mGetColor = SCLR_GRAY;
     mSpeed = 0;
     mDeg   = 0;
+    mGain = 0;
 }
 
 /**
@@ -36,19 +37,24 @@ void LineTracer_ohs::postLineTraceConduct() {
  * ライントレース実行
  */
 void LineTracer_ohs::callLineTraceAct() {
+    static ULNG ulClrCounter = 0;
+
     //実行指揮の確認 
     if( mLineTraceGo == false ) { return; }//ライントレース指揮無し
     //フラグリセット
     mLineTraceGo = false;
 
     /* 光学反射値の取得 */
-    mGetColor = mRayReflectAdomin->getReflectValue();
+    mGetColor = mRayReflectAdmin->getState();
+
     /* ラインが白か否かの判別 */
-    if( mGetColor == SCLR_WHITE ) {
-        /* 白ならラインエッジトレースへ */
+    if( mGetColor == SCLR_WHITE ) { ulClrCounter; }
+
+    if( ulClrCounter < SEARCH_SW ) {
         execLineEdgeTrace();
+        ulClrCounter = 0;
     } else {
-        /* 白以外ならライン探索へ */
+        /* 一定以上白を連続して検出 */
         execLineSearch();
     }
 
@@ -63,13 +69,11 @@ void LineTracer_ohs::callLineTraceAct() {
  */
 void LineTracer_ohs::execLineEdgeTrace() {
     /* ライン探索ゲインのリセット */
-
-    /* 光学センサ値の取得 */
-    //mRayReflectAdomin->getReflectState();<-mGetColorに入ってます
+    mGain = 0;
     /* 左右モータの実指示値を取得(保留) */
 
     /* PID計算 */
-    mRunningLineCalculator->calcRunningLine( mGetColor, &mSpeed, &mDeg );
+    mRunLineCalculator->calcRunLine( mGetColor, &mSpeed, &mDeg );
     /* 走行速度 */
     if( mSpeed > MAX_SPEED ){
         mSpeed = MAX_SPEED;
@@ -87,12 +91,12 @@ void LineTracer_ohs::execLineEdgeTrace() {
 /**
  * ラインサーチ
  */
-void LineTracer_ohs::execLineSearch() {
-    /* ライン探索ゲインの取得 */
-
-    /* ゲイン比に基づき走行速度減 */
-
+void LineTracer_ohs::execLineSearch()
+{
+    /* 固定速度で走行 */
+    mSpeed = ( int8_t )( 30 );
     /* ゲイン比に基づき走行角度をCCWへ */
-
-    /* ライン探索ゲインの上昇 */    
+    mDeg = ( int8_t )( -50.0F * mGain );
+    /* ライン探索ゲインの上昇 */
+    mGain += RISE;
 }

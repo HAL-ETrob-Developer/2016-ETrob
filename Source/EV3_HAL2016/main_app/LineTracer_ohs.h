@@ -7,11 +7,13 @@
 #define MIN_SPEED (     -100 )
 #define MAX_DEGRE (       50 )
 #define MIN_DEGRE (      -50 )
+#define RISE      (      0.01)
+#define SEARCH_SW (    10000 )
 
 class LineTracer_ohs {
 public:
     //生成
-    LineTracer_ohs( RunningAdmin_ohs* running_admin, RayReflectAdomin_ohs* ray_reflect_adomin, RunningLineCalculator_ohs* running_line_calculator );
+    LineTracer_ohs( RunningAdmin_ohs* running_admin, RayReflectAdomin_ohs* ray_reflect_adomin, RunLineCalculator_ohs* running_line_calculator );
     //デストラクタ 死ぬときあるよ
     ~LineTracer_ohs();
 
@@ -23,13 +25,16 @@ private:
     void execLineEdgeTrace();
     void execLineSearch();
     //メンバ
-    RunningAdmin_ohs* mRunningAdmin;
-    RayReflectAdomin_ohs*  mRayReflectAdomin;
-    RunningLineCalculator_ohs*  mRunningLineCalclator;
+    RunningAdmin_ohs*      mRunningAdmin;
+    RayReflectAdmin_ohs*   mRayReflectAdmin;
+    RunLineCalculator_ohs* mRunLineCalculator;
+
     SENC_CLR mGetColor;
-    BOOL mLineTraceGo;
+    BOOL   mLineTraceGo;
+    FLOT   mGain;
     int8_t mSpeed;
     int8_t mDeg;
+
 };
 
 #endif  // MAINAPP_LINETRACER_OHS_H_
