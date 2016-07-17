@@ -5,16 +5,18 @@
 #define DEVICEOPE_GYRO_ADMIN_OHS_H_
 
 #include <string.h>
+#include "ev3api.h"
+#include "GyroSensor.h"
 
 #define QUEUE_MAX	(  127 )		/* キュー個数 */
 
 /* ゲイン値 */
-#define	GAIN_NOW		( 0.1F )		/* 現在 */
-#define	GAIN_OLD		( 0.9F )		/* 過去 */
+#define	GAIN_NOW		( 0.2F )		/* 現在 */
+#define	GAIN_OLD		( 0.8F )		/* 過去 */
 
 /* 閾値 */
 #define	THRESHOLD_STABILITY		(  50 )		/* 安定 */
-#define	THRESHOLD_FALLING		(  300 )	/* 転倒 */
+#define	THRESHOLD_FALLING		(  100 )	/* 転倒 */
 
 class GyroAdmin_ohs
 {

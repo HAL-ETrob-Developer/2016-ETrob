@@ -1,15 +1,13 @@
+#include "hal_ev3_std.h"
+#include "RunningAdmin_ohs.h"
 #include "Balancer_ohs.h"
-#include "balancer.h"
-#include "ev3api.h"
 
 /**
  * コンストラクタ
  */
-Balancer_ohs::Balancer_ohs( RunningAdmin_ohs* running_admin, 
-                                GyroAdmin_ohs* gyro_admin )
+Balancer_ohs::Balancer_ohs( GyroAdmin_ohs* gyro_admin )
+:mGyroAdmin( gyro_admin )
 {
-    mRunningAdmin = running_admin;
-    mGyroAdmin    = gyro_admin;
     mRightPwm     = 0;
     mLeftPwm      = 0;
 }
@@ -20,25 +18,26 @@ Balancer_ohs::Balancer_ohs( RunningAdmin_ohs* running_admin,
 Balancer_ohs::~Balancer_ohs() {
 }
 
-/**
+/**    RunningAdmin_ohs* mRunningAdmin;
+
  * モータ出力値計算
  */
-BOOL Balancer_ohs::calcPWM( int8_t spd, int8_t deg ) {
+BOOL Balancer_ohs::calcPWM( int8_t spd, int8_t deg, void* running_admin ) {
     FLOT fGyroValue = 0;
-    FLOT fOffSet = 0;
+    FLOT fOffSet  = 0;
     FLOT fNowRDeg = 0;
     FLOT fNowLDeg = 0;
     FLOT fBattery = 0;
-
+    RunningAdmin_ohs* RunningAdmin = ( RunningAdmin_ohs* )running_admin;
     //ジャイロ値の取得
     fGyroValue =   ( FLOT )mGyroAdmin->getValue();
 
     //モータ回転値の取得
-    fNowRDeg = ( FLOT )mRunningAdmin->isRightRotary();
-    fNowLDeg = ( FLOT )mRunningAdmin->isLeftRotary();
+    fNowRDeg = ( FLOT )RunningAdmin->isRightRotary();
+    fNowLDeg = ( FLOT )RunningAdmin->isLeftRotary();
 
     //バッテリー残量
-    FLOT fBattery = ( FLOT )ev3_battery_voltage_mV();
+    fBattery = ( FLOT )ev3_battery_voltage_mV();
 
     // 倒立振子制御APIを呼び出し、倒立走行するための
     // 左右モータ出力値を得る

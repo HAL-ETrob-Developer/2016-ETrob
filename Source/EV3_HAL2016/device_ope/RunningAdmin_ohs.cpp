@@ -1,14 +1,13 @@
-﻿#include "RunningAdmin_ohs.h"
+﻿#include "hal_ev3_std.h"
+#include "RunningAdmin_ohs.h"
 
 /**
  * コンストラクタ
  */
-RayReflectAdmin_ohs::RayReflectAdmin_ohs(   ev3api::Motor &leftwheel,
-                                            ev3api::Motor &rightwheel,
-                                            Baranser_ohs  *baranser )
-    : mLeftWheel( leftwheel ),
-    mRightWheel( rightwheel ),
-    mBaranser( baranser )
+RunningAdmin_ohs::RunningAdmin_ohs( ev3api::Motor& leftwheel, ev3api::Motor& rightwheel,  Balancer_ohs* balancer )
+:mLeftWheel( leftwheel ),
+ mRightWheel( rightwheel ),
+ mBalancer( balancer )
 {
     mRightRotary = 0;
     mLeftRotary  = 0;
@@ -19,14 +18,14 @@ RayReflectAdmin_ohs::RayReflectAdmin_ohs(   ev3api::Motor &leftwheel,
 /**
  * デストラクタ
  */
-RayReflectAdmin_ohs::~RayReflectAdmin_ohs( )
+RunningAdmin_ohs::~RunningAdmin_ohs( )
 {
 }
 
 /**
  * 走行量更新
  */
-void RayReflectAdmin_ohs::callRunningValueUpDate ( )
+void RunningAdmin_ohs::callValueUpDate ( )
 {
     mRightRotary = mRightWheel.getCount( );
     mLeftRotary  = mLeftWheel.getCount( );
@@ -35,13 +34,13 @@ void RayReflectAdmin_ohs::callRunningValueUpDate ( )
 /**
  * 走行指示
  */
-void RayReflectAdmin_ohs::postRunning ( int32_t speed, int32_t deg, BOOL baranser )
+void RunningAdmin_ohs::postRunning ( int32_t speed, int32_t deg, BOOL baranser )
 {
     // バランス制御有無
     if( baranser ) {
-        mBaranser->calcPWM( speed, deg );
-        mRightPwm = Baranser->isRightPWM( );
-        mLeftPwm  = Baranser->isLeftPWM( );
+        mBalancer->calcPWM( speed, deg, this );
+        mRightPwm = mBalancer->isRightPWM( );
+        mLeftPwm  = mBalancer->isLeftPWM( );
     } else {
         mRightPwm = speed - deg;
         mLeftPwm  = speed + deg;
@@ -62,7 +61,7 @@ void RayReflectAdmin_ohs::postRunning ( int32_t speed, int32_t deg, BOOL baranse
 /**
  * 走行実行
  */
-void RayReflectAdmin_ohs::callRunning ( )
+void RunningAdmin_ohs::callRunning ( )
 {
     mRightWheel.setPWM( mRightPwm );            // 右モータ回転
     mLeftWheel.setPWM( mLeftPwm );              // 左モータ回転
@@ -71,15 +70,15 @@ void RayReflectAdmin_ohs::callRunning ( )
 /**
  * 走行距離取得
  */
-void RayReflectAdmin_ohs::getRunningMileage ( )
+int32_t RunningAdmin_ohs::getMileage ( )
 {
-    return ( mRightRotary + mLeftRotary ) / 2;
+    return (( mRightRotary + mLeftRotary ) / 2 );
 }
 
 /**
  * 走行角度取得
  */
-void RayReflectAdmin_ohs::getRunningAngle ( )
+int8_t RunningAdmin_ohs::getAngle ( )
 {
     return mRightRotary - mLeftRotary;
 }
@@ -87,28 +86,28 @@ void RayReflectAdmin_ohs::getRunningAngle ( )
 /**
  * 実指示走行速度取得
  */
-void RayReflectAdmin_ohs::getTheRunningPWM ( )
+int8_t RunningAdmin_ohs::getSpeed ( )
 {
-    return ( mRightPwm + mLeftPwm ) / 2;
+    return (( mRightPwm + mLeftPwm ) / 2 );
 }
 
 /**
  * 実指示走行角度取得
  */
-void RayReflectAdmin_ohs::getTheRunningVector ( )
+int8_t RunningAdmin_ohs::getVector ( )
 {
-    return mRightPwm - mLeftPwm;
+    return ( mRightPwm - mLeftPwm );
 }
 
 /**
  * 実指示走行角度取得
  */
-void RunningAdmin_ohs::isRightRotary ( )
+int32_t RunningAdmin_ohs::isRightRotary ( )
 {
     return mRightRotary;
 }
 
-void RunningAdmin_ohs::isLeftRotary ( )
+int32_t RunningAdmin_ohs::isLeftRotary ( )
 {
     return mLeftRotary;
 }

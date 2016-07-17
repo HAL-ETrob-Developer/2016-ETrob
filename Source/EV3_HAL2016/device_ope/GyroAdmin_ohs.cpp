@@ -1,7 +1,4 @@
-#include "ev3api.h"
 #include "hal_ev3_std.h"
-#include "GyroSensor.h"
-
 #include "GyroAdmin_ohs.h"
 
 /**
@@ -60,23 +57,24 @@ GYRO_STATE GyroAdmin_ohs::getState( void )
 	
 	//安定値チェック
 	for( iIdx = 0; iIdx < QUEUE_MAX; iIdx++){
-		if( mQueue[iIdx] < -THRESHOLD_STABILITY && mQueue[iIdx] > THRESHOLD_STABILITY ){
-			//ジャイロ値確認
+		if( mQueue[iIdx] < -THRESHOLD_STABILITY || mQueue[iIdx] > THRESHOLD_STABILITY ){
+			//ジャイロ値フィルタリング
 			mNowGyroValue = mQueue[mQNo] * GAIN_NOW + mOldGyroValue * GAIN_OLD;
-			if( mNowGyroValue >= THRESHOLD_FALLING || mNowGyroValue <= -THRESHOLD_FALLING ){
+
+			//転倒検知
+			if( mNowGyroValue > THRESHOLD_FALLING || mNowGyroValue < -THRESHOLD_FALLING ){
 				/* 状態：転倒 */
 				mState = GSTA_FALLING;
 			}else{
 				/* 状態：不安定 */
 				mState = GSTA_UNSTABLE;
 			}
+
+			break;
 		}		
 	}
-	
-	if( iIdx == QUEUE_MAX ){
-		/* 状態：安定 */
-		mState = GSTA_STABILITY;
-	}
+	/* 状態：安定 */
+	if( iIdx == QUEUE_MAX ){ mState = GSTA_STABILITY; }
 	
 	//ジャイロ値を過去ジャイロ値に記録
 	mOldGyroValue = mNowGyroValue;
