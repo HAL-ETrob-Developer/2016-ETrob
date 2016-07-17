@@ -39,7 +39,7 @@ class RayReflectAdmin_ohs
 
 		/* メソッド */
 		void setLowPassFilter( void );				//ローパスフィルタ
-	
+		int8_t getClrCvtBright( void );				//カラーセンサ
 };
 
 #endif  // DEVICEOPE_RAYREFLECTADMIN_OHS_H_

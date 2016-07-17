@@ -34,12 +34,13 @@ void RayReflectAdmin_ohs::callValueUpDate( void )
 	int8_t cBrightness;
 	static int8_t cNo = 0;
 
-	cBrightness = mColorSensor.getBrightness();	//光学センサの反射値の取得
-	
+	//cBrightness = mColorSensor.getBrightness();	//光学センサの反射値の取得
+	cBrightness = getClrCvtBright();
+
 	//記録キューの更新
-	mQNo = cNo % QUEUE_MAX;
-	mQueue[mQNo] = cBrightness;
 	cNo %= QUEUE_MAX;
+	mQNo = cNo;
+	mQueue[mQNo] = cBrightness;
 	cNo++;
 	
 	//ローパスフィルタ
@@ -69,11 +70,11 @@ SENC_CLR RayReflectAdmin_ohs::getState( void )
 			if( mNowReflValue <= THRESHOLD_BLACK ){
 				/* 状態：ブラック */
 				mState = SCLR_BLACK;
-				break;
 			}else if( mNowReflValue >= THRESHOLD_WHITE ){
 				/* 状態：ホワイト */
 				mState = SCLR_WHITE;
 			}	
+			break;
 		}		
 	}
 	
@@ -90,8 +91,33 @@ SENC_CLR RayReflectAdmin_ohs::getState( void )
  */
 void RayReflectAdmin_ohs::setLowPassFilter( void )
 {
-	mNowReflValue = mQueue[mQNo] * GAIN_NOW + mOldReflValue * GAIN_OLD;	
-	
+	FLOT fNowRef  = ( FLOT )mQueue[mQNo] * GAIN_NOW + ( FLOT )mOldReflValue * GAIN_OLD;
+
+	mNowReflValue = ( int8_t )fNowRef;
+
+
 	//反射値を過去反射値に記録
 	mOldReflValue = mNowReflValue;
+}
+
+int8_t RayReflectAdmin_ohs::getClrCvtBright( void )
+{
+	rgb_raw_t RgbRaw;
+	memset( &RgbRaw, 0, sizeof(RgbRaw));
+
+    SCHR   cString[50];
+    memset( cString , 0, sizeof(cString));
+
+	mColorSensor.getRawColor( RgbRaw );
+
+    /* LCD画面表示 */
+	//Red
+	sprintf(( char* )cString, "Red_Value[%5d]",RgbRaw.r);
+	ev3_lcd_draw_string( cString, 0, 8*3);
+	sprintf(( char* )cString, "Red_Value[%5d]",RgbRaw.g);
+	ev3_lcd_draw_string( cString, 0, 8*4);
+	sprintf(( char* )cString, "Red_Value[%5d]",RgbRaw.b);
+	ev3_lcd_draw_string( cString, 0, 8*5);
+
+	return (int8_t)((uint32_t)( RgbRaw.r + RgbRaw.g + RgbRaw.b )/3);
 }
