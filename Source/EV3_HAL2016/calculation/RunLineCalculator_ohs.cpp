@@ -1,6 +1,4 @@
-#include "ev3api.h"
 #include "hal_ev3_std.h"
-
 #include "RunLineCalculator_ohs.h"
 
 /**
@@ -8,7 +6,8 @@
  */
 RunLineCalculator_ohs::RunLineCalculator_ohs()
 {
-    mColorState = SCLR_GRAY; 
+	mAfterColor = SCLR_GRAY;
+	mBeforeColor = SCLR_GRAY;
 
     mSpeed  = 0;
     mDeg    = 0;
@@ -27,7 +26,8 @@ RunLineCalculator_ohs::~RunLineCalculator_ohs() {
 /**
  * モータ出力値計算
  */
-void RunLineCalculator_ohs::calcRunLine( SENC_CLR color, int8_t* p_speed, int8_t* p_deg ) {
+void RunLineCalculator_ohs::calcRunLine( SENC_CLR color, int8_t* p_speed, int8_t* p_deg )
+{
     static FLOT fNowDeflect = 0;
     static FLOT fOldDeflect = 0;
            char cSpeedRev   = 1;
@@ -64,8 +64,8 @@ void RunLineCalculator_ohs::calcRunLine( SENC_CLR color, int8_t* p_speed, int8_t
     mSpeed = ( int8_t )( TERGET_SPD - K_I_SPD * ( mIValue * cSpeedRev ));
 
     //走行パラメータの返却
-    *p_speed　= mSpeed;
-    *p_deg  　= mDeg;
+    *p_speed = mSpeed;
+    *p_deg   = mDeg;
 
     //値の保存
     mBeforeColor = mAfterColor;
