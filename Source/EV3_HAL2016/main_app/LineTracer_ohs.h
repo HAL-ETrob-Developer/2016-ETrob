@@ -3,6 +3,10 @@
 #ifndef MAINAPP_LINETRACER_OHS_H_
 #define MAINAPP_LINETRACER_OHS_H_
 
+#include "../calculation/RunLineCalculator_ohs.h"
+#include "../device_ope/RunningAdmin_ohs.h"
+#include "../device_ope/RayReflectAdmin_ohs.h"
+
 #define MAX_SPEED (      100 )
 #define MIN_SPEED (     -100 )
 #define MAX_DEGRE (       50 )
@@ -13,11 +17,12 @@
 class LineTracer_ohs {
 public:
     //生成
-    LineTracer_ohs( RunningAdmin_ohs* running_admin, RayReflectAdomin_ohs* ray_reflect_adomin, RunLineCalculator_ohs* running_line_calculator );
+    LineTracer_ohs( RunningAdmin_ohs* running_admin, RayReflectAdmin_ohs* ray_reflect_adomin, RunLineCalculator_ohs* running_line_calculator );
     //デストラクタ 死ぬときあるよ
     ~LineTracer_ohs();
 
     void postLineTraceConduct();
+    void postLineTraceStop();
     void callLineTraceAct();
 
 private:

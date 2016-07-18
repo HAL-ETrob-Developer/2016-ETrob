@@ -1,16 +1,12 @@
 #include "ev3api.h"
 #include "hal_ev3_std.h"
-#include "RunningAdmin_ohs.h"
-#include "RayReflectAdmin_ohs.h"
-#include "RunLineCalculator_ohs.h"
-
 #include "LineTracer_ohs.h"
 
 /**
  * コンストラクタ
  */
-LineTracer_ohs::LineTracer_ohs( RunningAdmin_ohs* running_admin,,RayReflectAdmin_ohs* ray_reflect_admin, RunLineCalculator_ohs* run_line_calculator )
-:mRunningAdmin(running_admin)
+LineTracer_ohs::LineTracer_ohs( RunningAdmin_ohs* running_admin, RayReflectAdmin_ohs* ray_reflect_admin, RunLineCalculator_ohs* run_line_calculator )
+:mRunningAdmin(running_admin),
  mRayReflectAdmin( ray_reflect_admin ),
  mRunLineCalculator( run_line_calculator )
 {
@@ -34,6 +30,13 @@ void LineTracer_ohs::postLineTraceConduct() {
 }
 
 /**
+ * ライントレース停止指示
+ */
+void LineTracer_ohs::postLineTraceStop() {
+    mLineTraceGo = false;
+}
+
+/**
  * ライントレース実行
  */
 void LineTracer_ohs::callLineTraceAct() {
@@ -41,8 +44,6 @@ void LineTracer_ohs::callLineTraceAct() {
 
     //実行指揮の確認 
     if( mLineTraceGo == false ) { return; }//ライントレース指揮無し
-    //フラグリセット
-    mLineTraceGo = false;
 
     /* 光学反射値の取得 */
     mGetColor = mRayReflectAdmin->getState();
@@ -77,13 +78,13 @@ void LineTracer_ohs::execLineEdgeTrace() {
     /* 走行速度 */
     if( mSpeed > MAX_SPEED ){
         mSpeed = MAX_SPEED;
-    } eise if( mSpeed < MIN_SPEED ) {
+    } else if( mSpeed < MIN_SPEED ) {
         mSpeed = MIN_SPEED;
     }
     /* 角度の決定 */
     if( mDeg > MAX_DEGRE ){
         mDeg = MAX_DEGRE;
-    } eise if( mDeg < MIN_DEGRE ) {
+    } else if( mDeg < MIN_DEGRE ) {
         mDeg = MIN_DEGRE;
     }
 }

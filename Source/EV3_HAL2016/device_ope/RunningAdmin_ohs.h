@@ -4,7 +4,7 @@
 
 #include "ev3api.h"
 #include "Motor.h"
-#include "Balancer_ohs.h"
+#include "../calculation/Balancer_ohs.h"
 
 #define PWM_MAX ( 100 )
 class RunningAdmin_ohs

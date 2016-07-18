@@ -1,7 +1,5 @@
 #include <string.h>
-#include "ev3api.h"
 #include "hal_ev3_std.h"
-#include "ColorSensor.h"
 
 #include "RayReflectAdmin_ohs.h"
 

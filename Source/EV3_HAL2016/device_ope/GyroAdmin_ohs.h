@@ -11,8 +11,8 @@
 #define QUEUE_MAX	(  127 )		/* キュー個数 */
 
 /* ゲイン値 */
-#define	GAIN_NOW		( 0.2F )		/* 現在 */
-#define	GAIN_OLD		( 0.8F )		/* 過去 */
+#define	GYR_GAIN_NOW		( 0.2F )		/* 現在 */
+#define	GYR_GAIN_OLD		( 0.8F )		/* 過去 */
 
 /* 閾値 */
 #define	THRESHOLD_STABILITY		(  50 )		/* 安定 */

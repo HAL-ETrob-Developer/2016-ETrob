@@ -3,8 +3,10 @@
 #ifndef DEVICEOPE_TAILADMIN_OHS_H_
 #define DEVICEOPE_TAILADMIN_OHS_H_
 
-#define P_GAIN		( 2.5F)
-#define D_GAIN		( 5.0F)
+#include "Motor.h"
+
+#define TIL_P_GAIN		( 2.5F)
+#define TIL_D_GAIN		( 5.0F)
 #define MAX_TARGET	(  100)
 #define MIN_TARGET	( -100)
 

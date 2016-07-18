@@ -4,6 +4,9 @@
 #ifndef DEVICEOPE_RAY_REFLECT_ADMIN_OHS_H_
 #define DEVICEOPE_RAY_REFLECT_ADMIN_OHS_H_
 
+#include "ev3api.h"
+#include "ColorSensor.h"
+
 #define QUEUE_MAX	(  127 )		/* キュー個数 */	
 
 /* ゲイン値 */

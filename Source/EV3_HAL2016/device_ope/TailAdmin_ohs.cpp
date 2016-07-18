@@ -1,5 +1,4 @@
 ﻿#include "ev3api.h"
-#include "Motor.h"
 #include "hal_ev3_std.h"
 #include "TailAdmin_ohs.h"
 
@@ -34,7 +33,7 @@ void TailAdmin_ohs::callTailDegreeUpdate() {
 BOOL TailAdmin_ohs::postTailDegree( int32_t post_tail_deg ) {
 	BOOL overflag = false;
 	
-	mTailTarget = ( post_tail_deg - mTailDeg) * P_GAIN + ( mTailTarget - mOldTarget ) * D_GAIN;
+	mTailTarget = ( post_tail_deg - mTailDeg) * TIL_P_GAIN + ( mTailTarget - mOldTarget ) * TIL_D_GAIN;
 
 	if (mTailTarget > MAX_TARGET){
 		mTailTarget = MAX_TARGET;

@@ -8,10 +8,12 @@
  **   —š—ð       : y_yama - Tue Sep 25 11:37:09 2007
  **                takashic - Sun Sep 28 17:50:53 2008
  **
- ** Copyright (c) 2009-2015 MathWorks, Inc.
+ ** Copyright (c) 2009-2016 MathWorks, Inc.
  ** All rights reserved.
  ******************************************************************************
  **/
+#ifndef _ETROBO_BALANCER_H_INCLUDED
+#define _ETROBO_BALANCER_H_INCLUDED
 
 #ifdef __cplusplus
 extern "C" {
@@ -89,7 +91,10 @@ extern void balance_control(float args_cmd_forward, float args_cmd_turn,
  * rtw_embedded_coder                                                         *
  * simulink                                                                   *
  *============================================================================*/
+/******************************** END OF FILE ********************************/
+
 #ifdef __cplusplus
 }
 #endif
-/******************************** END OF FILE ********************************/
+
+#endif /* ! _ETROBO_BALANCER_H_INCLUDED */

@@ -5,7 +5,7 @@
 
 #include "balancer.h"
 #include "ev3api.h"
-#include "GyroAdmin_ohs.h"
+#include "../device_ope/GyroAdmin_ohs.h"
 
 class Balancer_ohs {
 public:

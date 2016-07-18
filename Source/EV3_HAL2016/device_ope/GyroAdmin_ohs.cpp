@@ -59,7 +59,7 @@ GYRO_STATE GyroAdmin_ohs::getState( void )
 	for( iIdx = 0; iIdx < QUEUE_MAX; iIdx++){
 		if( mQueue[iIdx] < -THRESHOLD_STABILITY || mQueue[iIdx] > THRESHOLD_STABILITY ){
 			//ジャイロ値フィルタリング
-			mNowGyroValue = mQueue[mQNo] * GAIN_NOW + mOldGyroValue * GAIN_OLD;
+			mNowGyroValue = mQueue[mQNo] * GYR_GAIN_NOW + mOldGyroValue * GYR_GAIN_OLD;
 
 			//転倒検知
 			if( mNowGyroValue > THRESHOLD_FALLING || mNowGyroValue < -THRESHOLD_FALLING ){
