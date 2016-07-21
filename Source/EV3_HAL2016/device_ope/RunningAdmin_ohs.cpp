@@ -13,6 +13,10 @@ RunningAdmin_ohs::RunningAdmin_ohs( ev3api::Motor& leftwheel, ev3api::Motor& rig
     mLeftRotary  = 0;
     mRightPwm    = 0;
     mLeftPwm     = 0;
+
+    mFront = 0;
+    mTurn = 0;
+    mBalanceF = false;
 }
 
 /**
@@ -29,21 +33,44 @@ void RunningAdmin_ohs::callValueUpDate ( )
 {
     mRightRotary = mRightWheel.getCount( );
     mLeftRotary  = mLeftWheel.getCount( );
+
+#ifdef PRINT
+	char cString[50];
+	memset( cString, 0, sizeof( cString ));
+	sprintf(( char* )cString, "mRightRotary[%5d]",mRightRotary);
+	ev3_lcd_draw_string( cString, 0, 8*9);
+	sprintf(( char* )cString, "mRightRotary[%5d]",mLeftRotary);
+	ev3_lcd_draw_string( cString, 0, 8*10);
+	sprintf(( char* )cString, "mRightPwm[%5d]",mRightPwm);
+	ev3_lcd_draw_string( cString, 0, 8*11);
+	sprintf(( char* )cString, "mLeftPwm[%5d]",mLeftPwm);
+	ev3_lcd_draw_string( cString, 0, 8*12);
+#endif
 }
 
 /**
  * 走行指示
  */
-void RunningAdmin_ohs::postRunning ( int32_t speed, int32_t deg, BOOL baranser )
+void RunningAdmin_ohs::postRunning ( int32_t speed, int32_t deg, BOOL balancer )
+{
+    mFront    = (int8_t)speed;
+    mTurn     = (int8_t)deg;
+    mBalanceF = balancer;
+}
+
+/**
+ * 走行実行
+ */
+void RunningAdmin_ohs::callRunning ( )
 {
     // バランス制御有無
-    if( baranser ) {
-        mBalancer->calcPWM( speed, deg, this );
+    if( mBalanceF ) {
+        mBalancer->calcPWM( mFront, mTurn, this );
         mRightPwm = mBalancer->isRightPWM( );
         mLeftPwm  = mBalancer->isLeftPWM( );
     } else {
-        mRightPwm = speed - deg;
-        mLeftPwm  = speed + deg;
+        mRightPwm = mFront - mTurn;
+        mLeftPwm  = mFront + mTurn;
     }
     // 消すかも
     if( mRightPwm > PWM_MAX ) {
@@ -56,13 +83,7 @@ void RunningAdmin_ohs::postRunning ( int32_t speed, int32_t deg, BOOL baranser )
     } else if( mLeftPwm < -PWM_MAX ) {
         mLeftPwm = -PWM_MAX;
     } // 消すかもここまで
-}
-
-/**
- * 走行実行
- */
-void RunningAdmin_ohs::callRunning ( )
-{
+    
     mRightWheel.setPWM( mRightPwm );            // 右モータ回転
     mLeftWheel.setPWM( mLeftPwm );              // 左モータ回転
 }

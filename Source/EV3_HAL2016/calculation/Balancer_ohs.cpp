@@ -10,6 +10,8 @@ Balancer_ohs::Balancer_ohs( GyroAdmin_ohs* gyro_admin )
 {
     mRightPwm     = 0;
     mLeftPwm      = 0;
+
+    balance_init();  // 倒立振子制御初期化
 }
 
 /**
@@ -44,11 +46,11 @@ BOOL Balancer_ohs::calcPWM( int8_t spd, int8_t deg, void* running_admin ) {
     balance_control(
         static_cast<float>(spd),
         static_cast<float>(deg),
-        fGyroValue,
-        fOffSet,
-        fNowLDeg,
-        fNowRDeg,
-        fBattery,
+        static_cast<float>( fGyroValue ),
+        static_cast<float>( fOffSet ),
+        static_cast<float>( fNowLDeg ),
+        static_cast<float>( fNowRDeg ),
+        static_cast<float>( fBattery ),
         &mLeftPwm,
         &mRightPwm);
 

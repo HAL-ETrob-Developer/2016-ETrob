@@ -36,6 +36,26 @@ void LineTracer_ohs::postLineTraceStop() {
     mLineTraceGo = false;
 }
 
+
+void LineTracer_ohs::callSimplLineTraceAct() {
+    //実行指揮の確認 
+    if( mLineTraceGo == false ) { return; }//ライントレース指揮無し
+    /* 光学反射値の取得 */
+    mGetColor = mRayReflectAdmin->getState();
+  
+    /* ラインが白か否かの判別 */
+    if( mGetColor == SCLR_WHITE ) {
+        mDeg = -LT_DEGRE_SLT;
+    } else {
+        mDeg = LT_DEGRE_SLT;
+    }
+    //走行速度の決定
+    mSpeed = LT_SPEED_SLT;
+
+    //走行指示
+    mRunningAdmin->postRunning( mSpeed, mDeg, true );//(走行速度,走行角度,バランス制御の有無)
+}
+
 /**
  * ライントレース実行
  */
@@ -49,7 +69,7 @@ void LineTracer_ohs::callLineTraceAct() {
     mGetColor = mRayReflectAdmin->getState();
 
     /* ラインが白か否かの判別 */
-    if( mGetColor == SCLR_WHITE ) { ulClrCounter; }
+    if( mGetColor == SCLR_WHITE ) { ulClrCounter++; }
 
     if( ulClrCounter < SEARCH_SW ) {
         execLineEdgeTrace();
@@ -76,16 +96,16 @@ void LineTracer_ohs::execLineEdgeTrace() {
     /* PID計算 */
     mRunLineCalculator->calcRunLine( mGetColor, &mSpeed, &mDeg );
     /* 走行速度 */
-    if( mSpeed > MAX_SPEED ){
-        mSpeed = MAX_SPEED;
-    } else if( mSpeed < MIN_SPEED ) {
-        mSpeed = MIN_SPEED;
+    if( mSpeed > LT_MAX_SPEED ){
+        mSpeed = LT_MAX_SPEED;
+    } else if( mSpeed < LT_MIN_SPEED ) {
+        mSpeed = LT_MIN_SPEED;
     }
     /* 角度の決定 */
-    if( mDeg > MAX_DEGRE ){
-        mDeg = MAX_DEGRE;
-    } else if( mDeg < MIN_DEGRE ) {
-        mDeg = MIN_DEGRE;
+    if( mDeg > LT_MAX_DEGRE ){
+        mDeg = LT_MAX_DEGRE;
+    } else if( mDeg < LT_MIN_DEGRE ) {
+        mDeg = LT_MIN_DEGRE;
     }
 }
 

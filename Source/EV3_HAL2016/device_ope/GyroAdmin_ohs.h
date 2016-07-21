@@ -28,6 +28,7 @@ class GyroAdmin_ohs
 		~GyroAdmin_ohs();
 
 		/* メソッド */
+		bool        initDegree();
 		void 		callValueUpdate( void );	//ジャイロセンサの値の更新
 		int16_t 	getValue( void );			//ジャイロセンサの値の取得
 		GYRO_STATE	getState( void );				//ジャイロセンサ状態の取得
@@ -37,9 +38,11 @@ class GyroAdmin_ohs
 		ev3api::GyroSensor& mGyroSensor;
 		int16_t mNowGyroValue;
 		int16_t mOldGyroValue;
+		int16_t mOffSet;
 		GYRO_STATE	mState;
 		int8_t mQueue[QUEUE_MAX];
 		uint8_t mQNo;
+		bool mInit;
 
 };
 

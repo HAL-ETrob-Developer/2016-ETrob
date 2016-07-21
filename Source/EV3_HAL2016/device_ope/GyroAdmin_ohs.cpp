@@ -9,9 +9,14 @@ GyroAdmin_ohs::GyroAdmin_ohs( ev3api::GyroSensor& gyro_sensor )
 {
 	mNowGyroValue = 0;
 	mOldGyroValue = 0;
-	
+	mOffSet = 0;
+
 	memset( mQueue, 0, sizeof( mQueue ));
 	mQNo = 0;
+
+	mInit = false;
+
+	initDegree();
 }
 
 /**
@@ -20,23 +25,25 @@ GyroAdmin_ohs::GyroAdmin_ohs( ev3api::GyroSensor& gyro_sensor )
 GyroAdmin_ohs::~GyroAdmin_ohs()
 {
 }
+bool GyroAdmin_ohs::initDegree()
+{
+	mInit = true;
+	mGyroSensor.reset();
+	mOffSet = mGyroSensor.getAnglerVelocity();
+	return mInit;
+}
 
 /**
  * ジャイロセンサの値の更新
  */
 void GyroAdmin_ohs::callValueUpdate( void )
 {
-	int16_t sVelocity;
-	static int8_t cNo = 0;
-	
-	sVelocity = mGyroSensor.getAnglerVelocity();
+	mNowGyroValue = ( mGyroSensor.getAnglerVelocity()) - mOffSet;
 	
 	//記録キューの更新
-	mQNo = cNo % QUEUE_MAX;
-	mQueue[mQNo] = sVelocity;
-	cNo %= QUEUE_MAX;
-	cNo++;
-	
+	mQNo = mQNo % QUEUE_MAX;
+	mQueue[mQNo] = mNowGyroValue;
+	mQNo++;
 }
 
 /**
@@ -44,7 +51,12 @@ void GyroAdmin_ohs::callValueUpdate( void )
  */
 int16_t GyroAdmin_ohs::getValue( void )
 {
-	mNowGyroValue = mQueue[mQNo];		//現在のキューからジャイロ値を取得
+#ifdef PRINT
+	char cString[50];
+	memset( cString, 0, sizeof( cString ));
+	sprintf(( char* )cString, "GyroAdmin_ohs::getValue[%5d]",mNowGyroValue);
+	ev3_lcd_draw_string( cString, 0, 8*6);
+#endif
 	return mNowGyroValue; 
 }
 
@@ -54,15 +66,16 @@ int16_t GyroAdmin_ohs::getValue( void )
 GYRO_STATE GyroAdmin_ohs::getState( void )
 {
 	SINT iIdx = 0;
+	int16_t sVelocity;
 	
 	//安定値チェック
 	for( iIdx = 0; iIdx < QUEUE_MAX; iIdx++){
 		if( mQueue[iIdx] < -THRESHOLD_STABILITY || mQueue[iIdx] > THRESHOLD_STABILITY ){
 			//ジャイロ値フィルタリング
-			mNowGyroValue = mQueue[mQNo] * GYR_GAIN_NOW + mOldGyroValue * GYR_GAIN_OLD;
+			sVelocity = mNowGyroValue * GYR_GAIN_NOW + mOldGyroValue * GYR_GAIN_OLD;
 
 			//転倒検知
-			if( mNowGyroValue > THRESHOLD_FALLING || mNowGyroValue < -THRESHOLD_FALLING ){
+			if( sVelocity > THRESHOLD_FALLING || sVelocity < -THRESHOLD_FALLING ){
 				/* 状態：転倒 */
 				mState = GSTA_FALLING;
 			}else{

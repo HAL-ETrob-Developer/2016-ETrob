@@ -18,9 +18,9 @@ class TailAdmin_ohs
     //デストラクタ 死ぬときあるよ
     ~TailAdmin_ohs();
 
-    void callTailDegreeUpdate();
+    void callValueUpDate();
 	BOOL postTailDegree( int32_t postTailDeg );
-    void callTailDegree();
+    void callActDegree();
     int32_t getTailDegree();
 
 

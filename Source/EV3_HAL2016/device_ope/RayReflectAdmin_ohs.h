@@ -14,8 +14,8 @@
 #define GAIN_OLD	( 0.9F )		/* 過去 */
 
 /* 閾値 */
-#define	THRESHOLD_BLACK	( 20 )		/* ブラック */
-#define	THRESHOLD_WHITE	( 40 )		/* ホワイト */
+#define	THRESHOLD_BLACK	( 30 )		/* ブラック */
+#define	THRESHOLD_WHITE	( 70 )		/* ホワイト */
 
 class RayReflectAdmin_ohs
 {
@@ -28,21 +28,21 @@ class RayReflectAdmin_ohs
 
 		/* メソッド */
 		void callValueUpDate( void );		//光学センサ反射値の更新
-		int8_t getValue( void );				//光学センサ反射値の取得
+		int16_t getValue( void );				//光学センサ反射値の取得
 		SENC_CLR getState( void );			//光学センサの状態の取得
 	
 	private:
 		/* メンバ */
 		ev3api::ColorSensor& mColorSensor;
-		int8_t	mNowReflValue;
-		int8_t 	mOldReflValue;
+		int16_t	mNowReflValue;
+		int16_t 	mOldReflValue;
 		SENC_CLR mState;
-		int8_t mQueue[QUEUE_MAX];
+		int16_t mQueue[QUEUE_MAX];
 		uint8_t mQNo;
 
 		/* メソッド */
-		void setLowPassFilter( void );				//ローパスフィルタ
-		int8_t getClrCvtBright( void );				//カラーセンサ
+		void   setLowPassFilter( void );				//ローパスフィルタ
+		int16_t getClrCvtBright( void );				//カラーセンサ
 };
 
 #endif  // DEVICEOPE_RAYREFLECTADMIN_OHS_H_

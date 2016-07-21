@@ -23,7 +23,7 @@ TailAdmin_ohs::~TailAdmin_ohs() {
 /**
  * 尾角度更新
  */
-void TailAdmin_ohs::callTailDegreeUpdate() {
+void TailAdmin_ohs::callValueUpDate() {
 	mTailDeg = mTailWheel.getCount();
 }
 
@@ -33,7 +33,9 @@ void TailAdmin_ohs::callTailDegreeUpdate() {
 BOOL TailAdmin_ohs::postTailDegree( int32_t post_tail_deg ) {
 	BOOL overflag = false;
 	
-	mTailTarget = ( post_tail_deg - mTailDeg) * TIL_P_GAIN + ( mTailTarget - mOldTarget ) * TIL_D_GAIN;
+	mTailTarget = ( post_tail_deg - mTailDeg) * TIL_P_GAIN;
+
+	//mTailTarget = ( post_tail_deg - mTailDeg) * TIL_P_GAIN + ( mTailTarget - mOldTarget ) * TIL_D_GAIN;
 
 	if (mTailTarget > MAX_TARGET){
 		mTailTarget = MAX_TARGET;
@@ -50,7 +52,7 @@ BOOL TailAdmin_ohs::postTailDegree( int32_t post_tail_deg ) {
 /**
  * 尾動作実行
  */
-void TailAdmin_ohs::callTailDegree() {
+void TailAdmin_ohs::callActDegree() {
 	mTailWheel.setPWM( mTailTarget );
 }
 

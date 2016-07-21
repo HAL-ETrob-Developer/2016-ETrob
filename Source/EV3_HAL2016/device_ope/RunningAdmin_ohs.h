@@ -16,7 +16,7 @@ public:
     ~RunningAdmin_ohs( );
 
     void    callValueUpDate ( );
-    void    postRunning ( int32_t speed, int32_t deg, BOOL baranser );
+    void    postRunning ( int32_t speed, int32_t deg, BOOL balancer );
     void    callRunning ( );
     int32_t    getMileage ( );
     int8_t    getAngle ( );
@@ -30,6 +30,11 @@ private:
     int32_t        mLeftRotary;
     int8_t         mRightPwm;
     int8_t         mLeftPwm;
+
+    int8_t      mFront;
+    int8_t      mTurn;
+    bool        mBalanceF;
+
     ev3api::Motor& mLeftWheel;
     ev3api::Motor& mRightWheel;
     Balancer_ohs*  mBalancer;

@@ -43,29 +43,16 @@ using namespace ev3api;
 
 /* Bluetooth */
 static int32_t   bt_cmd = 0;      /* Bluetoothコマンド 1:リモートスタート */
-static FILE     *bt = NULL;      /* Bluetoothファイルハンドル */
+static FILE*     gBtHandle = NULL;      /* Bluetoothファイルハンドル */
+static int8_t gSpd = 50;//test Mod
 
 /* 下記のマクロは個体/環境に合わせて変更する必要があります */
-#define GYRO_OFFSET           0  /* ジャイロセンサオフセット値(角速度0[deg/sec]時) */
-#define LIGHT_WHITE          40  /* 白色の光センサ値 */
-#define LIGHT_BLACK           0  /* 黒色の光センサ値 */
-#define SONAR_ALERT_DISTANCE 30  /* 超音波センサによる障害物検知距離[cm] */
-#define TAIL_ANGLE_STAND_UP  93  /* 完全停止時の角度[度] */
-#define TAIL_ANGLE_DRIVE      3  /* バランス走行時の角度[度] */
-#define P_GAIN             2.5F  /* 完全停止用モータ制御比例係数 */
-#define PWM_ABS_MAX          60  /* 完全停止用モータ制御PWM絶対最大値 */
-//#define DEVICE_NAME     "ET0"  /* Bluetooth名 hrp2/target/ev3.h BLUETOOTH_LOCAL_NAMEで設定 */
-//#define PASS_KEY        "1234" /* パスキー    hrp2/target/ev3.h BLUETOOTH_PIN_CODEで設定 */
 #define CMD_START         '1'    /* リモートスタートコマンド */
 
 /* LCDフォントサイズ */
 #define CALIB_FONT (EV3_FONT_SMALL)
 #define CALIB_FONT_WIDTH (6/*TODO: magic number*/)
 #define CALIB_FONT_HEIGHT (8/*TODO: magic number*/)
-
-/* 関数プロトタイプ宣言 */
-static int32_t sonar_alert(void);
-static void tail_control(int32_t angle);
 
 /* オブジェクトへのポインタ定義 */
 TouchSensor*    touchSensor;
@@ -77,26 +64,51 @@ Motor*          rightMotor;
 Motor*          tailMotor;
 Clock*          clock;
 
-RunLineCalculator_ohs*  gRunLineCalculator;
-LineTracer_ohs*         gLineTracer;
-RayReflectAdmin_ohs*    gRayReflectAdmin;
-Balancer_ohs*           gBalancer;
-RunningAdmin_ohs*       gRunningAdmin;
-GyroAdmin_ohs*          gGyroAdmin;
-TailAdmin_ohs*          gTailAdmin;
+static RunLineCalculator_ohs*  gRunLineCalculator;
+static LineTracer_ohs*         gLineTracer;
+static RayReflectAdmin_ohs*    gRayReflectAdmin;
+static Balancer_ohs*           gBalancer;
+static RunningAdmin_ohs*       gRunningAdmin;
+static GyroAdmin_ohs*          gGyroAdmin;
+static TailAdmin_ohs*          gTailAdmin;
 
-
-/* メインタスク */
 void main_task(intptr_t unused)
 {
-    int8_t forward;      /* 前後進命令 */
-    int8_t turn;         /* 旋回命令 */
-    int8_t pwm_L, pwm_R; /* 左右モータPWM出力 */
+    ev3_led_set_color(LED_OFF);
 
+    user_system_create();  // センサやモータの初期化処理
+
+    ev3_led_set_color(LED_GREEN);
+
+    // 周期ハンドラ開始
+    ev3_sta_cyc(EV3_CYC_TRACER);
+
+    // Bluetooth通信タスクの起動
+    act_tsk(BT_TASK);
+
+    //基本動作タスクの開始
+    act_tsk(TRACER_TASK);
+
+    slp_tsk();  // バックボタンが押されるまで待つ
+
+    // 周期ハンドラ停止
+    ev3_stp_cyc(EV3_CYC_TRACER);
+    /* Bluetooth通信タスクの破棄 */
+    ter_tsk(BT_TASK);
+    /* 基本動作タスクの破棄 */
+    ter_tsk(TRACER_TASK);
+    
+    user_system_destroy();  // 終了処理
+
+    ext_tsk();
+}
+
+static void user_system_create( void )
+{
     /* 各オブジェクトを生成・初期化する */
     touchSensor = new TouchSensor(PORT_1);
-    colorSensor = new ColorSensor(PORT_2);
-    sonarSensor = new SonarSensor(PORT_3);
+    colorSensor = new ColorSensor(PORT_3);
+    //sonarSensor = new SonarSensor(PORT_2);
     gyroSensor  = new GyroSensor(PORT_4);
     leftMotor   = new Motor(PORT_C);
     rightMotor  = new Motor(PORT_B);
@@ -112,207 +124,106 @@ void main_task(intptr_t unused)
   
     gLineTracer = new LineTracer_ohs( gRunningAdmin, gRayReflectAdmin, gRunLineCalculator );
 
-	/* ---------------------------------------------------------------------- */
-    /* LCD画面表示 */
-    ev3_lcd_fill_rect(0, 0, EV3_LCD_WIDTH, EV3_LCD_HEIGHT, EV3_LCD_WHITE);
-    ev3_lcd_draw_string("EV3way-ET sample_cpp", 0, CALIB_FONT_HEIGHT*1);
+    //Bluetooth
+    gBtHandle = ev3_serial_open_file( EV3_SERIAL_BT );
+    assert( gBtHandle != NULL );
 
-    gLineTracer->postLineTraceConduct();
+    return;
+}
 
-    while( true ) {
-        tail_control(TAIL_ANGLE_DRIVE); /* バランス走行用角度に制御 */
-        
-        gLineTracer->callLineTraceAct();
+static void user_system_destroy( void )
+{
+    if( gRunLineCalculator ) { delete gRunLineCalculator; gRunLineCalculator = NULL; }
+    if( gTailAdmin         ) { delete gTailAdmin;         gTailAdmin         = NULL; }
+    if( gRayReflectAdmin   ) { delete gRayReflectAdmin;   gRayReflectAdmin   = NULL; }
+    if( gRunningAdmin      ) { delete gRunningAdmin;      gRunningAdmin      = NULL; }
+    if( gGyroAdmin         ) { delete gGyroAdmin;         gGyroAdmin         = NULL; }
+    if( gBalancer          ) { delete gBalancer;          gBalancer          = NULL; }
+    if( gLineTracer        ) { delete gLineTracer;        gLineTracer        = NULL; }
 
-        clock->sleep(4); /* 4msec周期起動 */
+    if( touchSensor        ) { delete touchSensor;        touchSensor        = NULL; }
+    if( colorSensor        ) { delete colorSensor;        colorSensor        = NULL; }
+    if( sonarSensor        ) { delete sonarSensor;        sonarSensor        = NULL; }
+    if( gyroSensor         ) { delete gyroSensor;         gyroSensor         = NULL; }
+    if( leftMotor          ) { delete leftMotor;          leftMotor          = NULL; }
+    if( rightMotor         ) { delete rightMotor;         rightMotor         = NULL; }
+    if( tailMotor          ) { delete tailMotor;          tailMotor          = NULL; }
+    if( clock              ) { delete clock;              clock              = NULL; }
+
+    if( gBtHandle != NULL )  { fclose(gBtHandle); }
+	
+    return;
+}
+
+void ev3_cyc_tracer(intptr_t exinf) {
+    act_tsk(INTERRUPT_TASK);
+}
+
+void interrupt_task(intptr_t exinf) {
+    //センシング
+    gGyroAdmin->callValueUpdate();
+    gRunningAdmin->callValueUpDate();
+    gRayReflectAdmin->callValueUpDate();
+    gTailAdmin->callValueUpDate();
+
+    //制御
+    //gLineTracer->callLineTraceAct();
+    gLineTracer->callSimplLineTraceAct();
+
+    //アクチュエイト
+    gRunningAdmin->callRunning();
+    gTailAdmin->callActDegree();
+
+#ifdef INTERRUPT_CHK
+    static int tes = 0;
+    tes++;
+    if( tes > 124 ) {
+        ev3_speaker_play_tone( NOTE_AS4, 10 );
+        tes = 0;
     }
-
-    gLineTracer->postLineTraceStop();
-
-    leftMotor->reset();
-    rightMotor->reset();
-
-    ter_tsk(BT_TASK);
-    fclose(bt);
-
-
-    delete touchSensor;
-    delete colorSensor;
-    delete sonarSensor;
-    delete gyroSensor;
-    delete leftMotor;
-    delete rightMotor;
-    delete tailMotor;
-    delete clock;
-
-    delete gRunLineCalculator;
-    delete gTailAdmin;
-    delete gRayReflectAdmin;
-    delete gRunningAdmin;
-    delete gGyroAdmin;
-    delete gBalancer;
-    delete gLineTracer;
-
-    ext_tsk();
-	/* ---------------------------------------------------------------------- */
-
-    /* 尻尾モーターのリセット */
-    tailMotor->reset();
-    
-    /* Open Bluetooth file */
-    bt = ev3_serial_open_file(EV3_SERIAL_BT);
-    assert(bt != NULL);
-
-    /* Bluetooth通信タスクの起動 */
-    act_tsk(BT_TASK);
-
-    ev3_led_set_color(LED_ORANGE); /* 初期化完了通知 */
-
-    /* スタート待機 */
-    while(1)
-    {
-        tail_control(TAIL_ANGLE_STAND_UP); /* 完全停止用角度に制御 */
-
-        if (bt_cmd == 1)
-        {
-            break; /* リモートスタート */
-        }
-
-        if (touchSensor->isPressed())
-        {
-            break; /* タッチセンサが押された */
-        }
-
-        clock->sleep(10);
-    }
-
-    /* 走行モーターエンコーダーリセット */
-    leftMotor->reset();
-    rightMotor->reset();
-    
-    /* ジャイロセンサーリセット */
-    gyroSensor->reset();
-    balance_init(); /* 倒立振子API初期化 */
-
-    ev3_led_set_color(LED_GREEN); /* スタート通知 */
-
-    /**
-    * Main loop for the self-balance control algorithm
-    */
-    while(1)
-    {
-        int32_t motor_ang_l, motor_ang_r;
-        int32_t gyro, volt;
-
-        if (ev3_button_is_pressed(BACK_BUTTON)) break;
-
-        tail_control(TAIL_ANGLE_DRIVE); /* バランス走行用角度に制御 */
-
-        if (sonar_alert() == 1) /* 障害物検知 */
-        {
-            forward = turn = 0; /* 障害物を検知したら停止 */
-        }
-        else
-        {
-            forward = 30; /* 前進命令 */
-            if (colorSensor->getBrightness() >= (LIGHT_WHITE + LIGHT_BLACK)/2)
-            {
-                turn =  20; /* 左旋回命令 */
-            }
-            else
-            {
-                turn = -20; /* 右旋回命令 */
-            }
-        }
-
-        /* 倒立振子制御API に渡すパラメータを取得する */
-        motor_ang_l = leftMotor->getCount();
-        motor_ang_r = rightMotor->getCount();
-        gyro = gyroSensor->getAnglerVelocity();
-        volt = ev3_battery_voltage_mV();
-
-        /* 倒立振子制御APIを呼び出し、倒立走行するための */
-        /* 左右モータ出力値を得る */
-        balance_control(
-            (float)forward,
-            (float)turn,
-            (float)gyro,
-            (float)GYRO_OFFSET,
-            (float)motor_ang_l,
-            (float)motor_ang_r,
-            (float)volt,
-            (int8_t *)&pwm_L,
-            (int8_t *)&pwm_R);
-
-        leftMotor->setPWM(pwm_L);
-        rightMotor->setPWM(pwm_R);
-
-        clock->sleep(4); /* 4msec周期起動 */
-    }
-    leftMotor->reset();
-    rightMotor->reset();
-
-    ter_tsk(BT_TASK);
-    fclose(bt);
-
+#endif
     ext_tsk();
 }
 
-//*****************************************************************************
-// 関数名 : sonar_alert
-// 引数 : 無し
-// 返り値 : 1(障害物あり)/0(障害物無し)
-// 概要 : 超音波センサによる障害物検知
-//*****************************************************************************
-static int32_t sonar_alert(void)
-{
-    static uint32_t counter = 0;
-    static int32_t alert = 0;
-
-    int32_t distance;
-
-    if (++counter == 40/4) /* 約40msec周期毎に障害物検知  */
-    {
-        /*
-         * 超音波センサによる距離測定周期は、超音波の減衰特性に依存します。
-         * NXTの場合は、40msec周期程度が経験上の最短測定周期です。
-         * EV3の場合は、要確認
-         */
-        distance = sonarSensor->getDistance();
-        if ((distance <= SONAR_ALERT_DISTANCE) && (distance >= 0))
-        {
-            alert = 1; /* 障害物を検知 */
+void tracer_task(intptr_t exinf) {
+    while( ev3_button_is_pressed( BACK_BUTTON ) == false ) {
+        switch( bt_cmd ) {
+            case 3:
+            case 2:
+            case 1:
+                gRunningAdmin->postRunning(gSpd,0,true);
+                gTailAdmin->postTailDegree(0);
+                break;
+            case 4:
+                gRunningAdmin->postRunning(0,50,true);
+                gTailAdmin->postTailDegree(0);
+                break;
+            case 5:
+                gRunningAdmin->postRunning(0,-50,true);
+                gTailAdmin->postTailDegree(0);
+                break;
+            case 7:
+                gRunningAdmin->postRunning(-gSpd,0,true);
+                gTailAdmin->postTailDegree(0);
+                break;
+            case 'e':
+                goto EXIT;
+                break;
+            case 't':
+                gLineTracer->postLineTraceConduct();
+                break;
+            default:
+                gTailAdmin->postTailDegree(90);
+            break;
         }
-        else
-        {
-            alert = 0; /* 障害物無し */
-        }
-        counter = 0;
     }
-
-    return alert;
-}
-
-//*****************************************************************************
-// 関数名 : tail_control
-// 引数 : angle (モータ目標角度[度])
-// 返り値 : 無し
-// 概要 : 走行体完全停止用モータの角度制御
-//*****************************************************************************
-static void tail_control(int32_t angle)
-{
-    float pwm = (float)(angle - tailMotor->getCount()) * P_GAIN; /* 比例制御 */
-    /* PWM出力飽和処理 */
-    if (pwm > PWM_ABS_MAX)
-    {
-        pwm = PWM_ABS_MAX;
-    }
-    else if (pwm < -PWM_ABS_MAX)
-    {
-        pwm = -PWM_ABS_MAX;
-    }
-
-    tailMotor->setPWM(pwm);
+EXIT:
+    ev3_led_set_color(LED_RED);
+    gLineTracer->postLineTraceStop();//ライントレースストップ
+    gRunningAdmin->postRunning(0,0,false);//走行停止
+    gTailAdmin->postTailDegree(0);//尻尾復帰
+    clock->sleep(500);
+    wup_tsk(MAIN_TASK);  // バックボタン押下
 }
 
 //*****************************************************************************
@@ -326,15 +237,47 @@ void bt_task(intptr_t unused)
 {
     while(1)
     {
-        uint8_t c = fgetc(bt); /* 受信 */
+        ev3_speaker_play_tone( NOTE_AS4, 100 );
+        uint8_t c = fgetc(gBtHandle); /* 受信 */
         switch(c)
         {
         case '1':
             bt_cmd = 1;
             break;
+        case '2':
+            gSpd--;
+            bt_cmd = 2;
+            break;
+        case '3':
+            gSpd++;
+            bt_cmd = 3;
+            break;
+        case '4':
+            bt_cmd = 4;
+            break;
+        case '5':
+            bt_cmd = 5;
+            break;
+        case '7':
+            bt_cmd = 7;
+            break;
+        case 'e':
+            bt_cmd = 'e';
+            break;
+        case 't':
+            bt_cmd = 't';
+            break;
+        case '9':
+            bt_cmd = 9;
+            gGyroAdmin->initDegree();
+            break;
         default:
             break;
         }
-        fputc(c, bt); /* エコーバック */
+        fprintf( gBtHandle, "[speed = %3d ][deg = %3d ] [spped = %3d][cmd = %c]\r\n", 
+                gRunningAdmin->getSpeed(), gRunningAdmin->getAngle(), gSpd,c );
+        //fputc(c, gBtHandle); /* エコーバック */
     }
 }
+
+

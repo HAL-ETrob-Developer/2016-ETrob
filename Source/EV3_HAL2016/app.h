@@ -15,12 +15,15 @@ extern "C" {
  *  各タスクの優先度の定義
  */
 
-#define MAIN_PRIORITY   5           /* メインタスクの優先度 */
-                                    /* HIGH_PRIORITYより高くすること */
+#define MAIN_PRIORITY           ( TMIN_APP_TPRI )             // メインタスクの優先度
+#define INTERRUPT_PRIORITY      ( MAIN_PRIORITY + 1 )         // 割り込みタスクの優先度
 
-#define HIGH_PRIORITY   9           /* 並行実行されるタスクの優先度 */
-#define MID_PRIORITY    10
-#define LOW_PRIORITY    11
+//#define TRACER_PRIORITY         ( INTERRUPT_PRIORITY + 1 )    // 基本動作タスクの優先度
+//#define BT_PRIORITY             ( TRACER_PRIORITY + 1 )       // Bluetoothタスクの優先度
+
+#define TRACER_PRIORITY         ( INTERRUPT_PRIORITY + 2 )    // 基本動作タスクの優先度
+#define BT_PRIORITY             ( INTERRUPT_PRIORITY + 1 )       // Bluetoothタスクの優先度
+
 
 /*
  *  ターゲットに依存する可能性のある定数の定義
@@ -41,6 +44,12 @@ extern "C" {
 
 extern void main_task(intptr_t exinf);
 extern void bt_task(intptr_t exinf);
+extern void tracer_task(intptr_t exinf);
+extern void ev3_cyc_tracer(intptr_t exinf);
+extern void interrupt_task(intptr_t exinf);
+
+static void user_system_create( void );
+static void user_system_destroy( void );
 
 #endif /* TOPPERS_MACRO_ONLY */
 

@@ -7,12 +7,15 @@
 #include "../device_ope/RunningAdmin_ohs.h"
 #include "../device_ope/RayReflectAdmin_ohs.h"
 
-#define MAX_SPEED (      100 )
-#define MIN_SPEED (     -100 )
-#define MAX_DEGRE (       50 )
-#define MIN_DEGRE (      -50 )
-#define RISE      (      0.01)
-#define SEARCH_SW (    10000 )
+#define LT_SPEED_SLT (       50 )
+#define LT_DEGRE_SLT (       30 )
+
+#define LT_MAX_SPEED (      100 )
+#define LT_MIN_SPEED (     -100 )
+#define LT_MAX_DEGRE (       50 )
+#define LT_MIN_DEGRE (      -50 )
+#define RISE         (      0.01)
+#define SEARCH_SW    (    10000 )
 
 class LineTracer_ohs {
 public:
@@ -24,6 +27,7 @@ public:
     void postLineTraceConduct();
     void postLineTraceStop();
     void callLineTraceAct();
+    void callSimplLineTraceAct();
 
 private:
     //メソッド
