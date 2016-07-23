@@ -117,7 +117,7 @@ int8_t RunningAdmin_ohs::getSpeed ( )
  */
 int8_t RunningAdmin_ohs::getVector ( )
 {
-    return ( mRightPwm - mLeftPwm );
+    return ( mLeftPwm - mRightPwm );
 }
 
 /**

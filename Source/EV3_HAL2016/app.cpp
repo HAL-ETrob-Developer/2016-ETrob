@@ -119,7 +119,7 @@ static void user_system_create( void )
     gTailAdmin = new TailAdmin_ohs( *tailMotor );
     gGyroAdmin = new GyroAdmin_ohs( *gyroSensor );
     gBalancer  = new Balancer_ohs( gGyroAdmin );
-    gRunningAdmin = new RunningAdmin_ohs( *rightMotor, *leftMotor, gBalancer );
+    gRunningAdmin = new RunningAdmin_ohs( *leftMotor, *rightMotor, gBalancer );
     gRayReflectAdmin = new RayReflectAdmin_ohs( *colorSensor );
   
     gLineTracer = new LineTracer_ohs( gRunningAdmin, gRayReflectAdmin, gRunLineCalculator );
@@ -167,8 +167,8 @@ void interrupt_task(intptr_t exinf) {
     gTailAdmin->callValueUpDate();
 
     //制御
-    //gLineTracer->callLineTraceAct();
-    gLineTracer->callSimplLineTraceAct();
+    gLineTracer->callLineTraceAct();
+    //gLineTracer->callSimplLineTraceAct();
 
     //アクチュエイト
     gRunningAdmin->callRunning();
@@ -182,7 +182,11 @@ void interrupt_task(intptr_t exinf) {
         tes = 0;
     }
 #endif
+#ifdef LT_DEBUG
+    fprintf( gBtHandle, "[P = %3.3f ][I = %3.3f ] [D = %3.3f]\r\n", 
+            gRunLineCalculator->isP(), gRunLineCalculator->isI(), gRunLineCalculator->isD());
     ext_tsk();
+#endif
 }
 
 void tracer_task(intptr_t exinf) {
@@ -191,6 +195,7 @@ void tracer_task(intptr_t exinf) {
             case 3:
             case 2:
             case 1:
+                gLineTracer->postLineTraceStop();//ライントレースストップ
                 gRunningAdmin->postRunning(gSpd,0,true);
                 gTailAdmin->postTailDegree(0);
                 break;

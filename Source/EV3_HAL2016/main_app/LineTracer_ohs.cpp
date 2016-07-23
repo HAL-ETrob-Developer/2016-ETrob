@@ -76,7 +76,9 @@ void LineTracer_ohs::callLineTraceAct() {
         ulClrCounter = 0;
     } else {
         /* 一定以上白を連続して検出 */
-        execLineSearch();
+        execLineEdgeTrace();
+      //  execLineSearch(); ラインサーチ停止test
+
     }
 
     //走行指示
@@ -94,7 +96,8 @@ void LineTracer_ohs::execLineEdgeTrace() {
     /* 左右モータの実指示値を取得(保留) */
 
     /* PID計算 */
-    mRunLineCalculator->calcRunLine( mGetColor, &mSpeed, &mDeg );
+    // mRunLineCalculator->calcRunLine( mGetColor, &mSpeed, &mDeg );
+    mRunLineCalculator->calcRunLineUseRefLv( mRayReflectAdmin->getValue(), &mSpeed, &mDeg);
     /* 走行速度 */
     if( mSpeed > LT_MAX_SPEED ){
         mSpeed = LT_MAX_SPEED;

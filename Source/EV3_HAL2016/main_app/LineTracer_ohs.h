@@ -8,7 +8,7 @@
 #include "../device_ope/RayReflectAdmin_ohs.h"
 
 #define LT_SPEED_SLT (       50 )
-#define LT_DEGRE_SLT (       30 )
+#define LT_DEGRE_SLT (       15 )
 
 #define LT_MAX_SPEED (      100 )
 #define LT_MIN_SPEED (     -100 )
