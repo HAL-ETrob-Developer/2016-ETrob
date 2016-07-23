@@ -1,18 +1,22 @@
+#include "hal_ev3_std.h"
 #include "GyroAdmin_ohs.h"
 
 /**
  * コンストラクタ
  */
 GyroAdmin_ohs::GyroAdmin_ohs( ev3api::GyroSensor& gyro_sensor )
+:mGyroSensor( gyro_sensor )
 {
-	mGyroSensor = gyro_sensor;
 	mNowGyroValue = 0;
 	mOldGyroValue = 0;
-	
-	memset( mQueue, 0, sizeof( mQueue ) );
-	int8_t mQNo = 0;
-	
-	
+	mOffSet = 0;
+
+	memset( mQueue, 0, sizeof( mQueue ));
+	mQNo = 0;
+
+	mInit = false;
+
+	initDegree();
 }
 
 /**
@@ -21,22 +25,25 @@ GyroAdmin_ohs::GyroAdmin_ohs( ev3api::GyroSensor& gyro_sensor )
 GyroAdmin_ohs::~GyroAdmin_ohs()
 {
 }
+bool GyroAdmin_ohs::initDegree()
+{
+	mInit = true;
+	mGyroSensor.reset();
+	mOffSet = mGyroSensor.getAnglerVelocity();
+	return mInit;
+}
 
 /**
  * ジャイロセンサの値の更新
  */
 void GyroAdmin_ohs::callValueUpdate( void )
 {
-	int16_t sVelocity;
-	static int8_t cNo = 0;
+	mNowGyroValue = ( mGyroSensor.getAnglerVelocity()) - mOffSet;
 	
-	sVelocity = mGyroSensor->getAnglerVelocity();
-	
-	mQNo = cNo % QUEUE_MAX;
-	mQueue[mQNo] = mNowGyrolValue;
-	cNo %= QUEUE_MAX;
-	cNo++;
-	
+	//記録キューの更新
+	mQNo = mQNo % QUEUE_MAX;
+	mQueue[mQNo] = mNowGyroValue;
+	mQNo++;
 }
 
 /**
@@ -44,27 +51,46 @@ void GyroAdmin_ohs::callValueUpdate( void )
  */
 int16_t GyroAdmin_ohs::getValue( void )
 {
-	mNowGyroValue = mQueue[mQNo];
+#ifdef PRINT
+	char cString[50];
+	memset( cString, 0, sizeof( cString ));
+	sprintf(( char* )cString, "GyroAdmin_ohs::getValue[%5d]",mNowGyroValue);
+	ev3_lcd_draw_string( cString, 0, 8*6);
+#endif
 	return mNowGyroValue; 
 }
 
 /**
  * ジャイロセンサの状態の取得
  */
- enum GYRO_STATE GyroAdmin_ohs::getState( void )
+GYRO_STATE GyroAdmin_ohs::getState( void )
 {
+	SINT iIdx = 0;
+	int16_t sVelocity;
+	
 	//安定値チェック
+	for( iIdx = 0; iIdx < QUEUE_MAX; iIdx++){
+		if( mQueue[iIdx] < -THRESHOLD_STABILITY || mQueue[iIdx] > THRESHOLD_STABILITY ){
+			//ジャイロ値フィルタリング
+			sVelocity = mNowGyroValue * GYR_GAIN_NOW + mOldGyroValue * GYR_GAIN_OLD;
 
-	mNowGyroValue = mQueue[mQNo] * GAIN_NOW + mOldGyroValue * GAIN_OLD;
-	
-	//ジャイロ値確認
-	if( mNowGyroValue >= THRESHOLD ){
-		mState = GSTA_FALLING;
-	}else{
-		mState = GSTA_UNSTABLE;
+			//転倒検知
+			if( sVelocity > THRESHOLD_FALLING || sVelocity < -THRESHOLD_FALLING ){
+				/* 状態：転倒 */
+				mState = GSTA_FALLING;
+			}else{
+				/* 状態：不安定 */
+				mState = GSTA_UNSTABLE;
+			}
+
+			break;
+		}		
 	}
+	/* 状態：安定 */
+	if( iIdx == QUEUE_MAX ){ mState = GSTA_STABILITY; }
 	
+	//ジャイロ値を過去ジャイロ値に記録
 	mOldGyroValue = mNowGyroValue;
 	
-	return mNowGyroValue;
+	return mState;
 }

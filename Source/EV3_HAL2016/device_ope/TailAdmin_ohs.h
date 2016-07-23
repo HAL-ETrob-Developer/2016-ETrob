@@ -3,28 +3,32 @@
 #ifndef DEVICEOPE_TAILADMIN_OHS_H_
 #define DEVICEOPE_TAILADMIN_OHS_H_
 
-#define GAIN		( 2.5F);
-#define MAX_TARGET	(  100);
-#define MIN_TARGET	( -100);
+#include "Motor.h"
+
+#define TIL_P_GAIN		( 2.5F)
+#define TIL_D_GAIN		( 5.0F)
+#define MAX_TARGET	(  100)
+#define MIN_TARGET	( -100)
 
 class TailAdmin_ohs
 {
-	public:
+    public:
     //生成
-    TailAdmin_ohs();
+    TailAdmin_ohs( ev3api::Motor& tail_wheel );
     //デストラクタ 死ぬときあるよ
     ~TailAdmin_ohs();
 
-    void callTailDegreeUpdate();
+    void callValueUpDate();
 	BOOL postTailDegree( int32_t postTailDeg );
-    void callTailDegree();
+    void callActDegree();
     int32_t getTailDegree();
 
 
 	private:
-		ev3api::Motor& mTailWheel;
-		int32_t mTailDeg;
-		SINT mTailTarget;
+    ev3api::Motor& mTailWheel;
+    int32_t mTailDeg;
+    SINT mTailTarget;
+    SINT mOldTarget;
 };
 
 #endif  // DEVICEOPE_TAILADMIN_OHS_H_

@@ -1,30 +1,43 @@
-/* by ohs50465 T.UENO */
-
+﻿/* by ohs50465 T.UENO */
 #ifndef DEVICEOPE_RUNNINGADMIN_OHS_H_
 #define DEVICEOPE_RUNNINGADMIN_OHS_H_
 
-class RunningAdmin_ohs {
-public:
-    //生成
-    RunningAdmin_ohs();
-    //デストラクタ 死ぬときあるよ
-        virtual ~RunningAdmin_ohs();
+#include "ev3api.h"
+#include "Motor.h"
+#include "../calculation/Balancer_ohs.h"
 
-    void callRunningValueUpDate();
-    void postRunning();
-    void callRunning();
-    void getRunningMileage();
-    void getRunningAngle();
-    void getTheRunningPWM();
-    void getTheRunningVector();
-    int32_t isRightRotary();
-    int32_t isLeftRotary();
+#define PWM_MAX ( 100 )
+class RunningAdmin_ohs
+{
+public:
+    // 生成
+    RunningAdmin_ohs( ev3api::Motor& leftwheel, ev3api::Motor& rightwheel, Balancer_ohs* balanser );
+    // デストラクタ 死ぬときあるよ
+    ~RunningAdmin_ohs( );
+
+    void    callValueUpDate ( );
+    void    postRunning ( int32_t speed, int32_t deg, BOOL balancer );
+    void    callRunning ( );
+    int32_t    getMileage ( );
+    int8_t    getAngle ( );
+    int8_t    getSpeed ( );
+    int8_t    getVector ( );
+    int32_t isRightRotary ( );
+    int32_t isLeftRotary ( );
 
 private:
-	int32_t mRightRotary;
-	int32_t mLeftRotary;
-	int32_t mRightPwm;
-	int32_t mLeftPwm;
+    int32_t        mRightRotary;
+    int32_t        mLeftRotary;
+    int8_t         mRightPwm;
+    int8_t         mLeftPwm;
+
+    int8_t      mFront;
+    int8_t      mTurn;
+    bool        mBalanceF;
+
+    ev3api::Motor& mLeftWheel;
+    ev3api::Motor& mRightWheel;
+    Balancer_ohs*  mBalancer;
 };
 
-#endif  // DEVICEOPE_RUNNINGADMIN_OHS_H_
+#endif// DEVICEOPE_RUNNINGADMIN_OHS_H_
