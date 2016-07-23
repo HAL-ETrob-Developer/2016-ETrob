@@ -7,7 +7,7 @@
 #include "ev3api.h"
 #include "ColorSensor.h"
 
-#define QUEUE_MAX	(  127 )		/* キュー個数 */	
+#define QUEUE_MAX	(  127 )		/* キュー個数 */
 
 /* ゲイン値 */
 #define GAIN_NOW	( 0.1F )		/* 現在 */
@@ -16,6 +16,9 @@
 /* 閾値 */
 #define	THRESHOLD_BLACK	( 30 )		/* ブラック */
 #define	THRESHOLD_WHITE	( 70 )		/* ホワイト */
+
+/* 反射値カット */
+#define	REY_MAX_REF	( 150 )		/* 最大反射値＠カット */
 
 class RayReflectAdmin_ohs
 {

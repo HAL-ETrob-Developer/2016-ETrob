@@ -44,7 +44,8 @@ using namespace ev3api;
 /* Bluetooth */
 static int32_t   bt_cmd = 0;      /* Bluetoothコマンド 1:リモートスタート */
 static FILE*     gBtHandle = NULL;      /* Bluetoothファイルハンドル */
-static int8_t gSpd = 50;//test Mod
+static int8_t gSpd = 0;//test Mod
+static FLOT   gGyOffSet = 0;//test Mod
 
 /* 下記のマクロは個体/環境に合わせて変更する必要があります */
 #define CMD_START         '1'    /* リモートスタートコマンド */
@@ -178,15 +179,20 @@ void interrupt_task(intptr_t exinf) {
     static int tes = 0;
     tes++;
     if( tes > 124 ) {
-        ev3_speaker_play_tone( NOTE_AS4, 10 );
+        ev3_speaker_play_tone( NOTE_E6, 10 );
         tes = 0;
     }
 #endif
 #ifdef LT_DEBUG
     fprintf( gBtHandle, "[P = %3.3f ][I = %3.3f ] [D = %3.3f]\r\n", 
             gRunLineCalculator->isP(), gRunLineCalculator->isI(), gRunLineCalculator->isD());
-    ext_tsk();
 #endif
+#ifdef REFST_DEBUG
+    if( gRayReflectAdmin->getState() == SCLR_GRAY ) {
+        fprintf( gBtHandle, "[SCLR_GRAY]\r\n");
+    }
+#endif
+    ext_tsk();
 }
 
 void tracer_task(intptr_t exinf) {
@@ -194,6 +200,7 @@ void tracer_task(intptr_t exinf) {
         switch( bt_cmd ) {
             case 3:
             case 2:
+                // gBalancer->setOffSet( gGyOffSet );
             case 1:
                 gLineTracer->postLineTraceStop();//ライントレースストップ
                 gRunningAdmin->postRunning(gSpd,0,true);
@@ -208,7 +215,7 @@ void tracer_task(intptr_t exinf) {
                 gTailAdmin->postTailDegree(0);
                 break;
             case 7:
-                gRunningAdmin->postRunning(-gSpd,0,true);
+                gRunningAdmin->postRunning(0,0,true);
                 gTailAdmin->postTailDegree(0);
                 break;
             case 'e':
@@ -242,7 +249,7 @@ void bt_task(intptr_t unused)
 {
     while(1)
     {
-        ev3_speaker_play_tone( NOTE_AS4, 100 );
+        ev3_speaker_play_tone( NOTE_C4, 80 );
         uint8_t c = fgetc(gBtHandle); /* 受信 */
         switch(c)
         {
@@ -250,11 +257,13 @@ void bt_task(intptr_t unused)
             bt_cmd = 1;
             break;
         case '2':
-            gSpd--;
+            gSpd -= 10;
+            // gGyOffSet--;
             bt_cmd = 2;
             break;
         case '3':
-            gSpd++;
+            gSpd += 10;
+            // gGyOffSet++;
             bt_cmd = 3;
             break;
         case '4':
@@ -279,7 +288,7 @@ void bt_task(intptr_t unused)
         default:
             break;
         }
-        fprintf( gBtHandle, "[speed = %3d ][deg = %3d ] [spped = %3d][cmd = %c]\r\n", 
+        fprintf( gBtHandle, "[speed = %3d ][deg = %3d ] [gSpd = %3d][cmd = %c]\r\n", 
                 gRunningAdmin->getSpeed(), gRunningAdmin->getAngle(), gSpd,c );
         //fputc(c, gBtHandle); /* エコーバック */
     }

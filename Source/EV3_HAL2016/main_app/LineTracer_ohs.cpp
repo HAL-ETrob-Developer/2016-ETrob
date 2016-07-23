@@ -91,13 +91,15 @@ void LineTracer_ohs::callLineTraceAct() {
  * ラインエッジトレース
  */
 void LineTracer_ohs::execLineEdgeTrace() {
+    /* 光学反射値の取得 */
+    int16_t sRefVal = mRayReflectAdmin->getValue();
     /* ライン探索ゲインのリセット */
     mGain = 0;
     /* 左右モータの実指示値を取得(保留) */
 
     /* PID計算 */
     // mRunLineCalculator->calcRunLine( mGetColor, &mSpeed, &mDeg );
-    mRunLineCalculator->calcRunLineUseRefLv( mRayReflectAdmin->getValue(), &mSpeed, &mDeg);
+    mRunLineCalculator->calcRunLineUseRefLv( sRefVal, &mSpeed, &mDeg);
     /* 走行速度 */
     if( mSpeed > LT_MAX_SPEED ){
         mSpeed = LT_MAX_SPEED;

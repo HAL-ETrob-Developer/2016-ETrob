@@ -40,9 +40,10 @@
 #define DSC_MODE			(		   5 )		/* USHR  print_mode 		 */
 
 /* 動作設定＠デバッグ */
-#define PRINT									/* プリント動作 ON/OFF		 */
+//#define PRINT									/* プリント動作 ON/OFF		 */
 #define INTERRUPT_CHK							/* メトロノーム ON/OFF		 */
 #define CHECK_STAY								/* 実行終了後停止			 */
+// #define REFST_DEBUG
 
 /* ------------------------------------------------------------------------- */
 /* typedef宣言																 */

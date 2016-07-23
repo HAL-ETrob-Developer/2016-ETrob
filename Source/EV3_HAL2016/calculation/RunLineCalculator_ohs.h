@@ -8,24 +8,40 @@
 
 #define DEF_ADD     (      0.10F )
 
-#define TERGET_SPD  (      60.0F )
+#define TERGET_SPD  (      80.0F )
 #define MAX_CW_DEG  (       0.0F )
 #define MAX_CCW_DEG (       0.0F )
 
 #define DEF_TERGET  (       0.0F )
 
-#define TERGET_LV   (      50.0F )
+#define TERGET_LV   (      70.0F )
 
 /* ゲイン変更 ----------------------------------------------------------------------------------- */
 #define USE_REFLV 
 #ifdef USE_REFLV//calcRunLineUseRefLv使用
 
-#define K_P_SPD     (       0.0F )
+#define K_P_SPD     (       0.005F )
 #define K_I_SPD     (       0.0F )
-#define K_D_SPD     (       0.0F )
-#define K_P_DEG     (       0.3F )
-#define K_I_DEG     (       0.0F )
-#define K_D_DEG     (       0.2F )
+#define K_D_SPD     (       1.0F )
+#define K_P_DEG     (       0.35F )
+#define K_I_DEG     (       0.04F )
+#define K_D_DEG     (       7.0F )
+
+//なかなか
+// #define K_P_SPD     (       0.006F )
+// #define K_I_SPD     (       0.0F )
+// #define K_D_SPD     (       0.04F )
+// #define K_P_DEG     (       0.08F )
+// #define K_I_DEG     (       0.25F )
+// #define K_D_DEG     (       5.0F )
+
+//原点
+// #define K_P_SPD     (       0.003F )
+// #define K_I_SPD     (       0.0F )
+// #define K_D_SPD     (       0.06F )
+// #define K_P_DEG     (       0.08F )
+// #define K_I_DEG     (       0.25F )
+// #define K_D_DEG     (       5.0F )
 
 #else//calcRunLine使用
 

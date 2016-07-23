@@ -10,7 +10,7 @@ Balancer_ohs::Balancer_ohs( GyroAdmin_ohs* gyro_admin )
 {
     mRightPwm     = 0;
     mLeftPwm      = 0;
-
+    mOffSet       = 0;
     balance_init();  // 倒立振子制御初期化
 }
 
@@ -26,7 +26,6 @@ Balancer_ohs::~Balancer_ohs() {
  */
 BOOL Balancer_ohs::calcPWM( int8_t spd, int8_t deg, void* running_admin ) {
     FLOT fGyroValue = 0;
-    FLOT fOffSet  = 0;
     FLOT fNowRDeg = 0;
     FLOT fNowLDeg = 0;
     FLOT fBattery = 0;
@@ -41,20 +40,23 @@ BOOL Balancer_ohs::calcPWM( int8_t spd, int8_t deg, void* running_admin ) {
     //バッテリー残量
     fBattery = ( FLOT )ev3_battery_voltage_mV();
 
+    //オフセット値の調整
+    mOffSet = ( FLOT )spd * BL_K_GY_OFFS;
+
     // 倒立振子制御APIを呼び出し、倒立走行するための
     // 左右モータ出力値を得る
     balance_control(
         static_cast<float>(spd),
         static_cast<float>(deg),
         static_cast<float>( fGyroValue ),
-        static_cast<float>( fOffSet ),
+        static_cast<float>( mOffSet ),
         static_cast<float>( fNowLDeg ),
         static_cast<float>( fNowRDeg ),
         static_cast<float>( fBattery ),
         &mLeftPwm,
         &mRightPwm);
 
-        return true;
+    return true;
 }
 
 /**
@@ -69,4 +71,9 @@ int8_t Balancer_ohs::isRightPWM() {
  */
 int8_t Balancer_ohs::isLeftPWM() {
     return ( mLeftPwm );
+}
+
+void  Balancer_ohs::setOffSet( FLOT set_offset )
+{
+   mOffSet =  set_offset;
 }

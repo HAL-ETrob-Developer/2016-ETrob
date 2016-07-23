@@ -79,9 +79,10 @@ void RunLineCalculator_ohs::calcRunLineUseRefLv( SSHT reflection_lv, int8_t* p_s
 {
     static FLOT fOldDevPoint  = 0;
            char cSpeedRev  = 1;
-           FLOT fCvtRefLv  = 0;
-           FLOT fTempSpeed = 0;
-           FLOT fTempDeg   = 0;
+           FLOT fCvtRefLv  = 0.0F;
+           FLOT fTempSpeed = 0.0F;
+           FLOT fSpeedOff  = 0.0F;
+           FLOT fTempDeg   = 0.0F;
 
     //走行パラメータの取得*意味は無い
     mSpeed = *p_speed;
@@ -102,8 +103,12 @@ void RunLineCalculator_ohs::calcRunLineUseRefLv( SSHT reflection_lv, int8_t* p_s
     mDeg = ( int8_t )fTempDeg;
 
     /* 走行速度計算 */
-    if( mIValue < 0 ) { cSpeedRev = -1; }//符号反転用
-    fTempSpeed = TERGET_SPD - ( K_I_SPD  * ( mIValue * cSpeedRev ));
+    //fTempSpeed = TERGET_SPD - ( K_I_SPD  * ( mIValue * cSpeedRev ));
+
+    fSpeedOff = ( K_P_SPD * mPValue ) + ( K_I_SPD * mIValue ) + ( K_D_SPD * mDValue );
+    if( fSpeedOff < 0.0F ) { cSpeedRev = -1; }//符号反転用
+    fTempSpeed = TERGET_SPD - ( fSpeedOff * cSpeedRev );
+
     mSpeed = ( int8_t )fTempSpeed;
     //走行パラメータの返却
     
