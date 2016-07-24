@@ -64,6 +64,8 @@ public:
 
     void calcRunLine( SENC_CLR color, int8_t* p_speed, int8_t* p_deg );
     void calcRunLineUseRefLv( SSHT reflection_lv, int8_t* p_speed, int8_t* p_deg );
+
+    //テスト用メソッド(非公開)
     FLOT isP(void);
     FLOT isI(void);
     FLOT isD(void);

@@ -37,6 +37,10 @@ extern "C" {
 #define STACK_SIZE      4096        /* タスクのスタックサイズ */
 #endif /* STACK_SIZE */
 
+/* 設定ファイル */
+#define PID_SET_FILE_PASS ( "/ev3rt/res/pid_settings" )
+
+
 /*
  *  関数のプロトタイプ宣言
  */
@@ -47,9 +51,6 @@ extern void bt_task(intptr_t exinf);
 extern void tracer_task(intptr_t exinf);
 extern void ev3_cyc_tracer(intptr_t exinf);
 extern void interrupt_task(intptr_t exinf);
-
-static void user_system_create( void );
-static void user_system_destroy( void );
 
 #endif /* TOPPERS_MACRO_ONLY */
 

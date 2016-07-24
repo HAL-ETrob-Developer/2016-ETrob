@@ -44,6 +44,7 @@
 #define INTERRUPT_CHK							/* メトロノーム ON/OFF		 */
 #define CHECK_STAY								/* 実行終了後停止			 */
 // #define REFST_DEBUG
+//#define LT_DEBUG
 
 /* ------------------------------------------------------------------------- */
 /* typedef宣言																 */

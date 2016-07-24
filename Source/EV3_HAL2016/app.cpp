@@ -44,6 +44,10 @@ using namespace ev3api;
 /* Bluetooth */
 static int32_t   bt_cmd = 0;      /* Bluetoothコマンド 1:リモートスタート */
 static FILE*     gBtHandle = NULL;      /* Bluetoothファイルハンドル */
+
+/* 設定ファイル */
+static memfile_t     gPidSetStract;      /* 設定ファイルハンドル */
+
 static int8_t gSpd = 0;//test Mod
 static FLOT   gGyOffSet = 0;//test Mod
 
@@ -72,6 +76,10 @@ static Balancer_ohs*           gBalancer;
 static RunningAdmin_ohs*       gRunningAdmin;
 static GyroAdmin_ohs*          gGyroAdmin;
 static TailAdmin_ohs*          gTailAdmin;
+
+
+static void user_system_create( void );
+static void user_system_destroy( void );
 
 void main_task(intptr_t unused)
 {
@@ -106,6 +114,7 @@ void main_task(intptr_t unused)
 
 static void user_system_create( void )
 {
+    ER ret;
     /* 各オブジェクトを生成・初期化する */
     touchSensor = new TouchSensor(PORT_1);
     colorSensor = new ColorSensor(PORT_3);
@@ -129,11 +138,16 @@ static void user_system_create( void )
     gBtHandle = ev3_serial_open_file( EV3_SERIAL_BT );
     assert( gBtHandle != NULL );
 
+    memset( &gPidSetStract, 0, sizeof(gPidSetStract));
+    ret  =  ev3_memfile_load( PID_SET_FILE_PASS, &gPidSetStract );
+    assert( ret != E_OK );
     return;
 }
 
 static void user_system_destroy( void )
 {
+    FILE* pidSetFileH = NULL;
+
     if( gRunLineCalculator ) { delete gRunLineCalculator; gRunLineCalculator = NULL; }
     if( gTailAdmin         ) { delete gTailAdmin;         gTailAdmin         = NULL; }
     if( gRayReflectAdmin   ) { delete gRayReflectAdmin;   gRayReflectAdmin   = NULL; }
@@ -152,7 +166,19 @@ static void user_system_destroy( void )
     if( clock              ) { delete clock;              clock              = NULL; }
 
     if( gBtHandle != NULL )  { fclose(gBtHandle); }
-	
+
+    if( gPidSetStract.buffer != NULL )  {
+        pidSetFileH =  fopen( PID_SET_FILE_PASS, "wb" );
+        if( pidSetFileH != NULL ) {
+            fwrite( gPidSetStract.buffer,
+                  sizeof(char),
+                  gPidSetStract.buffersz,
+                  pidSetFileH );
+            fclose( pidSetFileH );
+        }
+        ev3_memfile_free( &gPidSetStract );
+    }
+
     return;
 }
 
@@ -198,6 +224,9 @@ void interrupt_task(intptr_t exinf) {
 void tracer_task(intptr_t exinf) {
     while( ev3_button_is_pressed( BACK_BUTTON ) == false ) {
         switch( bt_cmd ) {
+            case 0:
+                gTailAdmin->postTailDegree(90);
+                break;
             case 3:
             case 2:
                 // gBalancer->setOffSet( gGyOffSet );
@@ -225,8 +254,7 @@ void tracer_task(intptr_t exinf) {
                 gLineTracer->postLineTraceConduct();
                 break;
             default:
-                gTailAdmin->postTailDegree(90);
-            break;
+                break;
         }
     }
 EXIT:
@@ -253,6 +281,8 @@ void bt_task(intptr_t unused)
         uint8_t c = fgetc(gBtHandle); /* 受信 */
         switch(c)
         {
+        case '0':
+            break;
         case '1':
             bt_cmd = 1;
             break;
@@ -288,10 +318,23 @@ void bt_task(intptr_t unused)
         default:
             break;
         }
+        if( gPidSetStract.buffer != NULL ) {
+            fprintf( gBtHandle, "buffer[%s]filesz[%d]buffersz[%d]\r\n", 
+            (char*)(gPidSetStract.buffer), gPidSetStract.filesz, gPidSetStract.buffersz );
+
+            *( char* )gPidSetStract.buffer = 's';
+        }
+
         fprintf( gBtHandle, "[speed = %3d ][deg = %3d ] [gSpd = %3d][cmd = %c]\r\n", 
                 gRunningAdmin->getSpeed(), gRunningAdmin->getAngle(), gSpd,c );
         //fputc(c, gBtHandle); /* エコーバック */
     }
 }
 
+void PidFileLood( memfile_t* pid_file_stc )
+{
+}
 
+void PidFileWrite( memfile_t* pid_file_stc, char cmd )
+{
+}
