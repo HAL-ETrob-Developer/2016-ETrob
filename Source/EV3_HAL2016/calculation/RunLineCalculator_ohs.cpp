@@ -1,4 +1,6 @@
 #include "hal_ev3_std.h"
+#include <string.h>
+
 #include "RunLineCalculator_ohs.h"
 
 /**
@@ -12,6 +14,13 @@ RunLineCalculator_ohs::RunLineCalculator_ohs()
     mPValue = 0;
     mIValue = 0;
     mDValue = 0;
+
+    mKspdP = K_P_SPD;
+    mKspdI = K_I_SPD;
+    mKspdD = K_D_SPD;
+    mKdegP = K_P_DEG;
+    mKdegI = K_I_DEG;
+    mKdegD = K_D_DEG;
 }
 
 /**
@@ -58,12 +67,12 @@ void RunLineCalculator_ohs::calcRunLine( SENC_CLR color, int8_t* p_speed, int8_t
     mIValue += mDValue;
 
     /* 走行角度計算 */
-    fTempDeg = ( K_P_DEG * mPValue ) + ( K_I_DEG * mIValue ) + ( K_D_DEG * mDValue );
+    fTempDeg = ( mKdegP * mPValue ) + ( mKdegI * mIValue ) + ( mKdegD * mDValue );
     mDeg = ( int8_t )fTempDeg;
 
     /* 走行速度計算 */
     if( mIValue < 0 ) { cSpeedRev = -1; }//符号反転用
-    fTempSpeed = TERGET_SPD - ( K_I_SPD  * ( mIValue * cSpeedRev ));
+    fTempSpeed = TERGET_SPD - ( mKspdI  * ( mIValue * cSpeedRev ));
     mSpeed = ( int8_t )fTempSpeed;
     //走行パラメータの返却
     
@@ -99,13 +108,13 @@ void RunLineCalculator_ohs::calcRunLineUseRefLv( SSHT reflection_lv, int8_t* p_s
     mIValue += mDValue;
 
     /* 走行角度計算 */
-    fTempDeg = ( K_P_DEG * mPValue ) + ( K_I_DEG * mIValue ) + ( K_D_DEG * mDValue );
+    fTempDeg = ( mKdegP * mPValue ) + ( mKspdI * mIValue ) + ( mKspdD * mDValue );
     mDeg = ( int8_t )fTempDeg;
 
     /* 走行速度計算 */
     //fTempSpeed = TERGET_SPD - ( K_I_SPD  * ( mIValue * cSpeedRev ));
 
-    fSpeedOff = ( K_P_SPD * mPValue ) + ( K_I_SPD * mIValue ) + ( K_D_SPD * mDValue );
+    fSpeedOff = ( mKspdP * mPValue ) + ( mKspdI * mIValue ) + ( mKspdD * mDValue );
     if( fSpeedOff < 0.0F ) { cSpeedRev = -1; }//符号反転用
     fTempSpeed = TERGET_SPD - ( fSpeedOff * cSpeedRev );
 
@@ -130,4 +139,34 @@ FLOT RunLineCalculator_ohs::isI(void)
 FLOT RunLineCalculator_ohs::isD(void)
 {
     return mDValue;
+}
+
+void RunLineCalculator_ohs::setGain( PID_SETTING* p_set_file )
+{
+if( p_set_file == NULL ) { return; }
+
+    mKspdP = p_set_file->fSpdP;
+    mKspdI = p_set_file->fSpdI;
+    mKspdD = p_set_file->fSpdD;
+    mKdegP = p_set_file->fDegP;
+    mKdegI = p_set_file->fDegI;
+    mKdegD = p_set_file->fDegD;
+
+    SCHR   cString[100];
+    memset( cString , 0, sizeof(cString));
+
+    sprintf(( char* )cString, "[%3.3f]" , mKspdP );
+	ev3_lcd_draw_string( cString, 0, 8*1);
+    sprintf(( char* )cString, "[%3.3f]" , mKspdI );
+	ev3_lcd_draw_string( cString, 0, 8*2);
+    sprintf(( char* )cString, "[%3.3f]" , mKspdD );
+	ev3_lcd_draw_string( cString, 0, 8*3);
+    sprintf(( char* )cString, "[%3.3f]" , mKdegP );
+	ev3_lcd_draw_string( cString, 0, 8*4);
+    sprintf(( char* )cString, "[%3.3f]" , mKdegI );
+	ev3_lcd_draw_string( cString, 0, 8*5);
+    sprintf(( char* )cString, "[%3.3f]" , mKdegD );
+	ev3_lcd_draw_string( cString, 0, 8*5);
+
+    return;
 }

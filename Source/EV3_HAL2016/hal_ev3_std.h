@@ -93,6 +93,17 @@ enum TRACE_MODE {
 	TMODE_SEARCH								/* 探索						 */
 };
 
+
+typedef struct _PID_SETTING{
+	float fSpdP;
+	float fSpdI;
+	float fSpdD;
+	float fDegP;
+	float fDegI;
+	float fDegD;
+}PID_SETTING;
+
+
 /* ------------------------------------------------------------------------- */
 /*              Copyright HAL Collage of Technology & Design                 */
 /* ------------------------------------------------------------------------- */

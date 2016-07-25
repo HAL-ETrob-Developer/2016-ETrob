@@ -80,6 +80,9 @@ static TailAdmin_ohs*          gTailAdmin;
 
 static void user_system_create( void );
 static void user_system_destroy( void );
+static void PidFileLood( memfile_t* pid_file_stc );
+static void PidFileWrite( memfile_t* pid_file_stc, char cmd );
+
 
 void main_task(intptr_t unused)
 {
@@ -141,6 +144,9 @@ static void user_system_create( void )
     memset( &gPidSetStract, 0, sizeof(gPidSetStract));
     ret  =  ev3_memfile_load( PID_SET_FILE_PASS, &gPidSetStract );
     assert( ret != E_OK );
+
+   PidFileLood( &gPidSetStract );
+
     return;
 }
 
@@ -172,7 +178,7 @@ static void user_system_destroy( void )
         if( pidSetFileH != NULL ) {
             fwrite( gPidSetStract.buffer,
                   sizeof(char),
-                  gPidSetStract.buffersz,
+                  sizeof(PID_SETTING) ,
                   pidSetFileH );
             fclose( pidSetFileH );
         }
@@ -311,6 +317,23 @@ void bt_task(intptr_t unused)
         case 't':
             bt_cmd = 't';
             break;
+        case 's':
+            /* 設定ファイルの書き込み */
+            // PidFileWrite( &gPidSetStract,c );
+
+            fprintf( gBtHandle,"[%c]---FILE IN----\r\n",c ); /* エコーバック */
+            ev3_speaker_play_tone( NOTE_C4, 500 );
+
+            /* Bt受付 */
+            fread( gPidSetStract.buffer,
+                    sizeof(char),
+                    sizeof(PID_SETTING),
+                    gBtHandle );
+
+            /* ユーザーレスポンス */
+            ev3_speaker_play_tone( NOTE_C4, 500 );
+            
+            break;
         case '9':
             bt_cmd = 9;
             gGyroAdmin->initDegree();
@@ -319,10 +342,8 @@ void bt_task(intptr_t unused)
             break;
         }
         if( gPidSetStract.buffer != NULL ) {
-            fprintf( gBtHandle, "buffer[%s]filesz[%d]buffersz[%d]\r\n", 
-            (char*)(gPidSetStract.buffer), gPidSetStract.filesz, gPidSetStract.buffersz );
-
-            *( char* )gPidSetStract.buffer = 's';
+            fprintf( gBtHandle, "buffer[%s]PID_SETTING[%d]buffersz[%d]\r\n", 
+            (char*)(gPidSetStract.buffer), sizeof(PID_SETTING), gPidSetStract.buffersz );
         }
 
         fprintf( gBtHandle, "[speed = %3d ][deg = %3d ] [gSpd = %3d][cmd = %c]\r\n", 
@@ -331,10 +352,51 @@ void bt_task(intptr_t unused)
     }
 }
 
-void PidFileLood( memfile_t* pid_file_stc )
+static void PidFileLood( memfile_t* pid_file_stc )
 {
+    /* ファイル構造体の生成 */
+    PID_SETTING  strcPidFile;
+    memset( &strcPidFile, 0, sizeof(PID_SETTING));
+
+    /* 異常終了 */
+    if( pid_file_stc->buffersz < sizeof(PID_SETTING) ) { return; }
+
+    /* メモリ領域から構造体へ変換 */
+    memcpy( &strcPidFile, pid_file_stc->buffer,sizeof(PID_SETTING));
+
+    /* 設定ファイルのロード＠パラメタ変更 */
+    gRunLineCalculator->setGain( &strcPidFile );
+
+    fprintf( gBtHandle,"[%s]s[%f][%f][%f]d[%f][%f][%f]\r\n",&strcPidFile,
+            strcPidFile.fSpdP,strcPidFile.fSpdI,strcPidFile.fSpdD, 
+            strcPidFile.fDegP,strcPidFile.fDegI,strcPidFile.fDegD );
+    return;
 }
 
-void PidFileWrite( memfile_t* pid_file_stc, char cmd )
+static void PidFileWrite( memfile_t* pid_file_stc, char cmd )
 {
+    /* ファイル構造体の生成（一時受け用） */
+    int8_t  cDummy[100];
+    memset( &cDummy[0], 0, 100);
+
+    /* ユーザーレスポンス */
+    fprintf( gBtHandle,"[%c]---FILE IN----\r\n",cmd ); /* エコーバック */
+    ev3_speaker_play_tone( NOTE_C4, 500 );
+
+    /* Bt受付 */
+    fread( cDummy,
+            sizeof(char),
+            sizeof(PID_SETTING),
+            gBtHandle );
+
+    /* ユーザーレスポンス */
+    ev3_speaker_play_tone( NOTE_C4, 500 );
+
+    /* 一時受けからメモリ領域へ */
+    memcpy( pid_file_stc->buffer, cDummy, sizeof(PID_SETTING));
+
+    /* 設定ファイルのロード */
+    PidFileLood( pid_file_stc );
+
+    return;
 }

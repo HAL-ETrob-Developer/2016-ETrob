@@ -69,6 +69,7 @@ public:
     FLOT isP(void);
     FLOT isI(void);
     FLOT isD(void);
+    void setGain( PID_SETTING* p_set_file );
 
 private:
 	/* メンバ */
@@ -77,7 +78,13 @@ private:
     FLOT mPValue;
     FLOT mIValue;
     FLOT mDValue;
-
+    //ゲイン
+    FLOT mKspdP;
+    FLOT mKspdI;
+    FLOT mKspdD;
+    FLOT mKdegP;
+    FLOT mKdegI;
+    FLOT mKdegD;
 };
 
 #endif  // RUNLINECALCULATOR_OHS_H_
