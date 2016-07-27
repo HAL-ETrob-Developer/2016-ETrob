@@ -7,7 +7,7 @@
 #include "ev3api.h"
 #include "../device_ope/GyroAdmin_ohs.h"
 
-#define BL_K_GY_OFFS (      0.04F )
+#define BL_K_GY_OFFS (      0.02F )
 //#define BL_K_GY_OFFS (      0.0F )
 
 class Balancer_ohs {

@@ -365,7 +365,7 @@ static void PidFileLood( memfile_t* pid_file_stc )
     memcpy( &strcPidFile, pid_file_stc->buffer,sizeof(PID_SETTING));
 
     /* 設定ファイルのロード＠パラメタ変更 */
-    gRunLineCalculator->setGain( &strcPidFile );
+    // gRunLineCalculator->setGain( &strcPidFile );
 
     fprintf( gBtHandle,"[%s]s[%f][%f][%f]d[%f][%f][%f]\r\n",&strcPidFile,
             strcPidFile.fSpdP,strcPidFile.fSpdI,strcPidFile.fSpdD, 
