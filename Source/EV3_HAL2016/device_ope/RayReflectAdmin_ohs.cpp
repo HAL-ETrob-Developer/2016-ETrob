@@ -101,22 +101,27 @@ void RayReflectAdmin_ohs::setLowPassFilter( void )
 int16_t RayReflectAdmin_ohs::getClrCvtBright( void )
 {
 	rgb_raw_t RgbRaw;
+	int32_t sBright = 0;
 	memset( &RgbRaw, 0, sizeof(RgbRaw));
 
 	mColorSensor.getRawColor( RgbRaw );
-
+	/* 反射値の変換 */
+	sBright = RgbRaw.r + RgbRaw.g + RgbRaw.b;
+	if( sBright == 0 ) { sBright = 0; }
+	else { sBright = sBright / 3; }
+	if( sBright > REY_MAX_REF ) { sBright = REY_MAX_REF; }
     /* LCD画面表示 */
 #ifdef PRINT
     SCHR   cString[50];
     memset( cString , 0, sizeof(cString));
 
-	sprintf(( char* )cString, "Red_Value[%5d]",RgbRaw.r);
+	sprintf(( char* )cString, "Sam_Value[%3d]Red_Value[%3d]",sBright,RgbRaw.r);
 	ev3_lcd_draw_string( cString, 0, 8*4);
-	sprintf(( char* )cString, "Red_Value[%5d]",RgbRaw.g);
+	sprintf(( char* )cString, "              Gre_Value[%3d]",RgbRaw.g);
 	ev3_lcd_draw_string( cString, 0, 8*5);
-	sprintf(( char* )cString, "Red_Value[%5d]",RgbRaw.b);
+	sprintf(( char* )cString, "              Ble_Value[%3d]",RgbRaw.b);
 	ev3_lcd_draw_string( cString, 0, 8*6);
 #endif
 
-	return (int16_t)((uint32_t)( RgbRaw.r + RgbRaw.g + RgbRaw.b )/3);
+	return (int16_t)sBright;
 }

@@ -40,9 +40,11 @@
 #define DSC_MODE			(		   5 )		/* USHR  print_mode 		 */
 
 /* 動作設定＠デバッグ */
-#define PRINT									/* プリント動作 ON/OFF		 */
+//#define PRINT									/* プリント動作 ON/OFF		 */
 #define INTERRUPT_CHK							/* メトロノーム ON/OFF		 */
 #define CHECK_STAY								/* 実行終了後停止			 */
+// #define REFST_DEBUG
+//#define LT_DEBUG
 
 /* ------------------------------------------------------------------------- */
 /* typedef宣言																 */
@@ -90,6 +92,17 @@ enum TRACE_MODE {
 	TMODE_EDGE,									/* エッジトレース			 */
 	TMODE_SEARCH								/* 探索						 */
 };
+
+
+typedef struct _PID_SETTING{
+	float fSpdP;
+	float fSpdI;
+	float fSpdD;
+	float fDegP;
+	float fDegI;
+	float fDegD;
+}PID_SETTING;
+
 
 /* ------------------------------------------------------------------------- */
 /*              Copyright HAL Collage of Technology & Design                 */
