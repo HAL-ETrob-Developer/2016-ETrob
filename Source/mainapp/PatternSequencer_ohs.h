@@ -2,6 +2,14 @@
 
 #ifndef MAINAPP_PATTERNSEQUENCER_OHS_H_
 #define MAINAPP_PATTERNSEQUENCER_OHS_H_
+#include "hal_ev3_std.h"
+
+typedef struct {
+  int32_t RunningSpeed;
+  int32_t RunningAngle;
+  int32_t TailAngle;
+  BOOL    Balance;
+};
 
 class PatternSequencer_ohs {
 public:
