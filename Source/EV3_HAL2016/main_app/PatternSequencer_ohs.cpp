@@ -1,5 +1,6 @@
+#include "hal_ev3_std.h"
 #include "PatternSequencer_ohs.h"
-
+          
 /**
  * コンストラクタ
  */
