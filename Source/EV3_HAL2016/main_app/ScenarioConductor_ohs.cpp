@@ -11,11 +11,16 @@
 ScenarioConductor_ohs::ScenarioConductor_ohs( LineTracer_ohs* line_tracer, BodyStateAdmin_ohs* body_state_admin, PatternSequencer_ohs* pattern_sequencer )
 {
 	/* 状態遷移インデックス構造体初期化 */
-	memset( mNow, 0, sizeof( BODY_STATE ) ;
+	memset( mIndex, 0, sizeof( STATE_FLOW_INDEX ) ;
 
 	mLineTracer 			= line_tracer;
 	mBodyStateAdmin 	= body_state_admin;
 	mPatternSequencer = pettern_sequencer;
+
+	mMilage = 0;
+	mBodyAngle = 0;
+	mTailAngle = 0;
+
 }
 
 /**
@@ -39,19 +44,19 @@ BOOL ScenarioConductor_ohs::execScenario() {
 	mBodyStateAdmin -> setBodyStateUpdate();
 
 	/* カラーセンサ状態取得 */
-	mBodyStateAdmin -> getColorSensorState();
+	mColorSensorState = mBodyStateAdmin -> getColorSensorState();
 
 	/* バランス状態取得 */
-	 mBodyStateAdmin -> getBalanceState();
+	mBalanceState = mBodyStateAdmin -> getBalanceState();
 
 	/* 走行距離取得 */
-	mBodyStateAdmin -> getMileage();
+	mMilage = mBodyStateAdmin -> getMileage();
 
 	/* 本体角度取得 */
-	mBodyStateAdmin -> getBodyAngle();
+	mBodyAngle = mBodyStateAdmin -> getBodyAngle();
 
 	/* 尾角度取得 */
-	mBodyStateAdmin -> getTailAngle();
+	mTailAngle = mBodyStateAdmin -> getTailAngle();
 }
 
 /**
