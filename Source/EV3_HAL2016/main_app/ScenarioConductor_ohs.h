@@ -20,10 +20,10 @@ public:
     //デストラクタ
         ~ScenarioConductor_ohs();
 
-    BOOL execScenario();        //シナリオ実行
-    void quitCommand();         //指揮終了
-    SCHR setScenario();         //シナリオセット
-    void setScenarioUpDate();   //シナリオ更新
+    BOOL execScenario();                      //シナリオ実行
+    void quitCommand();                       //指揮終了
+    SCHR setScenario( RUNNING_ROUTE route );  //シナリオセット
+    void setScenarioUpDate();                 //シナリオ更新
 
     //メンバ
     SENC_CLR    mColorSensorState;
@@ -32,11 +32,13 @@ public:
     int32_t     mBodyAngle;
     int32_t     mTailAngle;
 
+
 private:
   //メンバ
-  LineTracer_ohs* mLineTracer;
+  LineTracer_ohs*     mLineTracer;
   BodyStateAdmin_ohs* mBodyStateAdmin;
-  STATE_FLOW_INDEX　mIndex;
+  STATE_FLOW_INDEX    mIndex;
+  RUNNING_ROUTE       mRoute;
 
 };
 

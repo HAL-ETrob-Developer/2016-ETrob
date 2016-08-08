@@ -38,7 +38,7 @@ BOOL ScenarioConductor_ohs::execScenario() {
 	mLineTracer -> postLineTraceConduct();
 
 	/* 定量走行指揮 */
-	mPatternSequencer -> callPatternRunning( /* 保留 */ );
+	mPatternSequencer -> callPatternRunning( /* 記録番号,　バランス有無 */ );
 
 	/* 本体状態更新 */
 	mBodyStateAdmin -> setBodyStateUpdate();
@@ -57,19 +57,29 @@ BOOL ScenarioConductor_ohs::execScenario() {
 
 	/* 尾角度取得 */
 	mTailAngle = mBodyStateAdmin -> getTailAngle();
+
+	if( /* シナリオ更新条件達成 */ )　{
+		if( /* 次シナリオ無し */ ) {
+			quitCommand();
+		}
+		else {
+			setScenarioUpDate();
+		}
+	}
+	setScenario( mRoute );
 }
 
 /**
  * 指揮終了
  */
 void ScenarioConductor_ohs::quitCommand() {
-	/* 保留 */
+	/* システム終了通知をメインタスクへ */
 }
 
 /**
  * シナリオセット
  */
-SCHR ScenarioConductor_ohs::setScenario() {
+SCHR ScenarioConductor_ohs::setScenario( RUNNING_ROUTE route ) {
 	/* 保留 */
 }
 
