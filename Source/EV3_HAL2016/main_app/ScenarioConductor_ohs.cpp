@@ -76,6 +76,7 @@ BOOL ScenarioConductor_ohs::execScenario() {
 				TailAngle				 = mTailAngle;
 
 				setScenarioUpDate();//シナリオ更新
+				setScenario( mRoute );
 			break;
 
 			case HURDLE1_CLEAR:		//難所1（ルックアップゲートor階段）クリア
@@ -87,6 +88,7 @@ BOOL ScenarioConductor_ohs::execScenario() {
 				TailAngle				 = mTailAngle;
 
 				setScenarioUpDate();//シナリオ更新
+				setScenario( mRoute );
 				break;
 
 			case HURDLE2_CLEAR:		//難所2(ガレージイン)クリア
