@@ -7,10 +7,24 @@
 #include "LineTracer_ohs.h"
 #include "BodyStateAdmin_ohs.h"
 
+/* 達成条件 */
+#define TRACE_CLEAR     (    1  )
+#define HURDLE1_CLEAR   (    2  )
+#define HURDLE2_CLEAR   (    3  )
+
+/* 次の遷移番号 */
+#define TRACE           (    0  )
+#define HURDLE1         (    1  )
+#define HURDLE2         (    2  )
+
+/* 実行動作番号 */
+#define LINE_TRACE      (   '1' )
+#define PETTERN_RUNNING (   '2' )
+
 typedef struct {
-  SCHR event_condition;         //達成条件イベント
-  int32_t flow_transition;      //遷移要件
-  UCHR action_number;           //実行動作番号
+  SCHR event_condition      = LINE_TRACE;         //達成条件
+  int32_t flow_transition   = TRACE;              //次の遷移番号
+  UCHR action_number        = LINE_TRACE;         //実行動作番号
 }STATE_FLOW_INDEX;
 
 class ScenarioConductor_ohs {
@@ -32,6 +46,12 @@ public:
     int32_t     mBodyAngle;
     int32_t     mTailAngle;
 
+    //記録用
+    SENC_CLR    ColorSensorState;
+    GYRO_STATE  BalanceState;
+    int32_t     Milage;
+    int32_t     BodyAngle;
+    int32_t     TailAngle;
 
 private:
   //メンバ

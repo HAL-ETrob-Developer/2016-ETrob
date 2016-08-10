@@ -1,6 +1,8 @@
 #include "hal_ev3_std.h"
+
 #include "LineTracer_ohs.h"
-#include "ContestScenarioConductor_ohs.h"
+#include "ScenarioConductor_ohs.h"
+#include "../device_ope/RayReflectAdmin_ohs.h"
 
 #include "LineTracer_ohs.h"
 #include "PatternSequencer_ohs.h"
@@ -10,9 +12,6 @@
  */
 ScenarioConductor_ohs::ScenarioConductor_ohs( LineTracer_ohs* line_tracer, BodyStateAdmin_ohs* body_state_admin, PatternSequencer_ohs* pattern_sequencer )
 {
-	/* 状態遷移インデックス構造体初期化 */
-	memset( mIndex, 0, sizeof( STATE_FLOW_INDEX ) ;
-
 	mLineTracer 			= line_tracer;
 	mBodyStateAdmin 	= body_state_admin;
 	mPatternSequencer = pettern_sequencer;
@@ -20,7 +19,6 @@ ScenarioConductor_ohs::ScenarioConductor_ohs( LineTracer_ohs* line_tracer, BodyS
 	mMilage = 0;
 	mBodyAngle = 0;
 	mTailAngle = 0;
-
 }
 
 /**
@@ -34,11 +32,18 @@ ScenarioConductor_ohs::~ScenarioConductor_ohs() {
  */
 BOOL ScenarioConductor_ohs::execScenario() {
 
-	/*　ライントレース指揮 */
-	mLineTracer -> postLineTraceConduct();
+	/* 実行動作インデックスの番号に応じて指揮する */
+	switch ( mIndex.action_number ) {
+		case LINE_TRACE;
+		/*　ライントレース指揮 */
+		mLineTracer -> postLineTraceConduct();
+		break;
 
-	/* 定量走行指揮 */
-	mPatternSequencer -> callPatternRunning( /* 記録番号,　バランス有無 */ );
+		case PATTERN_RUNNING;
+		/* 定量走行指揮 */
+		mPatternSequencer -> callPatternRunning();
+		break;
+	}
 
 	/* 本体状態更新 */
 	mBodyStateAdmin -> setBodyStateUpdate();
@@ -58,15 +63,41 @@ BOOL ScenarioConductor_ohs::execScenario() {
 	/* 尾角度取得 */
 	mTailAngle = mBodyStateAdmin -> getTailAngle();
 
-	if( /* シナリオ更新条件達成 */ )　{
-		if( /* 次シナリオ無し */ ) {
-			quitCommand();
-		}
-		else {
-			setScenarioUpDate();
+	//グレー検知したら達成条件を更新する
+	if( mColorSensorState == SCLR_GRAY ) {
+		mIndex.event_condition++;
+		switch( mIndex.event_condition ) {
+			case TRACE_CLEAR:			//トレースクリア
+				/* 現本体状態の記録 ------------------------------------------- */
+				ColorSensorState = mColorSensorState;
+				BalanceState		 = mBalanceState;
+				Milage					 = mMilage;
+				BodyAngle				 = mBodyAngle;
+				TailAngle				 = mTailAngle;
+
+				setScenarioUpDate();//シナリオ更新
+			break;
+
+			case HURDLE1_CLEAR:		//難所1（ルックアップゲートor階段）クリア
+				/* 現本体状態の記録 ------------------------------------------- */
+				ColorSensorState = mColorSensorState;
+				BalanceState		 = mBalanceState;
+				Milage					 = mMilage;
+				BodyAngle				 = mBodyAngle;
+				TailAngle				 = mTailAngle;
+
+				setScenarioUpDate();//シナリオ更新
+				break;
+
+			case HURDLE2_CLEAR:		//難所2(ガレージイン)クリア
+				quitCommand();			//指揮終了
+				break;
+
+			default:							//トレース中
+				setScenario( mRoute );
+				break;
 		}
 	}
-	setScenario( mRoute );
 }
 
 /**
@@ -80,12 +111,37 @@ void ScenarioConductor_ohs::quitCommand() {
  * シナリオセット
  */
 SCHR ScenarioConductor_ohs::setScenario( RUNNING_ROUTE route ) {
-	/* 保留 */
+	if ( route == RROUTE_LEFT ) {
+		switch ( flow_transition ) {
+			case TRACE;
+				/* トレース */
+				break;
+			case HURDLE1;
+				/* ルックアップゲート */
+				break;
+			case HURDLE2;
+				/* ガレージイン */
+				break;
+		}
+	}
+	else if (route == RROUTE_RIGHT ) {
+		switch ( flow_transition ) {
+			case TRACE;
+				/* トレース */
+				break;
+			case HURDLE1;
+				/* 階段 */
+				break;
+			case HURDLE2;
+				/* ガレージイン */
+				break;
+		}
+	}
 }
 
 /**
  * シナリオ更新
  */
 void ScenarioConductor_ohs::setScenarioUpDate() {
-	/* 保留 */
+	flow_transition++;
 }
