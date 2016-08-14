@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.createSW = new System.Windows.Forms.Button();
             this.textBoxSpdP = new System.Windows.Forms.TextBox();
             this.textBoxSpdI = new System.Windows.Forms.TextBox();
@@ -64,12 +64,12 @@
             this.ev3OpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.groupRunningIndex = new System.Windows.Forms.GroupBox();
             this.runninngIndexGridView = new System.Windows.Forms.DataGridView();
+            this.ControlLabel = new System.Windows.Forms.Label();
             this.RunNo = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.RunSpeed = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.RunTrun = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.RunTailDeg = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.RunBalance = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.ControlLabel = new System.Windows.Forms.Label();
             this.groupSpd.SuspendLayout();
             this.groupDeg.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.righitStateDataGrid)).BeginInit();
@@ -240,9 +240,9 @@
             // RIdxNo
             // 
             this.RIdxNo.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
-            dataGridViewCellStyle3.Format = "0";
-            dataGridViewCellStyle3.NullValue = "0";
-            this.RIdxNo.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle1.Format = "0";
+            dataGridViewCellStyle1.NullValue = "0";
+            this.RIdxNo.DefaultCellStyle = dataGridViewCellStyle1;
             this.RIdxNo.HeaderText = "No";
             this.RIdxNo.Name = "RIdxNo";
             this.RIdxNo.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
@@ -422,6 +422,21 @@
             this.runninngIndexGridView.TabIndex = 0;
             this.runninngIndexGridView.CellParsing += new System.Windows.Forms.DataGridViewCellParsingEventHandler(this.runninngIndexeDataGrid_CellParsing);
             // 
+            // ControlLabel
+            // 
+            this.ControlLabel.AutoEllipsis = true;
+            this.ControlLabel.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.ControlLabel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.ControlLabel.Location = new System.Drawing.Point(169, 455);
+            this.ControlLabel.Margin = new System.Windows.Forms.Padding(0);
+            this.ControlLabel.MaximumSize = new System.Drawing.Size(500, 500);
+            this.ControlLabel.Name = "ControlLabel";
+            this.ControlLabel.Padding = new System.Windows.Forms.Padding(10, 5, 10, 3);
+            this.ControlLabel.Size = new System.Drawing.Size(400, 22);
+            this.ControlLabel.TabIndex = 20;
+            this.ControlLabel.Text = "デバッグ：NULL";
+            this.ControlLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // RunNo
             // 
             this.RunNo.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
@@ -454,11 +469,11 @@
             // RunTailDeg
             // 
             this.RunTailDeg.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
-            this.RunTailDeg.HeaderText = "TailDeg";
+            this.RunTailDeg.HeaderText = "Tail";
             this.RunTailDeg.Name = "RunTailDeg";
             this.RunTailDeg.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.RunTailDeg.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.RunTailDeg.Width = 50;
+            this.RunTailDeg.Width = 30;
             // 
             // RunBalance
             // 
@@ -466,21 +481,6 @@
             this.RunBalance.HeaderText = "Balance";
             this.RunBalance.Name = "RunBalance";
             this.RunBalance.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            // 
-            // ControlLabel
-            // 
-            this.ControlLabel.AutoEllipsis = true;
-            this.ControlLabel.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.ControlLabel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.ControlLabel.Location = new System.Drawing.Point(169, 455);
-            this.ControlLabel.Margin = new System.Windows.Forms.Padding(0);
-            this.ControlLabel.MaximumSize = new System.Drawing.Size(500, 500);
-            this.ControlLabel.Name = "ControlLabel";
-            this.ControlLabel.Padding = new System.Windows.Forms.Padding(10, 5, 10, 3);
-            this.ControlLabel.Size = new System.Drawing.Size(400, 22);
-            this.ControlLabel.TabIndex = 20;
-            this.ControlLabel.Text = "デバッグ：NULL";
-            this.ControlLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // Form1
             // 
@@ -548,12 +548,12 @@
         private System.Windows.Forms.OpenFileDialog ev3OpenFileDialog;
         private System.Windows.Forms.GroupBox groupRunningIndex;
         private System.Windows.Forms.DataGridView runninngIndexGridView;
+        private System.Windows.Forms.Label ControlLabel;
         private System.Windows.Forms.DataGridViewTextBoxColumn RunNo;
         private System.Windows.Forms.DataGridViewTextBoxColumn RunSpeed;
         private System.Windows.Forms.DataGridViewTextBoxColumn RunTrun;
         private System.Windows.Forms.DataGridViewTextBoxColumn RunTailDeg;
         private System.Windows.Forms.DataGridViewCheckBoxColumn RunBalance;
-        private System.Windows.Forms.Label ControlLabel;
     }
 }
 
