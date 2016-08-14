@@ -3,14 +3,17 @@
 #ifndef MAINAPP_BODYSTATEADMIN_OHS_H_
 #define MAINAPP_BODYSTATEADMIN_OHS_H_
 
+#include "ev3api.h"
+#include "hal_ev3_std.h"
+
 #include "../device_ope/RayReflectAdmin_ohs.h"
 #include "../device_ope/GyroAdmin_ohs.h"
 #include "../device_ope/RunningAdmin_ohs.h"
 #include "../device_ope/TailAdmin_ohs.h"
 
 typedef struct {
-      int8_t ColorSensorState;
-      int16_t BalanceState;
+      SENC_CLR ColorSensorState;
+      GYRO_STATE BalanceState;
       int32_t Mileage;
       int32_t BodyAngle;
       int32_t TailAngle;
@@ -49,7 +52,6 @@ private:
     GyroAdmin_ohs*         mGyroAdmin;
     RunningAdmin_ohs*      mRunningAdmin;
     TailAdmin_ohs*         mTailAdmin;
-
 };
 
 #endif  // MAINAPP_BODYSTATEADMIN_H_
