@@ -11,6 +11,7 @@
 #define SCENARIO_MAX_NUM_L  (   50 )
 #define SCENARIO_MAX_NUM    (  101 )//右コース+左コース+開始状態
 #define INIT_SCENARIO_ID    (  100 )//開始状態はindex末尾に
+#define SCENARIO_CPY_SIZE   ( syzeof( SCENE_INDEX ) * 100 )//シナリオインデックスコピーサイズ
 
 //達成条件:enum化するとEV3RT_2016_FORMと連携取り辛いので
 #define CLS_BLK    (     0 )
@@ -27,8 +28,8 @@
 
 typedef struct _SCENARIO_INDEX {
     UCHR move_event;   //達成条件
-    UCHR next_scene;   //次の遷移番号
     UCHR pattern_id;   //実行動作番号
+    UCHR next_scene;   //次の遷移番号
     UCHR dummy;        //バウンダリ対策
     SLNG event_value;  //達成条件に付随する値
 }SCENE_INDEX;
@@ -45,7 +46,7 @@ public:
     SCHR setScenario( UCHR uc_scen_no );        //シナリオセット
     void setScenarioUpDate();                 //シナリオ更新
 
-    void setScenarioIndex( SCENE_INDEX* p_scenx_index );//シナリオインデックスの外部登録
+    BOOL setScenarioIndex( SCENE_INDEX* p_scenx_index );//シナリオインデックスの外部登録
 
 private:
     //メンバ
@@ -55,14 +56,14 @@ private:
 
     UCHR    mScenarioID;
     SCENE_INDEX mScenario[SCENARIO_MAX_NUM];
-    void ( *mCheckMethod[EVENT_NUM] )( void );
+    BOOL ( *mCheckMethod[EVENT_NUM] )( void );
 
-    void checkRayRef();
-    void checkMileage();
-    void checkAngle();
-    void checkTailDeg();
-    void checkGyro();
-    void checkQuit();
-    void checkSlip();
+    BOOL checkRayRef();
+    BOOL checkMileage();
+    BOOL checkAngle();
+    BOOL checkTailDeg();
+    BOOL checkGyro();
+    BOOL checkQuit();
+    BOOL checkSlip();
 
 #endif  // MAINAPP_CONTESTSCENARIOCONDUCTOR_OHS_H_

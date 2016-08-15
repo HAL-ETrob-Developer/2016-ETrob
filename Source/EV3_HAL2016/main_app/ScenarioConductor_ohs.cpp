@@ -18,8 +18,8 @@ ScenarioConductor_ohs::ScenarioConductor_ohs( BodyStateAdmin_ohs* body_state_adm
 	memset( mScenario, 0, sizeof(mScenario));
 	//初期待機状態の入力
 	mScenario[INIT_SCENARIO_ID].move_event = EX_SLIP;
-	mScenario[INIT_SCENARIO_ID].next_scene = 0;
 	mScenario[INIT_SCENARIO_ID].pattern_id = 0;
+	mScenario[INIT_SCENARIO_ID].next_scene = INIT_SCENARIO_ID;
 	mScenario[INIT_SCENARIO_ID].event_value = 0;
 
 	//実行シナリオID = 初期待機状態
@@ -50,36 +50,70 @@ ScenarioConductor_ohs::~ScenarioConductor_ohs() {
 BOOL ScenarioConductor_ohs::execScenario() {
 
 
+	//シナリオ達成チェック
+	*mCheckMethod[mScenario[mScenarioID].move_event]();
+
+
 }
 
 /* 光学センサの状態を確認 */
-void ScenarioConductor_ohs::checkRayRef() {
+BOOL ScenarioConductor_ohs::checkRayRef() {
+	SENC_CLR getSencClr = mBodyStateAdmin->getColorSensorState();
 
+	switch( mScenario[mScenarioID].move_event ) {
+		case CLS_BLK:
+			if( getSencClr == SCLR_BLACK ) { return true; }
+			break;
+		case CLS_GRY:
+			if( getSencClr == SCLR_GRAY ) { return true; }
+			break;
+		case CLS_WHT:
+			if( getSencClr == SCLR_WHITE ) { return true; }
+			break;
+		default:
+			break;
+	}
+
+	return false;
 }
 /* 走行距離を確認 */
-void ScenarioConductor_ohs::checkMileage() {
+BOOL ScenarioConductor_ohs::checkMileage() {
 
 }
 /* 走行体角度を確認 */
-void ScenarioConductor_ohs::checkAngle() {
+BOOL ScenarioConductor_ohs::checkAngle() {
 
 }
 /* 尻尾角度を確認 */
-void ScenarioConductor_ohs::checkTailDeg() {
+BOOL ScenarioConductor_ohs::checkTailDeg() {
 
 }
 /* ジャイロ状態を確認 */
-void ScenarioConductor_ohs::checkGyro() {
+BOOL ScenarioConductor_ohs::checkGyro() {
+	SENC_CLR getGyroState = mBodyStateAdmin->getBalanceState();
 
+	switch( mScenario[mScenarioID].move_event ) {
+		case GYR__ST:
+			if( getGyroState == GSTA_STABILITY ) { return true; }
+			break;
+		case GYR_UST:
+			if( getGyroState == GSTA_UNSTABLE ) { return true; }
+			break;
+		default:
+			break;
+	}
+	
+	return false;
 }
 /* シナリオ終了操作 */
-void ScenarioConductor_ohs::checkQuit() {
-	//シナリオインデックスを範囲外にする = 終了
-	mScenarioID = SCENARIO_MAX_NUM;
+BOOL ScenarioConductor_ohs::checkQuit() {
+	//終了操作
+	quitCommand();
+	return true;
 }
 /* シナリオ現状を保持する（外部入力待ち） */
-void ScenarioConductor_ohs::checkSlip() {
-	return;
+BOOL ScenarioConductor_ohs::checkSlip() {
+	return false;
 }
 
 
@@ -99,11 +133,27 @@ BOOL ScenarioConductor_ohs::setScenario( UCHR uc_scen_no ) {
  * 指揮終了
  */
 void ScenarioConductor_ohs::quitCommand() {
+	//シナリオインデックスを範囲外にする = 終了
+	mScenarioID = SCENARIO_MAX_NUM;
+	
+	//ライントレーサに終了通知を渡す
+	mLineTracer->postLineTraceStop();
 }
 
 /**
  * シナリオ更新
  */
 void ScenarioConductor_ohs::setScenarioUpDate() {
-	flow_transition++;
+	mScenarioID = mScenario[mScenarioID].next_scene;
+}
+
+/**
+ * シナリオインデックスの外部登録
+ */
+BOOL ScenarioConductor_ohs::setScenarioIndex( SCENE_INDEX* p_scenx_index )
+{
+	if( p_scenx_index == NULL ) { return false; }
+	//シナリオインデックスのコピー
+	memcpy( mScenario, p_scenx_index,SCENARIO_CPY_SIZE );
+	return true;
 }
