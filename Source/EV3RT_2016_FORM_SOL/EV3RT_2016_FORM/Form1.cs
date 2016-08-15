@@ -37,7 +37,8 @@ namespace EV3RT_2016_FORM
         public const string _RUN_MLG = "RUN_MLG";
         public const string _EV3_DEG = "EV3_DEG";
         public const string _TIL_DEG = "TIL_DEG";
-        public const string _GYRO_ST = "GYRO_ST";
+        public const string _GYR__ST = "GYR__ST";
+        public const string _GYR_UST = "GYR_UST";
         public const string _EX_SLIP = "EX_SLIP";
         public const string _EX_END  = "EX_END";
 
@@ -47,7 +48,8 @@ namespace EV3RT_2016_FORM
                                             _RUN_MLG,
                                             _EV3_DEG,
                                             _TIL_DEG,
-                                            _GYRO_ST,
+                                            _GYR__ST,
+                                            _GYR_UST,
                                             _EX_SLIP,
                                             _EX_END };
         /* イニシャライズ ----------------------------------------------------------- */
