@@ -1,6 +1,6 @@
 #include "hal_ev3_std.h"
 
-#include "PatternSequencer_ohs.h"
+#include "ScenarioConductor_ohs.h"
 
 /**
  * コンストラクタ
@@ -44,13 +44,23 @@ ScenarioConductor_ohs::~ScenarioConductor_ohs() {
  */
 BOOL ScenarioConductor_ohs::execScenario() {
 	BOOL nextEventF = false;
+	UCHR ucMoveEvent = mScenario[mScenarioID].move_event;
 
-	//インデックスチェック
-	if( mScenarioID >= SCENARIO_MAX_NUM ) { return false; }
+	/* インデックスチェック ------------------------------------------- */
+	//実行インデックス
+	if( mScenarioID >= SCENARIO_MAX_NUM ) {
+		quitCommand();
+		return false;
+	}
+	//達成条件ID
+	if( ucMoveEvent >= EVENT_NUM ) {
+		quitCommand();
+		return false;
+	}
 
 	/* シナリオ達成チェック ------------------------------------------- */
 	//達成確認
-	nextEventF = ( *mCheckMethod[( mScenario[mScenarioID].move_event )] )();
+	nextEventF = ( *mCheckMethod[ucMoveEvent] )();
 
 	//達成フラグのチェック
 	if( nextEventF ) { 
@@ -93,18 +103,53 @@ BOOL ScenarioConductor_ohs::checkRayRef() {
 
 	return false;
 }
+
 /* 走行距離を確認 */
 BOOL ScenarioConductor_ohs::checkMileage() {
+	SLNG lGetNowMlg = mBodyStateAdmin->getMileage();
+	SLNG lTargetMlg = mScenario[mScenarioID].event_value;
 
+	if( lTargetMlg > 0 ) {
+		//前進チェック
+		if( lGetNowMlg > lTargetMlg ) { return true; }
+	} else {
+		//後進チェック
+		if( lGetNowMlg < lTargetMlg ) { return true; }
+	}
+	return false;
 }
+
 /* 走行体角度を確認 */
 BOOL ScenarioConductor_ohs::checkAngle() {
+	SLNG lGetNowDeg = mBodyStateAdmin->getBodyAngle();
+	SLNG lTargetDeg = mScenario[mScenarioID].event_value;
 
+	if( lTargetMlg > 0 ) {
+		//cwチェック
+		if( lGetNowMlg > lTargetMlg ) { return true; }
+	} else {
+		//ccwチェック
+		if( lGetNowMlg < lTargetMlg ) { return true; }
+	}
+	return false;
 }
+
 /* 尻尾角度を確認 */
 BOOL ScenarioConductor_ohs::checkTailDeg() {
+	SLNG lGetNowDeg = mBodyStateAdmin->getTailAngle();
+	SLNG lTrgDegMax = 0;
+	SLNG lTrgDegMin = 0;
 
+	//目標達成範囲の設定
+	lTrgDegMax = mScenario[mScenarioID].event_value + TIL_DEG_PERMISSION; 
+	lTrgDegMin = mScenario[mScenarioID].event_value - TIL_DEG_PERMISSION;
+
+	if(( lTrgDegMax > lGetNowDeg ) && ( lGetNowDeg > lTrgDegMin )) {
+		return true;
+	}
+	return false;
 }
+
 /* ジャイロ状態を確認 */
 BOOL ScenarioConductor_ohs::checkGyro() {
 	SENC_CLR getGyroState = mBodyStateAdmin->getBalanceState();
@@ -122,12 +167,14 @@ BOOL ScenarioConductor_ohs::checkGyro() {
 	
 	return false;
 }
+
 /* シナリオ終了操作 */
 BOOL ScenarioConductor_ohs::checkQuit() {
 	//終了操作
 	quitCommand();
 	return true;
 }
+
 /* シナリオ現状を保持する（外部入力待ち） */
 BOOL ScenarioConductor_ohs::checkSlip() {
 	return false;
@@ -167,7 +214,7 @@ BOOL ScenarioConductor_ohs::setScenarioUpDate() {
 	mScenarioID = mScenario[mScenarioID].next_scene;
 
 	//シナリオ範囲オーバチェック
-	if( mScenarioID >= SCENARIO_MAX_NUM; ) {
+	if( mScenarioID >= SCENARIO_MAX_NUM ) {
 		//終了操作
 		quitCommand();
 		//異常終了

@@ -5,14 +5,20 @@
 
 #include "hal_ev3_std.h"
 #include "LineTracer_ohs.h"
-#include "ScenarioConductor_ohs.h"
+#include "PatternSequencer_ohs.h"
 #include "BodyStateAdmin_ohs.h"
 
+//シナリオインデックス関連
 #define SCENARIO_MAX_NUM_R  (   50 )
 #define SCENARIO_MAX_NUM_L  (   50 )
 #define SCENARIO_MAX_NUM    (  101 )//右コース+左コース+開始状態
 #define INIT_SCENARIO_ID    (  100 )//開始状態はindex末尾に
 #define SCENARIO_CPY_SIZE   ( syzeof( SCENE_INDEX ) * 100 )//シナリオインデックスコピーサイズ
+
+//許容誤差
+// #define RUN_MLG_PERMISSION (   50 )
+// #define EV3_DEG_PERMISSION (   50 )
+#define TIL_DEG_PERMISSION (    5 )
 
 //達成条件:enum化するとEV3RT_2016_FORMと連携取り辛いので
 #define CLS_BLK    (     0 )
