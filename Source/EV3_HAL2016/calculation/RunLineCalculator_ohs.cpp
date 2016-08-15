@@ -19,6 +19,13 @@ RunLineCalculator_ohs::RunLineCalculator_ohs()
     mIValue[DEGRE_ID] = 0;
     mDValue[DEGRE_ID] = 0;
 
+    mPidGainF.fSpdP = K_P_SPD;
+    mPidGainF.fSpdI = K_I_SPD;
+    mPidGainF.fSpdD = K_D_SPD;
+    mPidGainF.fDegP = K_P_DEG;
+    mPidGainF.fDegI = K_I_DEG;
+    mPidGainF.fDegD = K_D_DEG;
+
     mKP[SPEED_ID] = K_P_SPD;
     mKI[SPEED_ID] = K_I_SPD;
     mKD[SPEED_ID] = K_D_SPD;
@@ -172,6 +179,8 @@ void RunLineCalculator_ohs::setGain( PID_SETTING* p_set_file )
 {
 if( p_set_file == NULL ) { return; }
 
+    memcpy( &mPidGainF, p_set_file, sizeof( PID_SETTING ));
+
     mKP[SPEED_ID] = p_set_file->fSpdP;
     mKI[SPEED_ID] = p_set_file->fSpdI;
     mKD[SPEED_ID] = p_set_file->fSpdD;
@@ -197,3 +206,9 @@ if( p_set_file == NULL ) { return; }
 
     return;
 }
+
+PID_SETTING* RunLineCalculator_ohs::isGain( void )
+{
+    return ( &mPidGainF );
+}
+

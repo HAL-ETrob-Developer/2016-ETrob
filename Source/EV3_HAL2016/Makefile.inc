@@ -3,13 +3,16 @@ mkfile_path := $(dir $(lastword $(MAKEFILE_LIST)))
 APPL_COBJS += balancer.o balancer_param.o
 
 APPL_CXXOBJS += \
-LineTracer_ohs.o \
 GyroAdmin_ohs.o \
 RayReflectAdmin_ohs.o \
 RunningAdmin_ohs.o \
 TailAdmin_ohs.o \
 RunLineCalculator_ohs.o \
-Balancer_ohs.o
+Balancer_ohs.o\
+LineTracer_ohs.o \
+PatternSequencer_ohs.o\
+EvStateAdmin_ohs.o\
+ScenarioConductor_ohs.o
 
 
 SRCLANG := c++

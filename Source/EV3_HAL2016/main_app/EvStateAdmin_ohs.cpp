@@ -1,20 +1,19 @@
-#include "ev3api.h"
 #include "hal_ev3_std.h"
 #include "EvStateAdmin_ohs.h"
 
 /**
  * コンストラクタ
  */
-EvStateAdmin_ohs::EvStateAdmin_ohs(RayReflectAdmin_ohs* ray_reflect_admin, GyroAdmin_ohs* gyro_admin, RunningAdmin_ohs* running_admin, TailAdmin_ohs* tail_admin )
+EvStateAdmin_ohs::EvStateAdmin_ohs( RayReflectAdmin_ohs* ray_reflect_admin, GyroAdmin_ohs* gyro_admin, RunningAdmin_ohs* running_admin, TailAdmin_ohs* tail_admin )
 :mRayReflectAdmin ( ray_reflect_admin ),
  mGyroAdmin( gyro_admin ),
  mRunningAdmin( running_admin ),
  mTailAdmin( tail_admin ) {
 
 	/* 現本体状態構造体初期化 */
-	memset( mNowState, 0, sizeof( BODY_STATE ));
+	memset( &mNowState, 0, sizeof( EV3_STATE ));
 	/* 旧本体状態構造体初期化 */
-	memset( mOldState, 0, sizeof( BODY_STATE ));
+	memset( &mOldState, 0, sizeof( EV3_STATE ));
 }
 
 /**

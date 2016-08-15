@@ -4,7 +4,6 @@
 #define MAINAPP_PATTERNSEQUENCER_OHS_H_
 
 /* include file */
-#include "hal_ev3_std.h"
 #include "../device_ope/RunningAdmin_ohs.h"
 #include "../device_ope/TailAdmin_ohs.h"
 
@@ -27,7 +26,7 @@ typedef struct _PATTERN_INDEX{
 class PatternSequencer_ohs {
 public:
 	//生成
-	PatternSequencer_ohs();
+	PatternSequencer_ohs( RunningAdmin_ohs* running_admin, TailAdmin_ohs* tail_admin );
 	//デストラクタ
 	~PatternSequencer_ohs();
 

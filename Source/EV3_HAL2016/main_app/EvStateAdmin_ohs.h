@@ -4,7 +4,6 @@
 #define MAINAPP_EVSTATEADMIN_OHS_H_
 
 #include "ev3api.h"
-#include "hal_ev3_std.h"
 
 #include "../device_ope/RayReflectAdmin_ohs.h"
 #include "../device_ope/GyroAdmin_ohs.h"
@@ -19,12 +18,12 @@ typedef struct _EV3_STATE{
 	int32_t    Tail_deg;
 }EV3_STATE;
 
-class EvStateAdmin {
+class EvStateAdmin_ohs {
 public:
 	//生成
-	BodyStateAdmin();
+	EvStateAdmin_ohs( RayReflectAdmin_ohs* ray_reflect_admin, GyroAdmin_ohs* gyro_admin, RunningAdmin_ohs* running_admin, TailAdmin_ohs* tail_admin );
 	//デストラクタ
-	~BodyStateAdmin();
+	~EvStateAdmin_ohs();
 
 	/* 本体状態の回収 */
 	void execStateCollection();
@@ -44,8 +43,8 @@ public:
 	int32_t getTailAngle();
 
 private:
-	BODY_STATE mNowState;
-	BODY_STATE mOldState;
+	EV3_STATE mNowState;
+	EV3_STATE mOldState;
 	//メンバ
 	RayReflectAdmin_ohs*   mRayReflectAdmin;
 	GyroAdmin_ohs*         mGyroAdmin;

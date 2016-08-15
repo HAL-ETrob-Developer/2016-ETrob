@@ -41,7 +41,7 @@
 
 /* 動作設定＠デバッグ */
 //#define PRINT									/* プリント動作 ON/OFF		 */
-#define INTERRUPT_CHK							/* メトロノーム ON/OFF		 */
+// #define INTERRUPT_CHK							/* メトロノーム ON/OFF		 */
 #define CHECK_STAY								/* 実行終了後停止			 */
 // #define REFST_DEBUG
 //#define LT_DEBUG
@@ -59,7 +59,7 @@ typedef          int    SINT;					/* int						 */
 typedef unsigned int    UINT;					/* unsigned int				 */
 typedef          float  FLOT;					/* float					 */
 typedef          double DBLE;					/* double					 */
-typedef          bool   BOOL;					/* bool					 */
+typedef          bool   BOOL;					/* bool						 */
 
 typedef          long long   SLLG;				/* long	long				 */
 typedef unsigned long long   ULLG;				/* unsigned long long		 */

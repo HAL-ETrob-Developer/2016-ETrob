@@ -92,6 +92,7 @@ public:
     FLOT isI(void);
     FLOT isD(void);
     void setGain( PID_SETTING* p_set_file );
+    PID_SETTING* isGain( void );
 
 private:
 	/* メンバ */
@@ -101,6 +102,7 @@ private:
     FLOT mIValue[2];
     FLOT mDValue[2];
     //ゲイン
+    PID_SETTING mPidGainF;
     FLOT mKP[2];
     FLOT mKI[2];
     FLOT mKD[2];

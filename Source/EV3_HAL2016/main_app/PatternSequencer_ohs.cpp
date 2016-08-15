@@ -10,7 +10,7 @@ PatternSequencer_ohs::PatternSequencer_ohs( RunningAdmin_ohs* running_admin, Tai
  mTailAdmin( tail_admin ) {
 
 	/* 現本体状態構造体初期化 */
-	memset( mPatternIndex, 0, sizeof( PATTERN_INDEX ) ;
+	memset( mPatternIndex, 0, sizeof( PATTERN_INDEX ));
 
 	/* 初期値のセット */
 	mPatternIndex[INIT_PAT_ID].speed    = INIT__SPEED;

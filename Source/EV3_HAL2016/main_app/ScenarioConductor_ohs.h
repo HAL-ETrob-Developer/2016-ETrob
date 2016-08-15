@@ -3,17 +3,16 @@
 #ifndef MAINAPP_SCENARIOCONDUCTOR_OHS_H_
 #define MAINAPP_SCENARIOCONDUCTOR_OHS_H_
 
-#include "hal_ev3_std.h"
+#include "EvStateAdmin_ohs.h"
 #include "LineTracer_ohs.h"
 #include "PatternSequencer_ohs.h"
-#include "EvStateAdmin_ohs.h"
 
 //シナリオインデックス関連
 #define SCENARIO_MAX_NUM_R  (   50 )
 #define SCENARIO_MAX_NUM_L  (   50 )
 #define SCENARIO_MAX_NUM    (  101 )/* 右コース+左コース+開始状態 */
 #define INIT_SCENARIO_ID    (  100 )/* 開始状態はindex末尾に */
-#define SCENARIO_CPY_SIZE   ( syzeof( SCENE_INDEX ) * 100 )/* シナリオインデックスコピーサイズ */
+#define SCENARIO_CPY_SIZE   ( sizeof( SCENE_INDEX ) * 100 )/* シナリオインデックスコピーサイズ */
 
 //許容誤差
 // #define RUN_MLG_PERMISSION (   50 )
@@ -45,33 +44,35 @@ typedef struct _SCENARIO_INDEX {
 class ScenarioConductor_ohs {
 public:
 //生成
-    ScenarioConductor_ohs( EvStateAdmin_ohs* ev_state_admin, LineTracer_ohs* line_tracer, PatternSequencer_ohs* pattern_sequencer );
+    ScenarioConductor_ohs( EvStateAdmin_ohs* ev_state_admin, LineTracer_ohs* line_tracer, PatternSequencer_ohs* pettern_sequencer );
     //デストラクタ
     ~ScenarioConductor_ohs();
 
     BOOL execScenario();                      //シナリオ実行
     void quitCommand();                       //指揮終了
-    SCHR setScenario( UCHR uc_scen_no );        //シナリオセット
-    void setScenarioUpDate();                 //シナリオ更新
+    BOOL setScenario( UCHR uc_scen_no );        //シナリオセット
+    BOOL setScenarioUpDate();                 //シナリオ更新
 
     BOOL setScenarioIndex( SCENE_INDEX* p_scenx_index );//シナリオインデックスの外部登録
 
 private:
+
+    bool checkRayRef();
+    bool checkMileage();
+    bool checkAngle();
+    bool checkTailDeg();
+    bool checkGyro();
+    bool checkQuit();
+    bool checkSlip();
+
     //メンバ
-    LineTracer_ohs*       mLineTracer;
-    EvStateAdmin_ohs*     mEvStateAdmin;
-    PatternSequencer_ohs* mPatternSequencer
+    EvStateAdmin_ohs* mEvStateAdmin;
+    LineTracer_ohs* mLineTracer;
+    PatternSequencer_ohs* mPatternSequencer;
 
     UCHR    mScenarioID;
     SCENE_INDEX mScenario[SCENARIO_MAX_NUM];
-    BOOL ( *mCheckMethod[EVENT_NUM] )( void );
-
-    BOOL checkRayRef();
-    BOOL checkMileage();
-    BOOL checkAngle();
-    BOOL checkTailDeg();
-    BOOL checkGyro();
-    BOOL checkQuit();
-    BOOL checkSlip();
+    bool ( ScenarioConductor_ohs::*mCheckMethod[EVENT_NUM] )( void );
+};
 
 #endif  // MAINAPP_CONTESTSCENARIOCONDUCTOR_OHS_H_
