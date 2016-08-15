@@ -26,11 +26,11 @@
 
 
 
-typedef struct {
+struct mIndex {
   SCHR event_condition      = NO_CLEAR;   //達成条件
   int32_t flow_transition   = TRACE;      //次の遷移番号
   UCHR action_number        = LINE_TRACE; //実行動作番号
-}STATE_FLOW_INDEX;
+}
 
 class ScenarioConductor_ohs {
 public:

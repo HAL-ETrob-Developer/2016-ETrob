@@ -12,7 +12,7 @@ typedef struct {
   int32_t RunningAngle;
   int32_t TailAngle;
   BOOL    Balance;
-}RUNNING_PAT_INDEX;
+}RUNNING_PAT_INDEX[20];
 
 class PatternSequencer_ohs {
 public:
@@ -21,12 +21,14 @@ public:
     //デストラクタ
         virtual ~PatternSequencer_ohs();
 
-    SCHR callPatternRunning( UCHR InputNumber, BOOL Balancer );
+    //定量走行指揮 ( 引数 ： 実行動作番号, バランス有無 )
+    SCHR callPatternRunning( UCHR InputNumber, BOOL ActionIndex.Balance );
 
 private:
   RUNNING_PAT_INDEX ActionIndex;
-  RunningAdmin_ohs*      mRunningAdmin;
-  TailAdmin_ohs*         mTailAdmin;
+  RunningAdmin_ohs* mRunningAdmin;
+  TailAdmin_ohs*    mTailAdmin;
+  BOOL overflag;
 };
 
 #endif  // MAINAPP_PATTERNSEQUENCER_OHS_H_
