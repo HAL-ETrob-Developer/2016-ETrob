@@ -34,6 +34,7 @@ typedef struct _SCENARIO_INDEX {
     SLNG event_value;  //達成条件に付随する値
 }SCENE_INDEX;
 
+
 class ScenarioConductor_ohs {
 public:
 //生成
