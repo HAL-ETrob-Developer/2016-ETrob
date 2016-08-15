@@ -1,10 +1,5 @@
 #include "hal_ev3_std.h"
 
-#include "LineTracer_ohs.h"
-#include "ScenarioConductor_ohs.h"
-#include "../device_ope/RayReflectAdmin_ohs.h"
-
-#include "LineTracer_ohs.h"
 #include "PatternSequencer_ohs.h"
 
 /**
@@ -50,12 +45,32 @@ ScenarioConductor_ohs::~ScenarioConductor_ohs() {
 BOOL ScenarioConductor_ohs::execScenario() {
 	BOOL nextEventF = false;
 
-	//
+	//インデックスチェック
+	if( mScenarioID >= SCENARIO_MAX_NUM ) { return false; }
 
-	//シナリオ達成チェック
+	/* シナリオ達成チェック ------------------------------------------- */
+	//達成確認
 	nextEventF = ( *mCheckMethod[( mScenario[mScenarioID].move_event )] )();
 
+	//達成フラグのチェック
+	if( nextEventF ) { 
+		//シナリオ更新(異常値返却ならば終了)
+		if( !setScenarioUpDate()) { return false; }
+	}
 
+	/* シナリオ実行 ------------------------------------------- */
+	if( mScenario[mScenarioID].pattern_id < PATTERN_ID_MAX  ) {
+		//ライントレーサに終了通知を渡す
+		mLineTracer->postLineTraceStop();
+		//パターンシーケンス指示
+		mPatternSequencer->callPatternRunning( mScenario[mScenarioID].pattern_id );
+	} else {
+		//ライントレース指示
+		mLineTracer->postLineTraceConduct();
+	}
+
+	//正常終了
+	return true;
 }
 
 /* 光学センサの状態を確認 */
@@ -137,7 +152,6 @@ BOOL ScenarioConductor_ohs::setScenario( UCHR uc_scen_no ) {
 void ScenarioConductor_ohs::quitCommand() {
 	//シナリオインデックスを範囲外にする = 終了
 	mScenarioID = SCENARIO_MAX_NUM;
-	
 	//ライントレーサに終了通知を渡す
 	mLineTracer->postLineTraceStop();
 }
@@ -145,8 +159,22 @@ void ScenarioConductor_ohs::quitCommand() {
 /**
  * シナリオ更新
  */
-void ScenarioConductor_ohs::setScenarioUpDate() {
+BOOL ScenarioConductor_ohs::setScenarioUpDate() {
+	//インデックスチェック
+	if( mScenarioID >= SCENARIO_MAX_NUM ) { return false; }
+
+	//次のシナリオへ
 	mScenarioID = mScenario[mScenarioID].next_scene;
+
+	//シナリオ範囲オーバチェック
+	if( mScenarioID >= SCENARIO_MAX_NUM; ) {
+		//終了操作
+		quitCommand();
+		//異常終了
+		return false;
+	}
+
+	return true;
 }
 
 /**
@@ -156,6 +184,6 @@ BOOL ScenarioConductor_ohs::setScenarioIndex( SCENE_INDEX* p_scenx_index )
 {
 	if( p_scenx_index == NULL ) { return false; }
 	//シナリオインデックスのコピー
-	memcpy( mScenario, p_scenx_index,SCENARIO_CPY_SIZE );
+	memcpy( mScenario, p_scenx_index, SCENARIO_CPY_SIZE );
 	return true;
 }

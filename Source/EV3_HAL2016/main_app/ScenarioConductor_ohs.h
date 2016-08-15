@@ -5,6 +5,7 @@
 
 #include "hal_ev3_std.h"
 #include "LineTracer_ohs.h"
+#include "ScenarioConductor_ohs.h"
 #include "BodyStateAdmin_ohs.h"
 
 #define SCENARIO_MAX_NUM_R  (   50 )
