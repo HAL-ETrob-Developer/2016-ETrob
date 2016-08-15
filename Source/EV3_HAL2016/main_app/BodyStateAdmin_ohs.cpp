@@ -34,12 +34,11 @@ void BodyStateAdmin_ohs::setBodyStateUpdate() {
     mOld.BodyAngle = mNow.BodyAngle;
     mOld.TailAngle = mNow.TailAngle;
 
-
-   mNow.ColorSensorState = mRayReflectAdmin -> getState();
-   mNow.BalanceState = mGyroAdmin -> getState();
-   mNow.Milage = mRunningAdmin -> getMileage();
-   mNow.BodyAngle = mRunningAdmin -> getAngle();
-   mNow.TailAngle = mTailAdmin -> getTailDegree();
+    mNow.ColorSensorState = mRayReflectAdmin -> getState();
+    mNow.BalanceState = mGyroAdmin -> getState();
+    mNow.Milage = mRunningAdmin -> getMileage();
+    mNow.BodyAngle = mRunningAdmin -> getAngle();
+    mNow.TailAngle = mTailAdmin -> getTailDegree();
 }
 
 /**

@@ -5,6 +5,8 @@
 
 /* include file */
 #include "hal_ev3_std.h"
+#include "../device_ope/RunningAdmin_ohs.h"
+#include "../device_ope/TailAdmin_ohs.h"
 
 /* 構造体 実行動作インデックス */
 typedef struct {
@@ -12,7 +14,7 @@ typedef struct {
   int32_t RunningAngle;
   int32_t TailAngle;
   BOOL    Balance;
-}RUNNING_PAT_INDEX[20];
+}RUNNING_PAT_INDEX[20]; //20は適当です（わからなかったので）
 
 class PatternSequencer_ohs {
 public:
