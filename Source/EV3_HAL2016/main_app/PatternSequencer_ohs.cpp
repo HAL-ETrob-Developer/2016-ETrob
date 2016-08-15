@@ -3,45 +3,64 @@
 #include "PatternSequencer_ohs.h"
 
 /**
- * コンストラクタ
- */
+* コンストラクタ
+*/
 PatternSequencer_ohs::PatternSequencer_ohs( RunningAdmin_ohs* running_admin, TailAdmin_ohs* tail_admin )
-    : m() {
+:mRunningAdmin( running_admin ),
+ mTailAdmin( tail_admin ) {
 
-      /* 現本体状態構造体初期化 */
-      memset( ActionIndex, 0, sizeof( RUNNING_PAT_INDEX ) ;
+	/* 現本体状態構造体初期化 */
+	memset( mPatternIndex, 0, sizeof( PATTERN_INDEX ) ;
 
-      mRunningAdmin    = running_admin;
-      mTailAdmin       = tail_admin;
-
+	/* 初期値のセット */
+	mPatternIndex[INIT_PAT_ID].speed    = INIT__SPEED;
+	mPatternIndex[INIT_PAT_ID].ev3_deg  = INIT_EV_DEG;
+	mPatternIndex[INIT_PAT_ID].Tail_dee = INIT_TL_DEG;
+	mPatternIndex[INIT_PAT_ID].balance  = INIT_BALANC;
 }
 
 /**
- * デストラクタ
- */
+* デストラクタ
+*/
 PatternSequencer_ohs::~PatternSequencer_ohs() {
 }
 
 /**
- * 定量走行指揮
- */
-BOOL PatternSequencer_ohs::callPatternRunning( UCHR InputNumber ) {
+* 定量走行指揮
+*/
+BOOL PatternSequencer_ohs::callPatternRunning( UCHR uc_index )
+{
+	SCHR cSpeed   = 0;
+	SCHR cDegre   = 0;
+	SCHR cTailD   = 0;
+	BOOL BalanceF = false;
 
-/* 走行指示 と 尾角度指示 を行う ----------------------------------------------- */
+	/* 引数チェック */
+	if( uc_index >= PATTERN_NUM ) { return false; }//異常終了
 
-  /* 走行指示 */
-  mRunningAdmin -> postRunning ( ActionIndex[InputNumber].RunningSpeed, ActionIndex[InputNumber].RunningAngle, ActionIndex[InputNumber].Balance );
+	/* 外部メソッドへ渡す引数の準備 */
+	cSpeed = mPatternIndex[uc_index].speed;
+	cDegre = mPatternIndex[uc_index].ev3_deg;
+	cTailD = mPatternIndex[uc_index].Tail_dee;
+	if( mPatternIndex[uc_index].balance == TRUE ) { BalanceF = true; }
 
-  /* 尻角度指示 */
-  overflag = mTailAdmin -> postTailDegree ( ActionIndex[InputNumber].TailAngle );
+	/* 走行指示 */
+	mRunningAdmin->postRunning ( cSpeed, cDegre, BalanceF );
 
-  return overflag;
+	/* 尻角度指示 */
+	mTailAdmin->postTailDegree( cTailD );
 
-/* ------------------------------------------------------------------- 処理終了 */
-
-)
-
-
-
-
+	return true;//正常終了
 }
+
+/**
+* パターンインデックスの登録
+*/
+BOOL PatternSequencer_ohs::setPatternIndex( PATTERN_INDEX* p_pattern_index )
+{
+	if( p_pattern_index == NULL ) { return false; }
+	//インデックスの取り込み
+	memcpy( mPatternIndex, p_pattern_index, sizeof( mPatternIndex ));
+	return true;
+}
+

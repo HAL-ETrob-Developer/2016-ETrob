@@ -6,7 +6,7 @@
 #include "hal_ev3_std.h"
 #include "LineTracer_ohs.h"
 #include "PatternSequencer_ohs.h"
-#include "BodyStateAdmin_ohs.h"
+#include "EvStateAdmin_ohs.h"
 
 //シナリオインデックス関連
 #define SCENARIO_MAX_NUM_R  (   50 )
@@ -45,7 +45,7 @@ typedef struct _SCENARIO_INDEX {
 class ScenarioConductor_ohs {
 public:
 //生成
-    ScenarioConductor_ohs( BodyStateAdmin_ohs* body_state_admin, LineTracer_ohs* line_tracer, PatternSequencer_ohs* pattern_sequencer );
+    ScenarioConductor_ohs( EvStateAdmin_ohs* ev_state_admin, LineTracer_ohs* line_tracer, PatternSequencer_ohs* pattern_sequencer );
     //デストラクタ
     ~ScenarioConductor_ohs();
 
@@ -59,7 +59,7 @@ public:
 private:
     //メンバ
     LineTracer_ohs*       mLineTracer;
-    BodyStateAdmin_ohs*   mBodyStateAdmin;
+    EvStateAdmin_ohs*     mEvStateAdmin;
     PatternSequencer_ohs* mPatternSequencer
 
     UCHR    mScenarioID;

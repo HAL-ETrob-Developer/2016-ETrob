@@ -5,8 +5,8 @@
 /**
  * コンストラクタ
  */
-ScenarioConductor_ohs::ScenarioConductor_ohs( BodyStateAdmin_ohs* body_state_admin, LineTracer_ohs* line_tracer, PatternSequencer_ohs* pattern_sequencer )
-:mBodyStateAdmin( body_state_admin ),
+ScenarioConductor_ohs::ScenarioConductor_ohs( EvStateAdmin_ohs* ev_state_admin, LineTracer_ohs* line_tracer, PatternSequencer_ohs* pattern_sequencer )
+:mEvStateAdmin( ev_state_admin ),
  mLineTracer( line_tracer ),
  mPatternSequencer( pettern_sequencer )
 {
@@ -59,6 +59,8 @@ BOOL ScenarioConductor_ohs::execScenario() {
 	}
 
 	/* シナリオ達成チェック ------------------------------------------- */
+	//本体状態管理を更新
+	mEvStateAdmin->execStateCollection();
 	//達成確認
 	nextEventF = ( *mCheckMethod[ucMoveEvent] )();
 
@@ -85,7 +87,7 @@ BOOL ScenarioConductor_ohs::execScenario() {
 
 /* 光学センサの状態を確認 */
 BOOL ScenarioConductor_ohs::checkRayRef() {
-	SENC_CLR getSencClr = mBodyStateAdmin->getColorSensorState();
+	SENC_CLR getSencClr = mEvStateAdmin->getColorSensorState();
 
 	switch( mScenario[mScenarioID].move_event ) {
 		case CLS_BLK:
@@ -106,7 +108,7 @@ BOOL ScenarioConductor_ohs::checkRayRef() {
 
 /* 走行距離を確認 */
 BOOL ScenarioConductor_ohs::checkMileage() {
-	SLNG lGetNowMlg = mBodyStateAdmin->getMileage();
+	SLNG lGetNowMlg = mEvStateAdmin->getMileage();
 	SLNG lTargetMlg = mScenario[mScenarioID].event_value;
 
 	if( lTargetMlg > 0 ) {
@@ -121,7 +123,7 @@ BOOL ScenarioConductor_ohs::checkMileage() {
 
 /* 走行体角度を確認 */
 BOOL ScenarioConductor_ohs::checkAngle() {
-	SLNG lGetNowDeg = mBodyStateAdmin->getBodyAngle();
+	SLNG lGetNowDeg = mEvStateAdmin->getBodyAngle();
 	SLNG lTargetDeg = mScenario[mScenarioID].event_value;
 
 	if( lTargetMlg > 0 ) {
@@ -136,7 +138,7 @@ BOOL ScenarioConductor_ohs::checkAngle() {
 
 /* 尻尾角度を確認 */
 BOOL ScenarioConductor_ohs::checkTailDeg() {
-	SLNG lGetNowDeg = mBodyStateAdmin->getTailAngle();
+	SLNG lGetNowDeg = mEvStateAdmin->getTailAngle();
 	SLNG lTrgDegMax = 0;
 	SLNG lTrgDegMin = 0;
 
@@ -152,7 +154,7 @@ BOOL ScenarioConductor_ohs::checkTailDeg() {
 
 /* ジャイロ状態を確認 */
 BOOL ScenarioConductor_ohs::checkGyro() {
-	SENC_CLR getGyroState = mBodyStateAdmin->getBalanceState();
+	SENC_CLR getGyroState = mEvStateAdmin->getBalanceState();
 
 	switch( mScenario[mScenarioID].move_event ) {
 		case GYR__ST:
@@ -209,6 +211,9 @@ void ScenarioConductor_ohs::quitCommand() {
 BOOL ScenarioConductor_ohs::setScenarioUpDate() {
 	//インデックスチェック
 	if( mScenarioID >= SCENARIO_MAX_NUM ) { return false; }
+
+	//本体状態管理のリフレッシュ
+	mEvStateAdmin->execStateRefresh();
 
 	//次のシナリオへ
 	mScenarioID = mScenario[mScenarioID].next_scene;
