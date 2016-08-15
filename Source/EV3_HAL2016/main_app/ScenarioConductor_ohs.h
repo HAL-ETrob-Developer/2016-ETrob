@@ -9,7 +9,8 @@
 
 #define SCENARIO_MAX_NUM_R  (   50 )
 #define SCENARIO_MAX_NUM_L  (   50 )
-#define SCENARIO_MAX_NUM    (  100 )
+#define SCENARIO_MAX_NUM    (  101 )//右コース+左コース+開始状態
+#define INIT_SCENARIO_ID    (  100 )//開始状態はindex末尾に
 
 //達成条件:enum化するとEV3RT_2016_FORMと連携取り辛いので
 #define CLS_BLK    (     0 )
@@ -18,16 +19,18 @@
 #define RUN_MLG    (     3 )
 #define EV3_DEG    (     4 )
 #define TIL_DEG    (     5 )
-#define GYRO_ST    (     6 )
-#define EX_SLIP    (     7 )
-#define EX_END     (     8 )
-#define EVENT_NUM  (     9 )
+#define GYR__ST    (     6 )
+#define GYR_UST    (     7 )
+#define EX_SLIP    (     8 )
+#define EX_END     (     9 )
+#define EVENT_NUM  (    10 )
 
 typedef struct _SCENARIO_INDEX {
     UCHR move_event;   //達成条件
-    SLNG event_value;  //達成条件に付随する値
     UCHR next_scene;   //次の遷移番号
     UCHR pattern_id;   //実行動作番号
+    UCHR dummy;        //バウンダリ対策
+    SLNG event_value;  //達成条件に付随する値
 }SCENE_INDEX;
 
 class ScenarioConductor_ohs {
@@ -39,8 +42,10 @@ public:
 
     BOOL execScenario();                      //シナリオ実行
     void quitCommand();                       //指揮終了
-    SCHR setScenario( UCHR ucScenNo );        //シナリオセット
+    SCHR setScenario( UCHR uc_scen_no );        //シナリオセット
     void setScenarioUpDate();                 //シナリオ更新
+
+    void setScenarioIndex( SCENE_INDEX* p_scenx_index );//シナリオインデックスの外部登録
 
 private:
     //メンバ
@@ -48,15 +53,15 @@ private:
     BodyStateAdmin_ohs*   mBodyStateAdmin;
     PatternSequencer_ohs* mPatternSequencer
 
-    int         mIndex;
+    UCHR    mScenarioID;
     SCENE_INDEX mScenario[SCENARIO_MAX_NUM];
     void ( *mCheckMethod[EVENT_NUM] )( void );
 
-    void checkGyro();
     void checkRayRef();
     void checkMileage();
     void checkAngle();
     void checkTailDeg();
+    void checkGyro();
     void checkQuit();
     void checkSlip();
 
