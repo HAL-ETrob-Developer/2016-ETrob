@@ -11,9 +11,9 @@
 //シナリオインデックス関連
 #define SCENARIO_MAX_NUM_R  (   50 )
 #define SCENARIO_MAX_NUM_L  (   50 )
-#define SCENARIO_MAX_NUM    (  101 )//右コース+左コース+開始状態
-#define INIT_SCENARIO_ID    (  100 )//開始状態はindex末尾に
-#define SCENARIO_CPY_SIZE   ( syzeof( SCENE_INDEX ) * 100 )//シナリオインデックスコピーサイズ
+#define SCENARIO_MAX_NUM    (  101 )/* 右コース+左コース+開始状態 */
+#define INIT_SCENARIO_ID    (  100 )/* 開始状態はindex末尾に */
+#define SCENARIO_CPY_SIZE   ( syzeof( SCENE_INDEX ) * 100 )/* シナリオインデックスコピーサイズ */
 
 //許容誤差
 // #define RUN_MLG_PERMISSION (   50 )
