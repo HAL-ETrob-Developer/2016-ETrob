@@ -48,6 +48,8 @@ ScenarioConductor_ohs::~ScenarioConductor_ohs() {
  * シナリオ実行
  */
 BOOL ScenarioConductor_ohs::execScenario() {
+<<<<<<< HEAD
+=======
 
 
 	//シナリオ達成チェック
@@ -127,17 +129,32 @@ BOOL ScenarioConductor_ohs::setScenario( UCHR uc_scen_no ) {
 		return true;
 	}
 	return false;
+>>>>>>> fa7f2176a8d229e984b1e244e7356a4d15e0aa5a
 }
 
 /**
  * 指揮終了
  */
 void ScenarioConductor_ohs::quitCommand() {
+<<<<<<< HEAD
 	//シナリオインデックスを範囲外にする = 終了
 	mScenarioID = SCENARIO_MAX_NUM;
 	
 	//ライントレーサに終了通知を渡す
 	mLineTracer->postLineTraceStop();
+=======
+<<<<<<< HEAD
+	/* システム終了通知をメインタスクへ */
+}
+
+/**
+ * シナリオセット
+ */
+SCHR ScenarioConductor_ohs::setScenario( RUNNING_ROUTE route ) {
+
+=======
+>>>>>>> fa7f2176a8d229e984b1e244e7356a4d15e0aa5a
+>>>>>>> 468958409c8d2d35090f8b34b99cd14b14565cfc
 }
 
 /**
