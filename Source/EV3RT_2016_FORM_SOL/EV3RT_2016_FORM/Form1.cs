@@ -150,6 +150,9 @@ namespace EV3RT_2016_FORM
         private void righitStateDataGrid_CellParsing(object sender, DataGridViewCellParsingEventArgs e )
         {
             DataGridView TempDgv = (DataGridView)sender;
+
+            ControlLabel.Text = "編集" + " " + e.ColumnIndex + ":" + e.RowIndex;
+
             //セルの列と型を調べる
             if (TempDgv.Columns[e.ColumnIndex].Name != "RIdxNextCond" ) {
                 if((string)e.Value != "" ) {
@@ -168,6 +171,9 @@ namespace EV3RT_2016_FORM
         private void leftStateDataGrid_CellParsing(object sender, DataGridViewCellParsingEventArgs e )
         {
             DataGridView TempDgv = (DataGridView)sender;
+
+            ControlLabel.Text = "編集" + " " + e.ColumnIndex + ":" + e.RowIndex;
+
             //セルの列と型を調べる
             if (TempDgv.Columns[e.ColumnIndex].Name != "LIdxNextCond" ) {
                 if((string)e.Value != "" ) {
@@ -186,6 +192,9 @@ namespace EV3RT_2016_FORM
         private void runninngIndexeDataGrid_CellParsing(object sender, DataGridViewCellParsingEventArgs e)
         {
             DataGridView TempDgv = (DataGridView)sender;
+
+            ControlLabel.Text = "編集" + " " + e.ColumnIndex + ":" + e.RowIndex;
+
             //セルの列と型を調べる
             if (TempDgv.Columns[e.ColumnIndex].Name != "RunBalance")
             {
@@ -324,8 +333,10 @@ namespace EV3RT_2016_FORM
                     }
                 }
             }
-            //設定ファイル生成後に終了
+            //メッセージ（問い合わせ）を鳴らす
+            System.Media.SystemSounds.Asterisk.Play(); 
             ControlLabel.Text = "設定ファイルの生成を終了";
+            //設定ファイル生成後に終了
             //this.Close();
         }
         /* PIDゲイン値の抽出 */
