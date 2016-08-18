@@ -103,7 +103,27 @@ typedef struct _PID_SETTING{
 	float fDegD;
 }PID_SETTING;
 
+typedef struct _SCENARIO_INDEX {
+    UCHR move_event;   //達成条件
+    UCHR pattern_id;   //実行動作番号
+    UCHR next_scene;   //次の遷移番号
+    UCHR dummy;        //バウンダリ対策
+    SLNG event_value;  //達成条件に付随する値
+}SCENE_INDEX;
 
+/* 構造体 実行動作インデックス */
+typedef struct _PATTERN_INDEX{
+	SCHR speed;
+	SCHR ev3_deg;
+	SCHR Tail_dee;
+	UCHR balance;
+}PATTERN_INDEX;
+
+typedef struct _EV3_SETTING{
+	PID_SETTING   pidSetting;
+	SCENE_INDEX   sceneIndexS[100];
+	PATTERN_INDEX patrnIndexS[20];
+}EV3_SETTING;
 /* ------------------------------------------------------------------------- */
 /*              Copyright HAL Collage of Technology & Design                 */
 /* ------------------------------------------------------------------------- */

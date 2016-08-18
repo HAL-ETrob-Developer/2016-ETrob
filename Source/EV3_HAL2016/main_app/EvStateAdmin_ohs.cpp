@@ -76,5 +76,5 @@ int32_t EvStateAdmin_ohs::getBodyAngle() {
  * 尾角度取得
  */
 int32_t EvStateAdmin_ohs::getTailAngle() {
-	return ( mNowState.Tail_deg - mOldState.Tail_deg );
+	return mNowState.Tail_deg;
 }

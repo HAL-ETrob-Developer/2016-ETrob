@@ -17,7 +17,7 @@
 //許容誤差
 // #define RUN_MLG_PERMISSION (   50 )
 // #define EV3_DEG_PERMISSION (   50 )
-#define TIL_DEG_PERMISSION (    5 )
+#define TIL_DEG_PERMISSION (    1 )
 
 //達成条件:enum化するとEV3RT_2016_FORMと連携取り辛いので
 #define CLS_BLK    (     0 )
@@ -32,15 +32,6 @@
 #define EX_END     (     9 )
 #define EVENT_NUM  (    10 )
 
-typedef struct _SCENARIO_INDEX {
-    UCHR move_event;   //達成条件
-    UCHR pattern_id;   //実行動作番号
-    UCHR next_scene;   //次の遷移番号
-    UCHR dummy;        //バウンダリ対策
-    SLNG event_value;  //達成条件に付随する値
-}SCENE_INDEX;
-
-
 class ScenarioConductor_ohs {
 public:
 //生成
@@ -54,6 +45,7 @@ public:
     BOOL setScenarioUpDate();                 //シナリオ更新
 
     BOOL setScenarioIndex( SCENE_INDEX* p_scenx_index );//シナリオインデックスの外部登録
+    UCHR getID();//現行インデックス取得
 
 private:
 

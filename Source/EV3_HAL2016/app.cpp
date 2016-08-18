@@ -45,17 +45,26 @@ using namespace ev3api;
 #endif
 
 /* Bluetooth */
-static int32_t   bt_cmd = 0;      /* Bluetoothコマンド 1:リモートスタート */
-static FILE*     gBtHandle = NULL;      /* Bluetoothファイルハンドル */
-
-/* 設定ファイル */
-static memfile_t     gPidSetStract;      /* 設定ファイルハンドル */
-
-static int8_t gSpd = 0;//test Mod
-static FLOT   gGyOffSet = 0;//test Mod
+static UCHR  bt_cmd    = 0;         /* Bluetoothコマンド 1:リモートスタート */
+static FILE* gBtHandle = NULL;      /* Bluetoothファイルハンドル */
 
 /* 下記のマクロは個体/環境に合わせて変更する必要があります */
-#define CMD_START         '1'    /* リモートスタートコマンド */
+#define CMD_RIGHIT        ('1')    /* リモートスタートコマンド */
+#define RIGHIT_ID         (0)    /* シナリオ指定ID */
+#define CMD_LEFT          ('2')    /* リモートスタートコマンド */
+#define LEFT_ID           (50)    /* シナリオ指定ID */
+
+#define SCENE_Q    (45)
+#define SCENE_W    (46)
+#define SCENE_E    (47)
+#define SCENE_R    (48)
+#define SCENE_T    (49)
+#define SCENE_Y    (95)
+#define SCENE_U    (96)
+#define SCENE_I    (97)
+#define SCENE_O    (98)
+#define SCENE_P    (99)
+#define SCENE_Z    (100)
 
 /* LCDフォントサイズ */
 #define CALIB_FONT (EV3_FONT_SMALL)
@@ -87,8 +96,8 @@ static TailAdmin_ohs*          gTailAdmin;
 
 static void user_system_create( void );
 static void user_system_destroy( void );
-static void PidFileLood( memfile_t* pid_file_stc );
-static void PidFileWrite( memfile_t* pid_file_stc, char cmd );
+static bool SetingFileload( char* f_pass, memfile_t* ev3_file_stc );//SDカード->オブジェクト
+static bool SetingFileWrite( char* f_pass, FILE* bt_handle );//BT->SDカード
 
 
 void main_task(intptr_t unused)
@@ -124,7 +133,9 @@ void main_task(intptr_t unused)
 
 static void user_system_create( void )
 {
-    ER ret;
+    memfile_t PidSetStract;
+    memset( &PidSetStract, 0,sizeof( PidSetStract ));
+
     /* 各オブジェクトを生成・初期化する */
     touchSensor = new TouchSensor(PORT_1);
     colorSensor = new ColorSensor(PORT_3);
@@ -151,19 +162,14 @@ static void user_system_create( void )
     gBtHandle = ev3_serial_open_file( EV3_SERIAL_BT );
     assert( gBtHandle != NULL );
 
-    memset( &gPidSetStract, 0, sizeof(gPidSetStract));
-    ret  =  ev3_memfile_load( PID_SET_FILE_PASS, &gPidSetStract );
-    assert( ret != E_OK );
-
-   PidFileLood( &gPidSetStract );
+    SetingFileload(( char* )PID_SET_FILE_PASS, &PidSetStract );
+    ev3_memfile_free( &PidSetStract );
 
     return;
 }
 
 static void user_system_destroy( void )
 {
-    FILE* pidSetFileH = NULL;
-
     if( gRunLineCalculator ) { delete gRunLineCalculator; gRunLineCalculator = NULL; }
     if( gTailAdmin         ) { delete gTailAdmin;         gTailAdmin         = NULL; }
     if( gRayReflectAdmin   ) { delete gRayReflectAdmin;   gRayReflectAdmin   = NULL; }
@@ -187,18 +193,6 @@ static void user_system_destroy( void )
     if( clock              ) { delete clock;              clock              = NULL; }
 
     if( gBtHandle != NULL )  { fclose(gBtHandle); }
-
-    if( gPidSetStract.buffer != NULL )  {
-        pidSetFileH =  fopen( PID_SET_FILE_PASS, "wb" );
-        if( pidSetFileH != NULL ) {
-            fwrite( gPidSetStract.buffer,
-                  sizeof(char),
-                  sizeof(PID_SETTING) ,
-                  pidSetFileH );
-            fclose( pidSetFileH );
-        }
-        ev3_memfile_free( &gPidSetStract );
-    }
 
     return;
 }
@@ -225,65 +219,23 @@ void interrupt_task(intptr_t exinf) {
 #ifdef INTERRUPT_CHK
     static int tes = 0;
     tes++;
-    if( tes > 124 ) {
+    if( tes > 100 ) {
         ev3_speaker_play_tone( NOTE_E6, 10 );
         tes = 0;
-    }
-#endif
-#ifdef LT_DEBUG
-    fprintf( gBtHandle, "[P = %3.3f ][I = %3.3f ] [D = %3.3f]\r\n", 
-            gRunLineCalculator->isP(), gRunLineCalculator->isI(), gRunLineCalculator->isD());
-#endif
-#ifdef REFST_DEBUG
-    if( gRayReflectAdmin->getState() == SCLR_GRAY ) {
-        fprintf( gBtHandle, "[SCLR_GRAY]\r\n");
     }
 #endif
     ext_tsk();
 }
 
 void tracer_task(intptr_t exinf) {
+    bool sceneGo = true;
     while( ev3_button_is_pressed( BACK_BUTTON ) == false ) {
-        switch( bt_cmd ) {
-            case 0:
-                gTailAdmin->postTailDegree(90);
-                break;
-            case 3:
-            case 2:
-                // gBalancer->setOffSet( gGyOffSet );
-            case 1:
-                gLineTracer->postLineTraceStop();//ライントレースストップ
-                gRunningAdmin->postRunning(gSpd,0,true);
-                gTailAdmin->postTailDegree(0);
-                break;
-            case 4:
-                gRunningAdmin->postRunning(0,50,true);
-                gTailAdmin->postTailDegree(0);
-                break;
-            case 5:
-                gRunningAdmin->postRunning(0,-50,true);
-                gTailAdmin->postTailDegree(0);
-                break;
-            case 7:
-                gRunningAdmin->postRunning(0,0,true);
-                gTailAdmin->postTailDegree(0);
-                break;
-            case 'e':
-                goto EXIT;
-                break;
-            case 't':
-                gLineTracer->postLineTraceConduct();
-                break;
-            default:
-                break;
-        }
+        sceneGo = gScenarioConductor->execScenario();//メインタスク
+        if( sceneGo == false ) { break; }
     }
-EXIT:
     ev3_led_set_color(LED_RED);
-    gLineTracer->postLineTraceStop();//ライントレースストップ
-    gRunningAdmin->postRunning(0,0,false);//走行停止
-    gTailAdmin->postTailDegree(0);//尻尾復帰
-    clock->sleep(500);
+    gScenarioConductor->quitCommand();
+    // clock->sleep(500);
     wup_tsk(MAIN_TASK);  // バックボタン押下
 }
 
@@ -296,122 +248,148 @@ EXIT:
 //*****************************************************************************
 void bt_task(intptr_t unused)
 {
-    while(1)
+    memfile_t PidSetStract;
+    memset( &PidSetStract, 0,sizeof( PidSetStract ));
+
+    while( true )
     {
         ev3_speaker_play_tone( NOTE_C4, 80 );
-        uint8_t c = fgetc(gBtHandle); /* 受信 */
-        switch(c)
-        {
-        case '0':
-            break;
-        case '1':
-            bt_cmd = 1;
-            break;
-        case '2':
-            gSpd -= 10;
-            // gGyOffSet--;
-            bt_cmd = 2;
-            break;
-        case '3':
-            gSpd += 10;
-            // gGyOffSet++;
-            bt_cmd = 3;
-            break;
-        case '4':
-            bt_cmd = 4;
-            break;
-        case '5':
-            bt_cmd = 5;
-            break;
-        case '7':
-            bt_cmd = 7;
-            break;
-        case 'e':
-            bt_cmd = 'e';
-            break;
-        case 't':
-            bt_cmd = 't';
-            break;
-        case 's':
-            /* 設定ファイルの書き込み */
-            // PidFileWrite( &gPidSetStract,c );
 
-            fprintf( gBtHandle,"[%c]---FILE IN----\r\n",c ); /* エコーバック */
-            ev3_speaker_play_tone( NOTE_C4, 500 );
+        bt_cmd = fgetc(gBtHandle); /* 受信 */
 
-            /* Bt受付 */
-            fread( gPidSetStract.buffer,
-                    sizeof(char),
-                    sizeof(PID_SETTING),
-                    gBtHandle );
+        switch( bt_cmd ) {
+            case CMD_RIGHIT://右コースセット
+                gScenarioConductor->setScenario( RIGHIT_ID );
+                break;
+            case CMD_LEFT://左コース
+                gScenarioConductor->setScenario( LEFT_ID );
+                break;
+            case 's'://ファイル読み込み
+                SetingFileWrite(( char* )PID_SET_FILE_PASS, gBtHandle );
+                SetingFileload(( char* )PID_SET_FILE_PASS, &PidSetStract );
+                ev3_memfile_free( &PidSetStract );
+                break;
+            case 'b'://Bluetooth通信の終了
+                ev3_speaker_play_tone( NOTE_C4, 240 );
+                goto EXIT;
+                break;
 
-            /* ユーザーレスポンス */
-            ev3_speaker_play_tone( NOTE_C4, 500 );
-            
-            break;
-        case '9':
-            bt_cmd = 9;
-            gGyroAdmin->initDegree();
-            break;
-        default:
-            break;
+            case 'x':
+                gScenarioConductor->quitCommand();
+                break;
+            case 'z':
+                gScenarioConductor->setScenario( SCENE_Z );
+                break;
+            case 'q':
+                gScenarioConductor->setScenario( SCENE_Q );
+                break;
+            case 'w':
+                gScenarioConductor->setScenario( SCENE_W );
+                break;
+            case 'e':
+                gScenarioConductor->setScenario( SCENE_E );
+                break;
+            case 'r':
+                gScenarioConductor->setScenario( SCENE_R );
+                break;
+            case 't':
+                gScenarioConductor->setScenario( SCENE_T );
+                break;
+            case 'y':
+                gScenarioConductor->setScenario( SCENE_Y );
+                break;
+            case 'u':
+                gScenarioConductor->setScenario( SCENE_U );
+                break;
+            case 'i':
+                gScenarioConductor->setScenario( SCENE_I );
+                break;
+            case 'o':
+                gScenarioConductor->setScenario( SCENE_O );
+                break;
+            case 'p':
+                gScenarioConductor->setScenario( SCENE_P );
+                break;
+            default:
+                break;
         }
-        if( gPidSetStract.buffer != NULL ) {
-            fprintf( gBtHandle, "buffer[%s]PID_SETTING[%d]buffersz[%d]\r\n", 
-            (char*)(gPidSetStract.buffer), sizeof(PID_SETTING), gPidSetStract.buffersz );
-        }
+        fprintf( gBtHandle,"[%c]\r\n", bt_cmd );
 
-        fprintf( gBtHandle, "[speed = %3d ][deg = %3d ] [gSpd = %3d][cmd = %c]\r\n", 
-                gRunningAdmin->getSpeed(), gRunningAdmin->getAngle(), gSpd,c );
-        //fputc(c, gBtHandle); /* エコーバック */
+        fprintf( gBtHandle,"[%d]\r\n",gScenarioConductor->getID());
+        fprintf( gBtHandle,"[%d]\r\n",gPatternSequencer->getID());
+        
+        bt_cmd = 0;//リセット
     }
-}
 
-static void PidFileLood( memfile_t* pid_file_stc )
-{
-    /* ファイル構造体の生成 */
-    PID_SETTING  strcPidFile;
-    memset( &strcPidFile, 0, sizeof(PID_SETTING));
-
-    /* 異常終了 */
-    if( pid_file_stc->buffersz < sizeof(PID_SETTING) ) { return; }
-
-    /* メモリ領域から構造体へ変換 */
-    memcpy( &strcPidFile, pid_file_stc->buffer,sizeof(PID_SETTING));
-
-    /* 設定ファイルのロード＠パラメタ変更 */
-    gRunLineCalculator->setGain( &strcPidFile );
-
-    fprintf( gBtHandle,"[%s]s[%f][%f][%f]d[%f][%f][%f]\r\n",&strcPidFile,
-            strcPidFile.fSpdP,strcPidFile.fSpdI,strcPidFile.fSpdD, 
-            strcPidFile.fDegP,strcPidFile.fDegI,strcPidFile.fDegD );
+EXIT:
     return;
 }
 
-static void PidFileWrite( memfile_t* pid_file_stc, char cmd )
+static bool SetingFileload( char* f_pass, memfile_t* ev3_file_stc )
 {
+    /* ファイル構造体の生成 */
+    EV3_SETTING  strcEv3File;
+    ER ret;
+    memset( &strcEv3File, 0, sizeof(EV3_SETTING));
+
+    /* 異常終了：ぬるぽ */
+    if( f_pass == NULL ) { return false; }
+    if( ev3_file_stc == NULL ) { return false; }
+
+    /* メモリ上にすでにファイルあれば削除 */
+    if( ev3_file_stc->buffer != NULL ) {
+        ev3_memfile_free( ev3_file_stc );
+    }
+
+    /* SDカードから設定ファイルを取り込み */
+    ret = ev3_memfile_load( f_pass, ev3_file_stc );
+    assert( ret != E_OK );
+
+    /* 異常終了:ファイルサイズが異常 */
+    if( ev3_file_stc->buffersz < sizeof(EV3_SETTING) ) { return false; }
+
+    /* メモリ領域から構造体へ変換 */
+    memcpy( &strcEv3File, ev3_file_stc->buffer,sizeof(EV3_SETTING));
+
+    /* 設定ファイルのロード＠パラメタ変更 */
+    gRunLineCalculator->setGain( &strcEv3File.pidSetting );
+    gPatternSequencer->setPatternIndex( &strcEv3File.patrnIndexS[0] );
+    gScenarioConductor->setScenarioIndex( &strcEv3File.sceneIndexS[0] );
+
+    fprintf( gBtHandle,"[%f][%f][%f]d[%f][%f][%f]\r\n",
+        strcEv3File.pidSetting.fSpdP,strcEv3File.pidSetting.fSpdI,strcEv3File.pidSetting.fSpdD, 
+        strcEv3File.pidSetting.fDegP,strcEv3File.pidSetting.fDegI,strcEv3File.pidSetting.fDegD );
+    return true;
+}
+
+static bool SetingFileWrite( char* f_pass, FILE* bt_handle )
+{
+    FILE* SDFileH = NULL;
     /* ファイル構造体の生成（一時受け用） */
-    int8_t  cDummy[100];
+    int8_t  cDummy[sizeof(EV3_SETTING)];
     memset( &cDummy[0], 0, 100);
 
+    /* 異常終了：ぬるぽ */
+    if( f_pass == NULL ) { return false; }
+    if( bt_handle == NULL ) { return false; }
+
     /* ユーザーレスポンス */
-    fprintf( gBtHandle,"[%c]---FILE IN----\r\n",cmd ); /* エコーバック */
+    fprintf( gBtHandle,"----FILE IN----\r\n" ); /* エコーバック */
     ev3_speaker_play_tone( NOTE_C4, 500 );
 
     /* Bt受付 */
-    fread( cDummy,
-            sizeof(char),
-            sizeof(PID_SETTING),
-            gBtHandle );
+    fread( cDummy, sizeof(char), sizeof(EV3_SETTING), bt_handle );
 
     /* ユーザーレスポンス */
+    fprintf( gBtHandle,"--FILE COMMIT--\r\n" ); /* エコーバック */
     ev3_speaker_play_tone( NOTE_C4, 500 );
 
-    /* 一時受けからメモリ領域へ */
-    memcpy( pid_file_stc->buffer, cDummy, sizeof(PID_SETTING));
+    /* 一時受けからSDカードへ書き込み */
+    SDFileH = fopen( f_pass, "wb" );//ファイルオープン
+    if( SDFileH != NULL ) {
+        fwrite( cDummy, sizeof(char), sizeof(cDummy), SDFileH );//書き込み
+        fclose( SDFileH );//SDファイルクローズ
+    }
 
-    /* 設定ファイルのロード */
-    PidFileLood( pid_file_stc );
-
-    return;
+    return true;
 }

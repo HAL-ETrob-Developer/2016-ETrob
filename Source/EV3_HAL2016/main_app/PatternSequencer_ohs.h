@@ -15,14 +15,6 @@
 #define INIT_PAT_ID (		 0 )/* 初期パターンを指し示す */
 #define PATTERN_NUM (		20 )/* パターンインデックスサイズ */
 
-/* 構造体 実行動作インデックス */
-typedef struct _PATTERN_INDEX{
-	SCHR speed;
-	SCHR ev3_deg;
-	SCHR Tail_dee;
-	UCHR balance;
-}PATTERN_INDEX;
-
 class PatternSequencer_ohs {
 public:
 	//生成
@@ -32,6 +24,13 @@ public:
 
 	//定量走行指揮
 	BOOL callPatternRunning( UCHR uc_index );
+
+	//定量走行指揮終了
+	void callSequencStop();
+
+	//現行インデックスNoの取得
+	UCHR getID();
+
 	//インデックス外部登録
 	BOOL setPatternIndex( PATTERN_INDEX* p_pattern_index );
 
@@ -40,6 +39,7 @@ private:
 	RunningAdmin_ohs* mRunningAdmin;
 	TailAdmin_ohs*    mTailAdmin;
 
+	UCHR 			  mNowId;//実行パターンD
 	PATTERN_INDEX     mPatternIndex[PATTERN_NUM];
 };
 

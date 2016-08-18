@@ -19,7 +19,7 @@ public:
     void    postRunning ( int32_t speed, int32_t deg, BOOL balancer );
     void    callRunning ( );
     int32_t    getMileage ( );
-    int8_t    getAngle ( );
+    int32_t    getAngle ( );
     int8_t    getSpeed ( );
     int8_t    getVector ( );
     int32_t isRightRotary ( );
