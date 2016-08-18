@@ -31,6 +31,10 @@ namespace EV3RT_2016_FORM
         public const byte RUN_CLM_T_D = 3;
         public const byte RUN_CLM_BLN = 4;
 
+        public const byte INDEX_MULTI = 10;
+        public const byte INDEX_R_ADD = 1;
+        public const byte INDEX_L_ADD = 51;
+
         public const string _CLS_BLK = "CLS_BLK";
         public const string _CLS_GRY = "CLS_GRY";
         public const string _CLS_WHT = "CLS_WHT";
@@ -93,11 +97,11 @@ namespace EV3RT_2016_FORM
             for (int iNo = 0; iNo < RIGHIT_INDEX_NUM; iNo++)
             {
                 this.righitStateDataGrid.Rows.Add();
-                this.righitStateDataGrid.Rows[iNo].Cells[SC_CLM___NO].Value = iNo * 10;
+                this.righitStateDataGrid.Rows[iNo].Cells[SC_CLM___NO].Value = iNo * INDEX_MULTI;
                 this.righitStateDataGrid.Rows[iNo].Cells[SC_CLM_NXCD].Value = _EX_SLIP;
                 this.righitStateDataGrid.Rows[iNo].Cells[SC_CLM_CDVL].Value = 0;
                 this.righitStateDataGrid.Rows[iNo].Cells[SC_CLM_ACTN].Value = 0;
-                this.righitStateDataGrid.Rows[iNo].Cells[SC_CLM_NXNO].Value = iNo + 1;
+                this.righitStateDataGrid.Rows[iNo].Cells[SC_CLM_NXNO].Value = iNo + INDEX_R_ADD;
             }
         }
         /* 左コースシナリオ */
@@ -119,11 +123,11 @@ namespace EV3RT_2016_FORM
             for (int iNo = 0; iNo < LEFT_INDEX_NUM; iNo++)
             {
                 this.leftStateDataGrid.Rows.Add();
-                this.leftStateDataGrid.Rows[iNo].Cells[SC_CLM___NO].Value = iNo * 10;
+                this.leftStateDataGrid.Rows[iNo].Cells[SC_CLM___NO].Value = iNo * INDEX_MULTI;
                 this.leftStateDataGrid.Rows[iNo].Cells[SC_CLM_NXCD].Value = _EX_SLIP;
                 this.leftStateDataGrid.Rows[iNo].Cells[SC_CLM_CDVL].Value = 0;
                 this.leftStateDataGrid.Rows[iNo].Cells[SC_CLM_ACTN].Value = 0;
-                this.leftStateDataGrid.Rows[iNo].Cells[SC_CLM_NXNO].Value = iNo + 1;
+                this.leftStateDataGrid.Rows[iNo].Cells[SC_CLM_NXNO].Value = iNo + INDEX_L_ADD;
             }
         }
         /* 走行インデックス */
@@ -216,8 +220,8 @@ namespace EV3RT_2016_FORM
             //行番号の再生成
             for (int iNo = 0; iNo < RIGHIT_INDEX_NUM; iNo++)
             {
-                this.righitStateDataGrid.Rows[iNo].Cells[SC_CLM___NO].Value = iNo * 10;
-                this.righitStateDataGrid.Rows[iNo].Cells[SC_CLM_NXNO].Value = iNo + 1;
+                this.righitStateDataGrid.Rows[iNo].Cells[SC_CLM___NO].Value = iNo * INDEX_MULTI;
+                this.righitStateDataGrid.Rows[iNo].Cells[SC_CLM_NXNO].Value = iNo + INDEX_R_ADD;
             }
         }
         //左コース
@@ -235,8 +239,8 @@ namespace EV3RT_2016_FORM
             //行番号の再生成
             for (int iNo = 0; iNo < RIGHIT_INDEX_NUM; iNo++)
             {
-                this.leftStateDataGrid.Rows[iNo].Cells[SC_CLM___NO].Value = iNo * 10;
-                this.leftStateDataGrid.Rows[iNo].Cells[SC_CLM_NXNO].Value = iNo + 1;
+                this.leftStateDataGrid.Rows[iNo].Cells[SC_CLM___NO].Value = iNo * INDEX_MULTI;
+                this.leftStateDataGrid.Rows[iNo].Cells[SC_CLM_NXNO].Value = iNo + INDEX_R_ADD;
             }
         }
 
