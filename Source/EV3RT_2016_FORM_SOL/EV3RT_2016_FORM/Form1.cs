@@ -430,9 +430,9 @@ namespace EV3RT_2016_FORM
             {
                 try
                 {
-                    ThisRunSta[i].speed   = (byte)(int)(ThisGridView.Rows[i].Cells[RUN_CLM_SPD].Value);
-                    ThisRunSta[i].turn    = (byte)(int)(ThisGridView.Rows[i].Cells[RUN_CLM_TRN].Value);
-                    ThisRunSta[i].tailDeg = (byte)(int)(ThisGridView.Rows[i].Cells[RUN_CLM_T_D].Value);
+                    ThisRunSta[i].speed   = (sbyte)(int)(ThisGridView.Rows[i].Cells[RUN_CLM_SPD].Value);
+                    ThisRunSta[i].turn    = (sbyte)(int)(ThisGridView.Rows[i].Cells[RUN_CLM_TRN].Value);
+                    ThisRunSta[i].tailDeg = (sbyte)(int)(ThisGridView.Rows[i].Cells[RUN_CLM_T_D].Value);
                     if((bool)ThisGridView.Rows[i].Cells[RUN_CLM_BLN].Value ) { ThisRunSta[i].balance = 1; }
                 }
                 catch (IndexOutOfRangeException)
@@ -494,9 +494,9 @@ namespace EV3RT_2016_FORM
                         //走行インデックス値の読み込み
                         for (int i = 0; i < RUNNING_INDEX_NUM; i++)
                         {
-                            runninngIndexGridView.Rows[i].Cells[RUN_CLM_SPD].Value = (int)w.ReadByte();
-                            runninngIndexGridView.Rows[i].Cells[RUN_CLM_TRN].Value = (int)w.ReadByte();
-                            runninngIndexGridView.Rows[i].Cells[RUN_CLM_T_D].Value = (int)w.ReadByte();
+                            runninngIndexGridView.Rows[i].Cells[RUN_CLM_SPD].Value = (int)(sbyte)w.ReadByte();
+                            runninngIndexGridView.Rows[i].Cells[RUN_CLM_TRN].Value = (int)(sbyte)w.ReadByte();
+                            runninngIndexGridView.Rows[i].Cells[RUN_CLM_T_D].Value = (int)(sbyte)w.ReadByte();
                             if (w.ReadByte() == 1) {
                                 runninngIndexGridView.Rows[i].Cells[RUN_CLM_BLN].Value = true;
                             } else {
@@ -530,9 +530,9 @@ namespace EV3RT_2016_FORM
 
         struct RUN_STATE
         {
-            public byte speed;
-            public byte turn;
-            public byte tailDeg;
+            public sbyte speed;
+            public sbyte turn;
+            public sbyte tailDeg;
             public byte balance;
         };
 
