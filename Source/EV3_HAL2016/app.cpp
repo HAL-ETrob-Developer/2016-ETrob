@@ -21,6 +21,9 @@
 #include "hal_ev3_std.h"
 
 #include "./main_app/LineTracer_ohs.h"
+#include "./main_app/PatternSequencer_ohs.h"
+#include "./main_app/EvStateAdmin_ohs.h"
+#include "./main_app/ScenarioConductor_ohs.h"
 
 #include "./calculation/RunLineCalculator_ohs.h"
 #include "./calculation/Balancer_ohs.h"
@@ -69,8 +72,12 @@ Motor*          rightMotor;
 Motor*          tailMotor;
 Clock*          clock;
 
-static RunLineCalculator_ohs*  gRunLineCalculator;
+
+static PatternSequencer_ohs*   gPatternSequencer;
+static EvStateAdmin_ohs*       gEvStateAdmin;
+static ScenarioConductor_ohs*  gScenarioConductor;
 static LineTracer_ohs*         gLineTracer;
+static RunLineCalculator_ohs*  gRunLineCalculator;
 static RayReflectAdmin_ohs*    gRayReflectAdmin;
 static Balancer_ohs*           gBalancer;
 static RunningAdmin_ohs*       gRunningAdmin;
@@ -135,7 +142,10 @@ static void user_system_create( void )
     gRunningAdmin = new RunningAdmin_ohs( *leftMotor, *rightMotor, gBalancer );
     gRayReflectAdmin = new RayReflectAdmin_ohs( *colorSensor );
   
-    gLineTracer = new LineTracer_ohs( gRunningAdmin, gRayReflectAdmin, gRunLineCalculator );
+    gEvStateAdmin = new EvStateAdmin_ohs( gRayReflectAdmin, gGyroAdmin, gRunningAdmin, gTailAdmin );
+    gLineTracer   = new LineTracer_ohs( gRunningAdmin, gRayReflectAdmin, gRunLineCalculator );
+    gPatternSequencer  = new PatternSequencer_ohs( gRunningAdmin, gTailAdmin );
+    gScenarioConductor = new ScenarioConductor_ohs( gEvStateAdmin, gLineTracer, gPatternSequencer );
 
     //Bluetooth
     gBtHandle = ev3_serial_open_file( EV3_SERIAL_BT );
@@ -161,6 +171,11 @@ static void user_system_destroy( void )
     if( gGyroAdmin         ) { delete gGyroAdmin;         gGyroAdmin         = NULL; }
     if( gBalancer          ) { delete gBalancer;          gBalancer          = NULL; }
     if( gLineTracer        ) { delete gLineTracer;        gLineTracer        = NULL; }
+    if( gEvStateAdmin      ) { delete gEvStateAdmin;      gEvStateAdmin      = NULL; }
+    if( gPatternSequencer  ) { delete gPatternSequencer;  gPatternSequencer  = NULL; }
+    if( gScenarioConductor ) { delete gScenarioConductor; gScenarioConductor = NULL; }
+
+
 
     if( touchSensor        ) { delete touchSensor;        touchSensor        = NULL; }
     if( colorSensor        ) { delete colorSensor;        colorSensor        = NULL; }
@@ -365,7 +380,7 @@ static void PidFileLood( memfile_t* pid_file_stc )
     memcpy( &strcPidFile, pid_file_stc->buffer,sizeof(PID_SETTING));
 
     /* 設定ファイルのロード＠パラメタ変更 */
-    // gRunLineCalculator->setGain( &strcPidFile );
+    gRunLineCalculator->setGain( &strcPidFile );
 
     fprintf( gBtHandle,"[%s]s[%f][%f][%f]d[%f][%f][%f]\r\n",&strcPidFile,
             strcPidFile.fSpdP,strcPidFile.fSpdI,strcPidFile.fSpdD, 
