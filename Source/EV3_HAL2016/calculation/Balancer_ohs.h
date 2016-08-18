@@ -18,15 +18,19 @@ public:
     ~Balancer_ohs();
 
     BOOL calcPWM( int8_t spd, int8_t deg, void* running_admin );
+    void init();
     int8_t isRightPWM( void );
     int8_t isLeftPWM( void );
     //テスト用メソッド(非公開)
     void  setOffSet( FLOT set_offset );
 private:
     GyroAdmin_ohs* mGyroAdmin;
+    FLOT   mRdOffSet;
+    FLOT   mLdOffSet;
+    FLOT   mGyOffSet;
     int8_t mRightPwm;
     int8_t mLeftPwm;
-    FLOT   mOffSet;
+    BOOL   mInit;
 };
 
 #endif  // MAINAPP_BALANCER_OHS_H_

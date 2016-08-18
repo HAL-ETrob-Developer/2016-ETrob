@@ -8,10 +8,13 @@
 Balancer_ohs::Balancer_ohs( GyroAdmin_ohs* gyro_admin )
 :mGyroAdmin( gyro_admin )
 {
-    mRightPwm     = 0;
-    mLeftPwm      = 0;
-    mOffSet       = 0;
+    mRightPwm = 0;
+    mLeftPwm  = 0;
+    mGyOffSet = 0;
+    mRdOffSet = 0;
+    mLdOffSet = 0;
     balance_init();  // 倒立振子制御初期化
+    mInit     = false;
 }
 
 /**
@@ -36,12 +39,21 @@ BOOL Balancer_ohs::calcPWM( int8_t spd, int8_t deg, void* running_admin ) {
     //モータ回転値の取得
     fNowRDeg = ( FLOT )RunningAdmin->isRightRotary();
     fNowLDeg = ( FLOT )RunningAdmin->isLeftRotary();
+    //イニシャライズのチェック
+    if( mInit == false ) {
+        mRdOffSet = fNowRDeg;
+        mLdOffSet = fNowLDeg;
+        mInit = true;
+    }
+    //回転値オフセット
+    fNowRDeg -= mRdOffSet;
+    fNowLDeg -= mLdOffSet;
 
     //バッテリー残量
     fBattery = ( FLOT )ev3_battery_voltage_mV();
 
     //オフセット値の調整
-    mOffSet = ( FLOT )spd * BL_K_GY_OFFS;
+    mGyOffSet = ( FLOT )spd * BL_K_GY_OFFS;
 
     // 倒立振子制御APIを呼び出し、倒立走行するための
     // 左右モータ出力値を得る
@@ -49,7 +61,7 @@ BOOL Balancer_ohs::calcPWM( int8_t spd, int8_t deg, void* running_admin ) {
         static_cast<float>(spd),
         static_cast<float>(deg),
         static_cast<float>( fGyroValue ),
-        static_cast<float>( mOffSet ),
+        static_cast<float>( mGyOffSet ),
         static_cast<float>( fNowLDeg ),
         static_cast<float>( fNowRDeg ),
         static_cast<float>( fBattery ),
@@ -73,7 +85,9 @@ int8_t Balancer_ohs::isLeftPWM() {
     return ( mLeftPwm );
 }
 
+void Balancer_ohs::init() { balance_init(); mInit = false; }
+
 void  Balancer_ohs::setOffSet( FLOT set_offset )
 {
-   mOffSet =  set_offset;
+   mGyOffSet =  set_offset;
 }

@@ -69,6 +69,7 @@ void RunningAdmin_ohs::callRunning ( )
         mRightPwm = mBalancer->isRightPWM( );
         mLeftPwm  = mBalancer->isLeftPWM( );
     } else {
+        mBalancer->init();
         mRightPwm = mFront - mTurn;
         mLeftPwm  = mFront + mTurn;
     }
