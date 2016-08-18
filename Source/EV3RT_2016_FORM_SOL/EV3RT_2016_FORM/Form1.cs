@@ -240,7 +240,7 @@ namespace EV3RT_2016_FORM
             for (int iNo = 0; iNo < RIGHIT_INDEX_NUM; iNo++)
             {
                 this.leftStateDataGrid.Rows[iNo].Cells[SC_CLM___NO].Value = iNo * INDEX_MULTI;
-                this.leftStateDataGrid.Rows[iNo].Cells[SC_CLM_NXNO].Value = iNo + INDEX_R_ADD;
+                this.leftStateDataGrid.Rows[iNo].Cells[SC_CLM_NXNO].Value = iNo + INDEX_L_ADD;
             }
         }
 
