@@ -30,8 +30,8 @@ ScenarioConductor_ohs::ScenarioConductor_ohs( EvStateAdmin_ohs* ev_state_admin, 
 	mCheckMethod[TIL_DEG] = &ScenarioConductor_ohs::checkTailDeg;
 	mCheckMethod[GYR__ST] = &ScenarioConductor_ohs::checkGyro;
 	mCheckMethod[GYR_UST] = &ScenarioConductor_ohs::checkGyro;
-	mCheckMethod[EX_SLIP] = &ScenarioConductor_ohs::checkQuit;
-	mCheckMethod[EX_END]  = &ScenarioConductor_ohs::checkSlip;
+	mCheckMethod[EX_SLIP] = &ScenarioConductor_ohs::checkSlip;
+	mCheckMethod[EX_END]  = &ScenarioConductor_ohs::checkQuit;
 }
 
 /**
@@ -66,9 +66,9 @@ BOOL ScenarioConductor_ohs::execScenario() {
 	nextEventF = ( this->*mCheckMethod[ucMoveEvent] )();
 
 	//達成フラグのチェック
-	if( nextEventF ) { 
+	if( nextEventF == true ) { 
 		//シナリオ更新(異常値返却ならば終了)
-		if( !setScenarioUpDate()) { return false; }
+		if( setScenarioUpDate() == false ) { return false; }
 	}
 
 	/* シナリオ実行 ------------------------------------------- */
@@ -109,7 +109,7 @@ bool ScenarioConductor_ohs::checkRayRef() {
 
 /* 走行距離を確認 */
 bool ScenarioConductor_ohs::checkMileage() {
-	SLNG lGetNowMlg = mEvStateAdmin->getMileage();
+	SLNG lGetNowMlg = ( SLNG )mEvStateAdmin->getMileage();
 	SLNG lTargetMlg = mScenario[mScenarioID].event_value;
 
 	if( lTargetMlg > 0 ) {
@@ -124,7 +124,7 @@ bool ScenarioConductor_ohs::checkMileage() {
 
 /* 走行体角度を確認 */
 bool ScenarioConductor_ohs::checkAngle() {
-	SLNG lGetNowDeg = mEvStateAdmin->getBodyAngle();
+	SLNG lGetNowDeg = ( SLNG )mEvStateAdmin->getBodyAngle();
 	SLNG lTargetDeg = mScenario[mScenarioID].event_value;
 
 	if( lTargetDeg > 0 ) {
@@ -139,7 +139,7 @@ bool ScenarioConductor_ohs::checkAngle() {
 
 /* 尻尾角度を確認 */
 bool ScenarioConductor_ohs::checkTailDeg() {
-	SLNG lGetNowDeg = mEvStateAdmin->getTailAngle();
+	SLNG lGetNowDeg = ( SLNG )mEvStateAdmin->getTailAngle();
 	SLNG lTrgDegMax = 0;
 	SLNG lTrgDegMin = 0;
 
@@ -192,6 +192,10 @@ BOOL ScenarioConductor_ohs::setScenario( UCHR uc_scen_no ) {
 	//指定インデックスが範囲内
 	if( uc_scen_no < SCENARIO_MAX_NUM ) {
 		mScenarioID = uc_scen_no;
+
+		//本体状態管理のリフレッシュ
+		mEvStateAdmin->execStateRefresh();
+
 		return true;
 	}
 	return false;
@@ -205,6 +209,8 @@ void ScenarioConductor_ohs::quitCommand() {
 	mScenarioID = SCENARIO_MAX_NUM;
 	//ライントレーサに終了通知を渡す
 	mLineTracer->postLineTraceStop();
+	//パターンシーケンサに終了通知を渡す
+	mPatternSequencer->callSequencStop();
 }
 
 /**
@@ -241,3 +247,6 @@ BOOL ScenarioConductor_ohs::setScenarioIndex( SCENE_INDEX* p_scenx_index )
 	memcpy( mScenario, p_scenx_index, SCENARIO_CPY_SIZE );
 	return true;
 }
+//現行インデックス取得
+UCHR ScenarioConductor_ohs::getID() { return mScenarioID; }
+

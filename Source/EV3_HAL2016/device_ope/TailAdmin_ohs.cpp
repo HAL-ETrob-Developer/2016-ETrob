@@ -11,7 +11,6 @@ TailAdmin_ohs::TailAdmin_ohs( ev3api::Motor& tail_wheel )
 	//mTailWheel  = tail_wheel;
 	mTailDeg    = 0;
 	mTailTarget = 0;
-	mOldTarget = mTailTarget;
 }
 
 /**
@@ -31,11 +30,18 @@ void TailAdmin_ohs::callValueUpDate() {
  * 尾角度指示
  */
 BOOL TailAdmin_ohs::postTailDegree( int32_t post_tail_deg ) {
+	static int32_t oldP = 0;
+	static int32_t i    = 0;
+	int32_t p = 0;
+	int32_t d = 0;
 	BOOL overflag = false;
 	
-	mTailTarget = ( post_tail_deg - mTailDeg) * TIL_P_GAIN;
+	
+	p = post_tail_deg - mTailDeg;
+	d = p - oldP;
+	i += d;
 
-	//mTailTarget = ( post_tail_deg - mTailDeg) * TIL_P_GAIN + ( mTailTarget - mOldTarget ) * TIL_D_GAIN;
+	mTailTarget = ( p * TIL_P_GAIN ) + ( i * TIL_I_GAIN ) + ( d * TIL_D_GAIN );
 
 	if (mTailTarget > MAX_TARGET){
 		mTailTarget = MAX_TARGET;
@@ -45,7 +51,7 @@ BOOL TailAdmin_ohs::postTailDegree( int32_t post_tail_deg ) {
 		overflag = true;
 	}
 
-	mOldTarget = mTailTarget;
+	oldP = p;
 	return (overflag);
 }
 

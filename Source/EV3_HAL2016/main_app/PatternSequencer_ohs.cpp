@@ -12,6 +12,8 @@ PatternSequencer_ohs::PatternSequencer_ohs( RunningAdmin_ohs* running_admin, Tai
 	/* 現本体状態構造体初期化 */
 	memset( mPatternIndex, 0, sizeof( PATTERN_INDEX ));
 
+	mNowId = INIT_PAT_ID;
+
 	/* 初期値のセット */
 	mPatternIndex[INIT_PAT_ID].speed    = INIT__SPEED;
 	mPatternIndex[INIT_PAT_ID].ev3_deg  = INIT_EV_DEG;
@@ -38,11 +40,13 @@ BOOL PatternSequencer_ohs::callPatternRunning( UCHR uc_index )
 	/* 引数チェック */
 	if( uc_index >= PATTERN_NUM ) { return false; }//異常終了
 
+	mNowId = uc_index;
+
 	/* 外部メソッドへ渡す引数の準備 */
-	cSpeed = mPatternIndex[uc_index].speed;
-	cDegre = mPatternIndex[uc_index].ev3_deg;
-	cTailD = mPatternIndex[uc_index].Tail_dee;
-	if( mPatternIndex[uc_index].balance == TRUE ) { BalanceF = true; }
+	cSpeed = mPatternIndex[mNowId].speed;
+	cDegre = mPatternIndex[mNowId].ev3_deg;
+	cTailD = mPatternIndex[mNowId].Tail_dee;
+	if( mPatternIndex[mNowId].balance == TRUE ) { BalanceF = true; }
 
 	/* 走行指示 */
 	mRunningAdmin->postRunning ( cSpeed, cDegre, BalanceF );
@@ -52,6 +56,13 @@ BOOL PatternSequencer_ohs::callPatternRunning( UCHR uc_index )
 
 	return true;//正常終了
 }
+
+void PatternSequencer_ohs::callSequencStop()
+{
+	/* 走行指示：しっぽはそのまま */
+	mRunningAdmin->postRunning ( 0, 0, false );
+}
+
 
 /**
 * パターンインデックスの登録
@@ -63,4 +74,7 @@ BOOL PatternSequencer_ohs::setPatternIndex( PATTERN_INDEX* p_pattern_index )
 	memcpy( mPatternIndex, p_pattern_index, sizeof( mPatternIndex ));
 	return true;
 }
+
+//現行インデックスNoの取得
+UCHR PatternSequencer_ohs::getID() { return mNowId; }
 

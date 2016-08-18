@@ -99,9 +99,9 @@ int32_t RunningAdmin_ohs::getMileage ( )
 /**
  * 走行角度取得
  */
-int8_t RunningAdmin_ohs::getAngle ( )
+int32_t RunningAdmin_ohs::getAngle ( )
 {
-    return mRightRotary - mLeftRotary;
+    return mLeftRotary - mRightRotary;
 }
 
 /**
