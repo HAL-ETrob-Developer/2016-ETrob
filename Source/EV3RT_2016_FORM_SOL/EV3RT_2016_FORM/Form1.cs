@@ -69,14 +69,25 @@ namespace EV3RT_2016_FORM
         }
 
         /* ゲイン */
-        private void gainsTextBox_init()//new20160811
+        private void gainsTextBox_init()//new20160820
         {
-            textBoxSpdP.Text = "0.008";
-            textBoxSpdI.Text = "0.001";
-            textBoxSpdD.Text = "0.004";
-            textBoxDegP.Text = "0.2";
-            textBoxDegI.Text = "0.1";
-            textBoxDegD.Text = "15.0";
+            nmTextBoxTerSpeed.Text = "80.0";
+            nmTextBoxTerRefLV.Text = "70.0";
+            nmTextBoxSpdP.Text = "0.01";
+            nmTextBoxSpdI.Text = "0.001";
+            nmTextBoxSpdD.Text = "0.02";
+            nmTextBoxDegP.Text = "0.2";
+            nmTextBoxDegI.Text = "0.5";
+            nmTextBoxDegD.Text = "13.0";
+
+            scTextBoxTerSpeed.Text = "30.0";
+            scTextBoxTerRefLV.Text = "40.0";
+            scTextBoxSpdP.Text = "0.0";
+            scTextBoxSpdI.Text = "0.0";
+            scTextBoxSpdD.Text = "0.0";
+            scTextBoxDegP.Text = "1.0";
+            scTextBoxDegI.Text = "0.5";
+            scTextBoxDegD.Text = "4.0";
         }
         /* 右コースシナリオ */
         private void righitStateDataGrid_init()
@@ -263,8 +274,10 @@ namespace EV3RT_2016_FORM
 
             ControlLabel.Text = "設定ファイルの生成を開始";
 
-            /* PIDゲイン値の取得 */
-            setingF.pidGains = getPidGains();
+            /* 標準PIDゲイン値の取得 */
+            setingF.nmPidGains = getNmPidGains();
+            /* 探索PIDゲイン値の取得 */
+            setingF.scPidGains = getScPidGains();
             /* 右シナリオの取得 */
             setingF.righitScen = getScenario(this.righitStateDataGrid);
             /* 左シナリオの取得 */
@@ -276,12 +289,12 @@ namespace EV3RT_2016_FORM
             using (BinaryWriter w = new BinaryWriter(File.Create(@"ev3_settings.evs")))
             {
                 //PIDゲイン値の書き込み
-                w.Write(setingF.pidGains.fSpdP);
-                w.Write(setingF.pidGains.fSpdI);
-                w.Write(setingF.pidGains.fSpdD);
-                w.Write(setingF.pidGains.fDegP);
-                w.Write(setingF.pidGains.fDegI);
-                w.Write(setingF.pidGains.fDegD);
+                w.Write(setingF.nmPidGains.fSpdP);
+                w.Write(setingF.nmPidGains.fSpdI);
+                w.Write(setingF.nmPidGains.fSpdD);
+                w.Write(setingF.nmPidGains.fDegP);
+                w.Write(setingF.nmPidGains.fDegI);
+                w.Write(setingF.nmPidGains.fDegD);
 
                 //右シナリオの書き込み
                 for (int i = 0; ; i++)
@@ -340,16 +353,21 @@ namespace EV3RT_2016_FORM
             //this.Close();
         }
         /* PIDゲイン値の抽出 */
-        private PID_SETTING getPidGains()
+        private PID_SETTING getNmPidGains()
         {
-            string strSpdP = textBoxSpdP.Text;
-            string strSpdI = textBoxSpdI.Text;
-            string strSpdD = textBoxSpdD.Text;
-            string strDegP = textBoxDegP.Text;
-            string strDegI = textBoxDegI.Text;
-            string strDegD = textBoxDegD.Text;
+            string strSpeed = nmTextBoxTerSpeed.Text;
+            string strRefLV = nmTextBoxTerRefLV.Text;
+            string strSpdP  = nmTextBoxSpdP.Text;
+            string strSpdI  = nmTextBoxSpdI.Text;
+            string strSpdD  = nmTextBoxSpdD.Text;
+            string strDegP  = nmTextBoxDegP.Text;
+            string strDegI  = nmTextBoxDegI.Text;
+            string strDegD  = nmTextBoxDegD.Text;
 
             PID_SETTING pidSetFile;
+
+            pidSetFile.fTerSpeed = 0.0F;
+            pidSetFile.fTerRefLV = 0.0F;
             pidSetFile.fSpdP = 0.0F;
             pidSetFile.fSpdI = 0.0F;
             pidSetFile.fSpdD = 0.0F;
@@ -357,6 +375,41 @@ namespace EV3RT_2016_FORM
             pidSetFile.fDegI = 0.0F;
             pidSetFile.fDegD = 0.0F;
 
+            if (strSpeed != "") { pidSetFile.fTerSpeed = float.Parse(strSpeed); }
+            if (strRefLV != "") { pidSetFile.fTerRefLV = float.Parse(strRefLV); }
+            if (strSpdP != "") { pidSetFile.fSpdP = float.Parse(strSpdP); }
+            if (strSpdI != "") { pidSetFile.fSpdI = float.Parse(strSpdI); }
+            if (strSpdD != "") { pidSetFile.fSpdD = float.Parse(strSpdD); }
+            if (strDegP != "") { pidSetFile.fDegP = float.Parse(strDegP); }
+            if (strDegI != "") { pidSetFile.fDegI = float.Parse(strDegI); }
+            if (strDegD != "") { pidSetFile.fDegD = float.Parse(strDegD); }
+
+            return pidSetFile;
+        }
+        private PID_SETTING getScPidGains()
+        {
+            string strSpeed = scTextBoxTerSpeed.Text;
+            string strRefLV = scTextBoxTerRefLV.Text;
+            string strSpdP  = scTextBoxSpdP.Text;
+            string strSpdI  = scTextBoxSpdI.Text;
+            string strSpdD  = scTextBoxSpdD.Text;
+            string strDegP  = scTextBoxDegP.Text;
+            string strDegI  = scTextBoxDegI.Text;
+            string strDegD  = scTextBoxDegD.Text;
+
+            PID_SETTING pidSetFile;
+
+            pidSetFile.fTerSpeed = 0.0F;
+            pidSetFile.fTerRefLV = 0.0F;
+            pidSetFile.fSpdP = 0.0F;
+            pidSetFile.fSpdI = 0.0F;
+            pidSetFile.fSpdD = 0.0F;
+            pidSetFile.fDegP = 0.0F;
+            pidSetFile.fDegI = 0.0F;
+            pidSetFile.fDegD = 0.0F;
+
+            if (strSpeed != "") { pidSetFile.fTerSpeed = float.Parse(strSpeed); }
+            if (strRefLV != "") { pidSetFile.fTerRefLV = float.Parse(strRefLV); }
             if (strSpdP != "") { pidSetFile.fSpdP = float.Parse(strSpdP); }
             if (strSpdI != "") { pidSetFile.fSpdI = float.Parse(strSpdI); }
             if (strSpdD != "") { pidSetFile.fSpdD = float.Parse(strSpdD); }
@@ -477,13 +530,24 @@ namespace EV3RT_2016_FORM
                 for (int getByte = 0; ; getByte++) {
                     try
                     {
-                        //PIDゲイン値の読み込み
-                        textBoxSpdP.Text = w.ReadSingle().ToString();
-                        textBoxSpdI.Text = w.ReadSingle().ToString();
-                        textBoxSpdD.Text = w.ReadSingle().ToString();
-                        textBoxDegP.Text = w.ReadSingle().ToString();
-                        textBoxDegI.Text = w.ReadSingle().ToString();
-                        textBoxDegD.Text = w.ReadSingle().ToString();
+                        //標準PIDゲイン値の読み込み
+                        nmTextBoxTerSpeed.Text = w.ReadSingle().ToString();
+                        nmTextBoxTerRefLV.Text = w.ReadSingle().ToString();
+                        nmTextBoxSpdP.Text = w.ReadSingle().ToString();
+                        nmTextBoxSpdI.Text = w.ReadSingle().ToString();
+                        nmTextBoxSpdD.Text = w.ReadSingle().ToString();
+                        nmTextBoxDegP.Text = w.ReadSingle().ToString();
+                        nmTextBoxDegI.Text = w.ReadSingle().ToString();
+                        nmTextBoxDegD.Text = w.ReadSingle().ToString();
+                        //探索PIDゲイン値の読み込み
+                        scTextBoxTerSpeed.Text = w.ReadSingle().ToString();
+                        scTextBoxTerRefLV.Text = w.ReadSingle().ToString();
+                        scTextBoxSpdP.Text = w.ReadSingle().ToString();
+                        scTextBoxSpdI.Text = w.ReadSingle().ToString();
+                        scTextBoxSpdD.Text = w.ReadSingle().ToString();
+                        scTextBoxDegP.Text = w.ReadSingle().ToString();
+                        scTextBoxDegI.Text = w.ReadSingle().ToString();
+                        scTextBoxDegD.Text = w.ReadSingle().ToString();
                         //右シナリオ値の読み込み
                         for (int i = 0; i < RIGHIT_INDEX_NUM; i++)
                         {
@@ -533,8 +597,9 @@ namespace EV3RT_2016_FORM
 
         /* 構造体宣言 */
         struct EV3_SETTING {
-            public PID_SETTING pidGains;
-            public SCENARIO[]  righitScen;
+            public PID_SETTING nmPidGains;
+            public PID_SETTING scPidGains;
+            public SCENARIO[] righitScen;
             public SCENARIO[]  leftScen;
             public RUN_STATE[] runState;
         };
@@ -556,6 +621,8 @@ namespace EV3RT_2016_FORM
         };
 
         struct PID_SETTING {
+            public float fTerSpeed;
+            public float fTerRefLV;
             public float fSpdP;
             public float fSpdI;
             public float fSpdD;
