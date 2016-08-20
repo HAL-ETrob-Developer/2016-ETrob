@@ -289,12 +289,23 @@ namespace EV3RT_2016_FORM
             using (BinaryWriter w = new BinaryWriter(File.Create(@"ev3_settings.evs")))
             {
                 //PIDゲイン値の書き込み
+                w.Write(setingF.nmPidGains.fTerSpeed);
+                w.Write(setingF.nmPidGains.fTerRefLV);
                 w.Write(setingF.nmPidGains.fSpdP);
                 w.Write(setingF.nmPidGains.fSpdI);
                 w.Write(setingF.nmPidGains.fSpdD);
                 w.Write(setingF.nmPidGains.fDegP);
                 w.Write(setingF.nmPidGains.fDegI);
                 w.Write(setingF.nmPidGains.fDegD);
+
+                w.Write(setingF.scPidGains.fTerSpeed);
+                w.Write(setingF.scPidGains.fTerRefLV);
+                w.Write(setingF.scPidGains.fSpdP);
+                w.Write(setingF.scPidGains.fSpdI);
+                w.Write(setingF.scPidGains.fSpdD);
+                w.Write(setingF.scPidGains.fDegP);
+                w.Write(setingF.scPidGains.fDegI);
+                w.Write(setingF.scPidGains.fDegD);
 
                 //右シナリオの書き込み
                 for (int i = 0; ; i++)
