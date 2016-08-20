@@ -33,19 +33,6 @@ void RunningAdmin_ohs::callValueUpDate ( )
 {
     mRightRotary = mRightWheel.getCount( );
     mLeftRotary  = mLeftWheel.getCount( );
-
-#ifdef PRINT
-	char cString[50];
-	memset( cString, 0, sizeof( cString ));
-	sprintf(( char* )cString, "mRightRotary[%5d]",mRightRotary);
-	ev3_lcd_draw_string( cString, 0, 8*9);
-	sprintf(( char* )cString, "mRightRotary[%5d]",mLeftRotary);
-	ev3_lcd_draw_string( cString, 0, 8*10);
-	sprintf(( char* )cString, "mRightPwm[%5d]",mRightPwm);
-	ev3_lcd_draw_string( cString, 0, 8*11);
-	sprintf(( char* )cString, "mLeftPwm[%5d]",mLeftPwm);
-	ev3_lcd_draw_string( cString, 0, 8*12);
-#endif
 }
 
 /**

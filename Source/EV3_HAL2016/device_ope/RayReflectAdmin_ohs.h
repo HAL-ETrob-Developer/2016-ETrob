@@ -7,15 +7,15 @@
 #include "ev3api.h"
 #include "ColorSensor.h"
 
-#define QUEUE_MAX	(  127 )		/* キュー個数 */
+#define R_QUEUE_MAX	(  200 )		/* キュー個数 */
 
 /* ゲイン値 */
 #define GAIN_NOW	( 0.1F )		/* 現在 */
 #define GAIN_OLD	( 0.9F )		/* 過去 */
 
 /* 閾値 */
-#define	THRESHOLD_BLACK	( 30 )		/* ブラック */
-#define	THRESHOLD_WHITE	( 70 )		/* ホワイト */
+#define	THRESHOLD_BLACK	( 25 )		/* ブラック */
+#define	THRESHOLD_WHITE	( 45 )		/* ホワイト */
 
 /* 反射値カット */
 #define	REY_MAX_REF	( 150 )		/* 最大反射値＠カット */
@@ -38,13 +38,13 @@ class RayReflectAdmin_ohs
 		/* メンバ */
 		ev3api::ColorSensor& mColorSensor;
 		int16_t	mNowReflValue;
-		int16_t 	mOldReflValue;
+		int16_t mOldReflValue;
 		SENC_CLR mState;
-		int16_t mQueue[QUEUE_MAX];
-		uint8_t mQNo;
+		int16_t mQueue[R_QUEUE_MAX];
+		uint16_t mQNo;
 
 		/* メソッド */
-		void   setLowPassFilter( void );				//ローパスフィルタ
+		void    calcLowPassFilter( void );				//ローパスフィルタ
 		int16_t getClrCvtBright( void );				//カラーセンサ
 };
 

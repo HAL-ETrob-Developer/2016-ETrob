@@ -25,7 +25,7 @@ public:
     //デストラクタ 死ぬときあるよ
     ~LineTracer_ohs();
 
-    void postLineTraceConduct();
+    void postLineTraceConduct( BOOL search_mode );
     void postLineTraceStop();
     void callLineTraceAct();
     void callSimplLineTraceAct();
@@ -41,6 +41,7 @@ private:
 
     SENC_CLR mGetColor;
     BOOL   mLineTraceGo;
+    BOOL   mSearchMode;
     FLOT   mGain;
     int8_t mSpeed;
     int8_t mDeg;

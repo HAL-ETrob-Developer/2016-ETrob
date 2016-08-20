@@ -15,7 +15,7 @@
 #define	GYR_GAIN_OLD		( 0.8F )		/* 過去 */
 
 /* 閾値 */
-#define	THRESHOLD_STABILITY		(  30 )		/* 安定 */
+#define	THRESHOLD_STABILITY		(  12 )		/* 安定 */
 #define	THRESHOLD_FALLING		(  100 )	/* 転倒 */
 
 class GyroAdmin_ohs

@@ -69,6 +69,9 @@ BOOL ScenarioConductor_ohs::execScenario() {
 	if( nextEventF == true ) { 
 		//シナリオ更新(異常値返却ならば終了)
 		if( setScenarioUpDate() == false ) { return false; }
+#ifdef TRANSITION_SOUND
+        ev3_speaker_play_tone( NOTE_B6, 80 );
+#endif
 	}
 
 	/* シナリオ実行 ------------------------------------------- */
@@ -79,7 +82,9 @@ BOOL ScenarioConductor_ohs::execScenario() {
 		mPatternSequencer->callPatternRunning( mScenario[mScenarioID].pattern_id );
 	} else {
 		//ライントレース指示
-		mLineTracer->postLineTraceConduct();
+		if( mScenario[mScenarioID].pattern_id == PATTERN_NUM ) { mLineTracer->postLineTraceConduct( false ); }
+		else { mLineTracer->postLineTraceConduct( true ); }
+		
 	}
 
 	//正常終了

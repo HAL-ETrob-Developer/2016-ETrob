@@ -7,8 +7,8 @@
  ** 注記 : sample_cpp (ライントレース/尻尾モータ/超音波センサ/リモートスタート)
  ******************************************************************************
  **/
-
 #include "ev3api.h"
+#include "syssvc/serial.h"
 #include "app.h"
 #include "balancer.h"
 #include "TouchSensor.h"
@@ -253,9 +253,12 @@ void bt_task(intptr_t unused)
 
     while( true )
     {
+#ifdef SOUND_ANSWER
         ev3_speaker_play_tone( NOTE_C4, 80 );
+#endif
 
         bt_cmd = fgetc(gBtHandle); /* 受信 */
+        // serial_rea_dat(SIO_PORT_BT, (char*)&bt_cmd, 1);
 
         switch( bt_cmd ) {
             case CMD_RIGHIT://右コースセット
@@ -270,7 +273,9 @@ void bt_task(intptr_t unused)
                 ev3_memfile_free( &PidSetStract );
                 break;
             case 'b'://Bluetooth通信の終了
+#ifdef SOUND_ANSWER
                 ev3_speaker_play_tone( NOTE_C4, 240 );
+#endif
                 goto EXIT;
                 break;
 
@@ -315,8 +320,9 @@ void bt_task(intptr_t unused)
         }
         fprintf( gBtHandle,"[%c]\r\n", bt_cmd );
 
-        fprintf( gBtHandle,"[%d]\r\n",gScenarioConductor->getID());
-        fprintf( gBtHandle,"[%d]\r\n",gPatternSequencer->getID());
+        fprintf( gBtHandle,"Scenario[%3d]\r\n",gScenarioConductor->getID());
+        fprintf( gBtHandle,"Pattern [%3d]\r\n",gPatternSequencer->getID());
+        fprintf( gBtHandle,"Mileage [%d]\r\n",(int)gRunningAdmin->getMileage());
         
         bt_cmd = 0;//リセット
     }
@@ -346,19 +352,23 @@ static bool SetingFileload( char* f_pass, memfile_t* ev3_file_stc )
     assert( ret != E_OK );
 
     /* 異常終了:ファイルサイズが異常 */
-    if( ev3_file_stc->buffersz < sizeof(EV3_SETTING) ) { return false; }
+    if( ev3_file_stc->buffersz != sizeof(EV3_SETTING) ) { return false; }
 
     /* メモリ領域から構造体へ変換 */
     memcpy( &strcEv3File, ev3_file_stc->buffer,sizeof(EV3_SETTING));
 
     /* 設定ファイルのロード＠パラメタ変更 */
-    gRunLineCalculator->setGain( &strcEv3File.pidSetting );
+    gRunLineCalculator->setGain( &strcEv3File.nmPidSetting );
     gPatternSequencer->setPatternIndex( &strcEv3File.patrnIndexS[0] );
     gScenarioConductor->setScenarioIndex( &strcEv3File.sceneIndexS[0] );
 
-    fprintf( gBtHandle,"[%f][%f][%f]d[%f][%f][%f]\r\n",
-        strcEv3File.pidSetting.fSpdP,strcEv3File.pidSetting.fSpdI,strcEv3File.pidSetting.fSpdD, 
-        strcEv3File.pidSetting.fDegP,strcEv3File.pidSetting.fDegI,strcEv3File.pidSetting.fDegD );
+    PID_SETTING* test;
+
+    test = gRunLineCalculator->isGain();
+
+    fprintf( gBtHandle,"nm[%f][%f]sc[%f][%f]\r\n",
+        ( test + 0 )->fTerSpeed,( test + 0 )->fTerRefLv, 
+        ( test + 1 )->fTerSpeed,( test + 1 )->fTerRefLv );
     return true;
 }
 
@@ -375,15 +385,17 @@ static bool SetingFileWrite( char* f_pass, FILE* bt_handle )
 
     /* ユーザーレスポンス */
     fprintf( gBtHandle,"----FILE IN----\r\n" ); /* エコーバック */
+#ifdef SOUND_ANSWER
     ev3_speaker_play_tone( NOTE_C4, 500 );
-
+#endif
     /* Bt受付 */
     fread( cDummy, sizeof(char), sizeof(EV3_SETTING), bt_handle );
 
     /* ユーザーレスポンス */
     fprintf( gBtHandle,"--FILE COMMIT--\r\n" ); /* エコーバック */
+#ifdef SOUND_ANSWER
     ev3_speaker_play_tone( NOTE_C4, 500 );
-
+#endif
     /* 一時受けからSDカードへ書き込み */
     SDFileH = fopen( f_pass, "wb" );//ファイルオープン
     if( SDFileH != NULL ) {

@@ -61,6 +61,8 @@ void PatternSequencer_ohs::callSequencStop()
 {
 	/* 走行指示：しっぽはそのまま */
 	mRunningAdmin->postRunning ( 0, 0, false );
+	/* 尻角度指示 */
+	mTailAdmin->postTailDegree( mPatternIndex[mNowId].Tail_dee );
 }
 
 

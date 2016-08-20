@@ -8,8 +8,8 @@
 TailAdmin_ohs::TailAdmin_ohs( ev3api::Motor& tail_wheel )
 :mTailWheel(tail_wheel)
 {
-	//mTailWheel  = tail_wheel;
 	mTailDeg    = 0;
+	mExecutVal  = 0;
 	mTailTarget = 0;
 }
 
@@ -30,36 +30,40 @@ void TailAdmin_ohs::callValueUpDate() {
  * 尾角度指示
  */
 BOOL TailAdmin_ohs::postTailDegree( int32_t post_tail_deg ) {
-	static int32_t oldP = 0;
-	static int32_t i    = 0;
-	int32_t p = 0;
-	int32_t d = 0;
 	BOOL overflag = false;
-	
-	
-	p = post_tail_deg - mTailDeg;
-	d = p - oldP;
-	i += d;
 
-	mTailTarget = ( p * TIL_P_GAIN ) + ( i * TIL_I_GAIN ) + ( d * TIL_D_GAIN );
+	//角度指定範囲のチェック
+	if( MAX_TARGET < post_tail_deg ) { post_tail_deg = MAX_TARGET; overflag = true; }
+	if( MIN_TARGET > post_tail_deg ) { post_tail_deg = MIN_TARGET; overflag = true; }
 
-	if (mTailTarget > MAX_TARGET){
-		mTailTarget = MAX_TARGET;
-		overflag = true;
-	} else if ( mTailTarget < MIN_TARGET ) {
-		mTailTarget = MIN_TARGET;
-		overflag = true;
-	}
+	//角度目標値の登録
+	mTailTarget = post_tail_deg;
 
-	oldP = p;
-	return (overflag);
+	return ( overflag );
 }
 
 /**
  * 尾動作実行
  */
-void TailAdmin_ohs::callActDegree() {
-	mTailWheel.setPWM( mTailTarget );
+void TailAdmin_ohs::callActDegree()
+{
+	static int32_t oldP = 0;
+	static int32_t i    = 0;
+	int32_t p = 0;
+	int32_t d = 0;
+	
+	p = mTailTarget - mTailDeg;
+	d = p - oldP;
+	i += d;
+
+	mExecutVal = ( p * TIL_P_GAIN ) + ( i * TIL_I_GAIN ) + ( d * TIL_D_GAIN );
+
+	if (mExecutVal > MAX_VALUE){ mExecutVal = MAX_VALUE; }
+	else if ( mExecutVal < MIN_VALUE ) { mExecutVal = MIN_VALUE; }
+
+	oldP = p;
+	
+	mTailWheel.setPWM( mExecutVal );
 }
 
 /**

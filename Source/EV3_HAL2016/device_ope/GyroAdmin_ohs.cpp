@@ -55,7 +55,7 @@ int16_t GyroAdmin_ohs::getValue( void )
 	char cString[50];
 	memset( cString, 0, sizeof( cString ));
 	sprintf(( char* )cString, "GyroAdmin_ohs::getValue[%5d]",mNowGyroValue);
-	ev3_lcd_draw_string( cString, 0, 8*6);
+	ev3_lcd_draw_string( cString, 0, 8*8);
 #endif
 	return mNowGyroValue; 
 }

@@ -17,7 +17,7 @@
 //許容誤差
 // #define RUN_MLG_PERMISSION (   50 )
 // #define EV3_DEG_PERMISSION (   50 )
-#define TIL_DEG_PERMISSION (    1 )
+#define TIL_DEG_PERMISSION (    2 )
 
 //達成条件:enum化するとEV3RT_2016_FORMと連携取り辛いので
 #define CLS_BLK    (     0 )

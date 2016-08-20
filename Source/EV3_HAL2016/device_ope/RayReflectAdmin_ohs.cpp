@@ -29,20 +29,20 @@ RayReflectAdmin_ohs::~RayReflectAdmin_ohs()
  */
 void RayReflectAdmin_ohs::callValueUpDate( void )
 {
-	int16_t cBrightness;
-	static uint8_t cNo = 0;
+	int16_t sBrightness;
+	static uint16_t cNo = 0;
 
-	//cBrightness = mColorSensor.getBrightness();	//光学センサの反射値の取得
-	cBrightness = getClrCvtBright();
+	//sBrightness = mColorSensor.getBrightness();	//光学センサの反射値の取得
+	sBrightness = getClrCvtBright();
 
 	//記録キューの更新
-	cNo %= QUEUE_MAX;
+	cNo %= R_QUEUE_MAX;
 	mQNo = cNo;
-	mQueue[mQNo] = cBrightness;
+	mQueue[mQNo] = sBrightness;
 	cNo++;
 	
 	//ローパスフィルタ
-	setLowPassFilter();
+	calcLowPassFilter();
 
 }
 
@@ -60,34 +60,40 @@ int16_t RayReflectAdmin_ohs::getValue( void )
 SENC_CLR RayReflectAdmin_ohs::getState( void )
 {
 	SINT iIdx = 0;
-	
+	UINT iWhiteCount = 0;
+	UINT iBlackCount = 0;
+	UINT iGrayCount  = 0;
+
 	//中間値範囲チェック
-	for( iIdx = 0; iIdx < QUEUE_MAX; iIdx++ ){
-		if( mQueue[iIdx] < THRESHOLD_BLACK || mQueue[iIdx] > THRESHOLD_WHITE ){
-			//反射値チェック
-			if( mNowReflValue < THRESHOLD_BLACK ){
-				/* 状態：ブラック */
-				mState = SCLR_BLACK;
-			}else if( mNowReflValue > THRESHOLD_WHITE ){
-				/* 状態：ホワイト */
-				mState = SCLR_WHITE;
-			}	
-			break;
-		}		
+	for( iIdx = 0; iIdx < R_QUEUE_MAX; iIdx++ ){
+		if( mQueue[iIdx] < THRESHOLD_BLACK ) { iBlackCount++; } 
+		if( mQueue[iIdx] > THRESHOLD_WHITE ) { iWhiteCount++; }
+		if( mQueue[iIdx] < THRESHOLD_BLACK || mQueue[iIdx] > THRESHOLD_WHITE ) {
+			iGrayCount++;
+		}
 	}
-	
-	if( iIdx == QUEUE_MAX ){
+	//反射値チェック
+	if( iBlackCount > 0 ){
+		/* 状態：ブラック */
+		mState = SCLR_BLACK;
+	} else {
 		/* 状態：グレー */
 		mState = SCLR_GRAY;
+	}
+	
+	if( iWhiteCount == R_QUEUE_MAX ){
+		/* 状態：ホワイト */
+		mState = SCLR_WHITE;
 	}
 	
 	return mState;
 }
 
+
 /**
  * ローパスフィルタ
  */
-void RayReflectAdmin_ohs::setLowPassFilter( void )
+void RayReflectAdmin_ohs::calcLowPassFilter( void )
 {
 	FLOT fNowRef  = ( FLOT )mQueue[mQNo] * GAIN_NOW + ( FLOT )mOldReflValue * GAIN_OLD;
 
@@ -115,11 +121,11 @@ int16_t RayReflectAdmin_ohs::getClrCvtBright( void )
     SCHR   cString[50];
     memset( cString , 0, sizeof(cString));
 
-	sprintf(( char* )cString, "Sam_Value[%3d]Red_Value[%3d]",sBright,RgbRaw.r);
+	sprintf(( char* )cString, "Sam_Value[%3d]Red_Value[%3d]",(int)sBright,(int)RgbRaw.r);
 	ev3_lcd_draw_string( cString, 0, 8*4);
-	sprintf(( char* )cString, "              Gre_Value[%3d]",RgbRaw.g);
+	sprintf(( char* )cString, "Sam_State[%3d]Gre_Value[%3d]",(int)mState,(int)RgbRaw.g);
 	ev3_lcd_draw_string( cString, 0, 8*5);
-	sprintf(( char* )cString, "              Ble_Value[%3d]",RgbRaw.b);
+	sprintf(( char* )cString, "              Ble_Value[%3d]",(int)RgbRaw.b);
 	ev3_lcd_draw_string( cString, 0, 8*6);
 #endif
 

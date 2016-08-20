@@ -10,6 +10,9 @@ LineTracer_ohs::LineTracer_ohs( RunningAdmin_ohs* running_admin, RayReflectAdmin
  mRayReflectAdmin( ray_reflect_admin ),
  mRunLineCalculator( run_line_calculator )
 {
+    mLineTraceGo = false;
+    mSearchMode  = false;
+
     mGetColor = SCLR_GRAY;
     mSpeed = 0;
     mDeg   = 0;
@@ -25,8 +28,9 @@ LineTracer_ohs::~LineTracer_ohs() {
 /**
  * ライントレース指揮
  */
-void LineTracer_ohs::postLineTraceConduct() {
+void LineTracer_ohs::postLineTraceConduct( BOOL search_mode ) {
     mLineTraceGo = true;
+    mSearchMode  = search_mode;
 }
 
 /**
@@ -98,8 +102,7 @@ void LineTracer_ohs::execLineEdgeTrace() {
     /* 左右モータの実指示値を取得(保留) */
 
     /* PID計算 */
-    // mRunLineCalculator->calcRunLine( mGetColor, &mSpeed, &mDeg );
-    mRunLineCalculator->calcRunLineUseRefLv( sRefVal, &mSpeed, &mDeg);
+    mRunLineCalculator->calcRunLine( mSearchMode ,sRefVal, &mSpeed, &mDeg );
     /* 走行速度 */
     if( mSpeed > LT_MAX_SPEED ){
         mSpeed = LT_MAX_SPEED;

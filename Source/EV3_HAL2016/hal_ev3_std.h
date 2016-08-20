@@ -40,9 +40,11 @@
 #define DSC_MODE			(		   5 )		/* USHR  print_mode 		 */
 
 /* 動作設定＠デバッグ */
-//#define PRINT									/* プリント動作 ON/OFF		 */
+#define PRINT									/* プリント動作 ON/OFF		 */
 // #define INTERRUPT_CHK							/* メトロノーム ON/OFF		 */
 #define CHECK_STAY								/* 実行終了後停止			 */
+#define SOUND_ANSWER							/* アンサー音 ON/OFF		 */
+#define TRANSITION_SOUND						/* 状態遷移チェック音 ON/OFF		 */
 // #define REFST_DEBUG
 //#define LT_DEBUG
 
@@ -95,6 +97,8 @@ enum TRACE_MODE {
 
 
 typedef struct _PID_SETTING{
+	float fTerSpeed;
+	float fTerRefLv;
 	float fSpdP;
 	float fSpdI;
 	float fSpdD;
@@ -120,7 +124,8 @@ typedef struct _PATTERN_INDEX{
 }PATTERN_INDEX;
 
 typedef struct _EV3_SETTING{
-	PID_SETTING   pidSetting;
+	PID_SETTING   nmPidSetting;
+	PID_SETTING   scPidSetting;
 	SCENE_INDEX   sceneIndexS[100];
 	PATTERN_INDEX patrnIndexS[20];
 }EV3_SETTING;

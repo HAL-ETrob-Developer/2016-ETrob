@@ -8,30 +8,41 @@
 
 #define SPEED_ID     (      0 )
 #define DEGRE_ID     (      1 )
+#define SPEED_ID_S   (      2 )
+#define DEGRE_ID_S   (      3 )
 
-#define DEF_ADD     (      0.10F )
+#define NORMAL_ID    (      0 )
+#define SCRCH__ID    (      1 )
 
-#define TERGET_SPD  (      85.0F )
-#define T_MIN_SPD   (      20.0F )
+#define DEF_ADD      (      0.10F )
 
-#define MAX_CW_DEG  (       0.0F )
-#define MAX_CCW_DEG (       0.0F )
+#define TERGET_SPD   (      80.0F )
+#define TERGET_SPD_S (      30.0F )
+#define T_MIN_SPD    (      20.0F )
 
-#define DEF_TERGET  (       0.0F )
+#define MAX_CW_DEG   (       0.0F )
+#define MAX_CCW_DEG  (       0.0F )
 
-#define TERGET_DEG  (       0.0F )
-#define TERGET_LV   (      70.0F )
+#define DEF_TERGET   (       0.0F )
+
+#define TERGET_DEG   (       0.0F )
+#define TERGET_LV    (      70.0F )
+#define TERGET_LV_S  (      40.0F )
 
 /* ゲイン変更 ----------------------------------------------------------------------------------- */
-#define USE_REFLV 
-#ifdef USE_REFLV//calcRunLineUseRefLv使用
-
 #define K_P_SPD     (       0.008F )
 #define K_I_SPD     (       0.001F )
 #define K_D_SPD     (       0.04F )
 #define K_P_DEG     (       0.2F )
 #define K_I_DEG     (       0.1F )
 #define K_D_DEG     (      15.0F )
+
+#define K_P_SPD_S   (       0.0F )
+#define K_I_SPD_S   (       0.0F )
+#define K_D_SPD_S   (       0.0F )
+#define K_P_DEG_S   (       1.0F )
+#define K_I_DEG_S   (       0.5F )
+#define K_D_DEG_S   (       4.0F )
 
 //3ms割り込み言い感じ
 // #define K_P_SPD     (       0.008F )
@@ -65,16 +76,6 @@
 // #define K_I_DEG     (       0.25F )
 // #define K_D_DEG     (       5.0F )
 
-#else//calcRunLine使用
-
-#define K_P_SPD     (       0.0F )
-#define K_I_SPD     (     0.007F )
-#define K_D_SPD     (       0.0F )
-#define K_P_DEG     (       0.5F )
-#define K_I_DEG     (       0.0F )
-#define K_D_DEG     (       3.0F )
-
-#endif
 
 
 class RunLineCalculator_ohs {
@@ -84,9 +85,7 @@ public:
     //デストラクタ
     ~RunLineCalculator_ohs();
 
-    void calcRunLine( SENC_CLR color, int8_t* p_speed, int8_t* p_deg );
-    void calcRunLineUseRefLv( SSHT reflection_lv, int8_t* p_speed, int8_t* p_deg );
-
+    void calcRunLine( BOOL line_check, SSHT reflection_lv, int8_t* p_speed, int8_t* p_deg );
     //テスト用メソッド(非公開)
     FLOT isP(void);
     FLOT isI(void);
@@ -95,17 +94,24 @@ public:
     PID_SETTING* isGain( void );
 
 private:
+
+    /* メソッド */
+    void calcRunLineUseRefLv( SSHT reflection_lv, int8_t* p_speed, int8_t* p_deg );
+    void calcRunLineCheckLine( SSHT reflection_lv, int8_t* p_speed, int8_t* p_deg );
 	/* メンバ */
     int8_t mSpeed;
     int8_t mDeg;
-    FLOT mPValue[2];
-    FLOT mIValue[2];
-    FLOT mDValue[2];
+    FLOT mPValue[4];
+    FLOT mIValue[4];
+    FLOT mDValue[4];
     //ゲイン
-    PID_SETTING mPidGainF;
-    FLOT mKP[2];
-    FLOT mKI[2];
-    FLOT mKD[2];
+    PID_SETTING mPidGainF[2];
+
+    FLOT mTergetSoeed[2];
+    FLOT mTergetRefLV[2];
+    FLOT mKP[4];
+    FLOT mKI[4];
+    FLOT mKD[4];
 };
 
 #endif  // RUNLINECALCULATOR_OHS_H_
