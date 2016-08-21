@@ -323,6 +323,7 @@ void bt_task(intptr_t unused)
         fprintf( gBtHandle,"Scenario[%3d]\r\n",gScenarioConductor->getID());
         fprintf( gBtHandle,"Pattern [%3d]\r\n",gPatternSequencer->getID());
         fprintf( gBtHandle,"Mileage [%d]\r\n",(int)gRunningAdmin->getMileage());
+        fprintf( gBtHandle,"Mileage [%d]\r\n",(int)gRunningAdmin->getAngle());
         
         bt_cmd = 0;//リセット
     }

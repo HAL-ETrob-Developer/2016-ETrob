@@ -18,7 +18,7 @@
 #define	THRESHOLD_WHITE	( 45 )		/* ホワイト */
 
 /* 反射値カット */
-#define	REY_MAX_REF	( 150 )		/* 最大反射値＠カット */
+#define	REY_MAX_REF	( 170 )		/* 最大反射値＠カット */
 
 class RayReflectAdmin_ohs
 {
