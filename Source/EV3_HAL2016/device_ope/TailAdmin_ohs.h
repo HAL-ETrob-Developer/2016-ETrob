@@ -5,9 +5,9 @@
 
 #include "Motor.h"
 
-#define TIL_P_GAIN		( 0.4F)
-#define TIL_I_GAIN		( 2.0F)
-#define TIL_D_GAIN		( 5.0F)
+#define TIL_P_GAIN		( 0.25F)
+#define TIL_I_GAIN		( 0.8F)
+#define TIL_D_GAIN		( 4.5F)
 
 #define MAX_TARGET	(  110)
 #define MIN_TARGET	(  -10)
@@ -26,13 +26,14 @@ class TailAdmin_ohs
 	BOOL postTailDegree( int32_t postTailDeg );
     void callActDegree();
     int32_t getTailDegree();
-
+    BOOL setOfsetDegree( int32_t ofset_tail_deg );
 
 	private:
     ev3api::Motor& mTailWheel;
     int32_t mTailDeg;
     int32_t mExecutVal;
     int32_t mTailTarget;
+    int32_t mOfsetDeg;
 };
 
 #endif  // DEVICEOPE_TAILADMIN_OHS_H_

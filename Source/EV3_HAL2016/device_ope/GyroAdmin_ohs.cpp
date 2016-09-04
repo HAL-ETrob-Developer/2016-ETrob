@@ -10,6 +10,7 @@ GyroAdmin_ohs::GyroAdmin_ohs( ev3api::GyroSensor& gyro_sensor )
 	mNowGyroValue = 0;
 	mOldGyroValue = 0;
 	mOffSet = 0;
+	mState = GSTA_UNDECIDED;
 
 	memset( mQueue, 0, sizeof( mQueue ));
 	mQNo = 0;
@@ -67,30 +68,32 @@ GYRO_STATE GyroAdmin_ohs::getState( void )
 {
 	SINT iIdx = 0;
 	int16_t sVelocity;
-	
+	GYRO_STATE	tmpState = GSTA_UNDECIDED;
+
 	//安定値チェック
 	for( iIdx = 0; iIdx < QUEUE_MAX; iIdx++){
 		if( mQueue[iIdx] < -THRESHOLD_STABILITY || mQueue[iIdx] > THRESHOLD_STABILITY ){
 			//ジャイロ値フィルタリング
 			sVelocity = mNowGyroValue * GYR_GAIN_NOW + mOldGyroValue * GYR_GAIN_OLD;
 
-			//転倒検知
-			if( sVelocity > THRESHOLD_FALLING || sVelocity < -THRESHOLD_FALLING ){
+			//状態検知
+			if( sVelocity > THRESHOLD_FALLING || sVelocity < -THRESHOLD_FALLING ) {
 				/* 状態：転倒 */
-				mState = GSTA_FALLING;
-			}else{
+				tmpState = GSTA_FALLING;
+			}
+			if( sVelocity > THRESHOLD_UNSTABILITY || sVelocity < -THRESHOLD_UNSTABILITY ){
 				/* 状態：不安定 */
-				mState = GSTA_UNSTABLE;
+				tmpState = GSTA_UNSTABLE;
 			}
 
 			break;
 		}		
 	}
 	/* 状態：安定 */
-	if( iIdx == QUEUE_MAX ){ mState = GSTA_STABILITY; }
+	if( iIdx == QUEUE_MAX ){ tmpState = GSTA_STABILITY; }
 	
 	//ジャイロ値を過去ジャイロ値に記録
 	mOldGyroValue = mNowGyroValue;
 	
-	return mState;
+	return ( mState = tmpState );
 }

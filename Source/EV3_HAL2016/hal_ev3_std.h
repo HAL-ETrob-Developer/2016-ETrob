@@ -72,9 +72,10 @@ typedef unsigned long long   ULLG;				/* unsigned long long		 */
 
 /* ジャイロ状態 ------------------------------------------------------------ */
 enum GYRO_STATE {
+	GSTA_UNDECIDED,								/* 不定状態					 */
 	GSTA_UNSTABLE,								/* 不安定					 */
-	GSTA_STABILITY,								/* 安定						 */
-	GSTA_FALLING								/* 転倒						 */
+	GSTA_STABILITY,								/* 安定					 */
+	GSTA_FALLING								/* 転倒					 */
 };
 
 /* カラーセンサカラー ------------------------------------------------------ */

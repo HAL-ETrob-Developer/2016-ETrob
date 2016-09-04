@@ -11,6 +11,7 @@ TailAdmin_ohs::TailAdmin_ohs( ev3api::Motor& tail_wheel )
 	mTailDeg    = 0;
 	mExecutVal  = 0;
 	mTailTarget = 0;
+	mOfsetDeg   = 0;
 }
 
 /**
@@ -23,7 +24,7 @@ TailAdmin_ohs::~TailAdmin_ohs() {
  * 尾角度更新
  */
 void TailAdmin_ohs::callValueUpDate() {
-	mTailDeg = mTailWheel.getCount();
+	mTailDeg = mTailWheel.getCount() + mOfsetDeg;
 }
 
 /**
@@ -42,6 +43,15 @@ BOOL TailAdmin_ohs::postTailDegree( int32_t post_tail_deg ) {
 	return ( overflag );
 }
 
+//尾角度オフセット調整
+BOOL TailAdmin_ohs::setOfsetDegree( int32_t ofset_tail_deg )
+{
+	if(( ofset_tail_deg > 50 ) || ( ofset_tail_deg < -50 )) { return false; }
+
+	mOfsetDeg = ofset_tail_deg;
+
+	return true;
+}
 /**
  * 尾動作実行
  */

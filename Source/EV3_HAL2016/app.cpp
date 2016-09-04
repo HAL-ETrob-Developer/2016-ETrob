@@ -202,6 +202,7 @@ void ev3_cyc_tracer(intptr_t exinf) {
 }
 
 void interrupt_task(intptr_t exinf) {
+    volatile static FLOT dummy = 0;
     //センシング
     gGyroAdmin->callValueUpdate();
     gRunningAdmin->callValueUpDate();
@@ -216,6 +217,10 @@ void interrupt_task(intptr_t exinf) {
     gRunningAdmin->callRunning();
     gTailAdmin->callActDegree();
 
+    //OS最適化防止ダミー計算
+    dummy += 0.001;
+    if( dummy == 1 ) { dummy = 0; }
+
 #ifdef INTERRUPT_CHK
     static int tes = 0;
     tes++;
@@ -223,6 +228,9 @@ void interrupt_task(intptr_t exinf) {
         ev3_speaker_play_tone( NOTE_E6, 10 );
         tes = 0;
     }
+
+    // fprintf( gBtHandle,"getRef[%d]\r\n", (int)gRayReflectAdmin->getValue());
+
 #endif
     ext_tsk();
 }
@@ -248,6 +256,7 @@ void tracer_task(intptr_t exinf) {
 //*****************************************************************************
 void bt_task(intptr_t unused)
 {
+    int32_t lTilOfset = 0;
     memfile_t PidSetStract;
     memset( &PidSetStract, 0,sizeof( PidSetStract ));
 
@@ -267,7 +276,7 @@ void bt_task(intptr_t unused)
             case CMD_LEFT://左コース
                 gScenarioConductor->setScenario( LEFT_ID );
                 break;
-            case 's'://ファイル読み込み
+            case 'S'://ファイル読み込み
                 SetingFileWrite(( char* )PID_SET_FILE_PASS, gBtHandle );
                 SetingFileload(( char* )PID_SET_FILE_PASS, &PidSetStract );
                 ev3_memfile_free( &PidSetStract );
@@ -314,6 +323,16 @@ void bt_task(intptr_t unused)
                 break;
             case 'p':
                 gScenarioConductor->setScenario( SCENE_P );
+                break;
+            case '<':
+                lTilOfset++;
+                fprintf( gBtHandle,"<%d>\r\n", (int)lTilOfset );
+                gTailAdmin->setOfsetDegree( lTilOfset );
+                break;
+            case '>':
+                lTilOfset--;
+                fprintf( gBtHandle,"<%d>\r\n", (int)lTilOfset );
+                gTailAdmin->setOfsetDegree( lTilOfset );
                 break;
             default:
                 break;

@@ -8,8 +8,8 @@
 
 #define SPEED_ID     (      0 )
 #define DEGRE_ID     (      1 )
-#define SPEED_ID_S   (      2 )
-#define DEGRE_ID_S   (      3 )
+#define SPEED_ID_S   (      0 )/*2*/
+#define DEGRE_ID_S   (      1 )/*3*/
 
 #define NORMAL_ID    (      0 )
 #define SCRCH__ID    (      1 )
@@ -18,7 +18,7 @@
 
 #define TERGET_SPD   (      80.0F )
 #define TERGET_SPD_S (      30.0F )
-#define T_MIN_SPD    (      20.0F )
+#define T_MIN_SPD    (       0.0F )
 
 #define MAX_CW_DEG   (       0.0F )
 #define MAX_CCW_DEG  (       0.0F )
