@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle22 = new System.Windows.Forms.DataGridViewCellStyle();
             this.createSW = new System.Windows.Forms.Button();
             this.nmTextBoxSpdP = new System.Windows.Forms.TextBox();
             this.nmTextBoxSpdI = new System.Windows.Forms.TextBox();
@@ -112,9 +112,10 @@
             // 
             // createSW
             // 
-            this.createSW.Location = new System.Drawing.Point(919, 450);
+            this.createSW.Location = new System.Drawing.Point(1532, 675);
+            this.createSW.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.createSW.Name = "createSW";
-            this.createSW.Size = new System.Drawing.Size(75, 23);
+            this.createSW.Size = new System.Drawing.Size(125, 34);
             this.createSW.TabIndex = 0;
             this.createSW.Text = "CREATE";
             this.createSW.UseVisualStyleBackColor = true;
@@ -122,97 +123,109 @@
             // 
             // nmTextBoxSpdP
             // 
-            this.nmTextBoxSpdP.Location = new System.Drawing.Point(43, 21);
+            this.nmTextBoxSpdP.Location = new System.Drawing.Point(72, 32);
+            this.nmTextBoxSpdP.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.nmTextBoxSpdP.Name = "nmTextBoxSpdP";
-            this.nmTextBoxSpdP.Size = new System.Drawing.Size(55, 19);
+            this.nmTextBoxSpdP.Size = new System.Drawing.Size(89, 25);
             this.nmTextBoxSpdP.TabIndex = 1;
             // 
             // nmTextBoxSpdI
             // 
-            this.nmTextBoxSpdI.Location = new System.Drawing.Point(43, 52);
+            this.nmTextBoxSpdI.Location = new System.Drawing.Point(72, 78);
+            this.nmTextBoxSpdI.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.nmTextBoxSpdI.Name = "nmTextBoxSpdI";
-            this.nmTextBoxSpdI.Size = new System.Drawing.Size(55, 19);
+            this.nmTextBoxSpdI.Size = new System.Drawing.Size(89, 25);
             this.nmTextBoxSpdI.TabIndex = 2;
             // 
             // nmTextBoxSpdD
             // 
-            this.nmTextBoxSpdD.Location = new System.Drawing.Point(43, 84);
+            this.nmTextBoxSpdD.Location = new System.Drawing.Point(72, 126);
+            this.nmTextBoxSpdD.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.nmTextBoxSpdD.Name = "nmTextBoxSpdD";
-            this.nmTextBoxSpdD.Size = new System.Drawing.Size(55, 19);
+            this.nmTextBoxSpdD.Size = new System.Drawing.Size(89, 25);
             this.nmTextBoxSpdD.TabIndex = 3;
             // 
             // nmTextBoxDegD
             // 
-            this.nmTextBoxDegD.Location = new System.Drawing.Point(47, 84);
+            this.nmTextBoxDegD.Location = new System.Drawing.Point(78, 126);
+            this.nmTextBoxDegD.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.nmTextBoxDegD.Name = "nmTextBoxDegD";
-            this.nmTextBoxDegD.Size = new System.Drawing.Size(55, 19);
+            this.nmTextBoxDegD.Size = new System.Drawing.Size(89, 25);
             this.nmTextBoxDegD.TabIndex = 6;
             // 
             // nmTextBoxDegI
             // 
-            this.nmTextBoxDegI.Location = new System.Drawing.Point(47, 52);
+            this.nmTextBoxDegI.Location = new System.Drawing.Point(78, 78);
+            this.nmTextBoxDegI.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.nmTextBoxDegI.Name = "nmTextBoxDegI";
-            this.nmTextBoxDegI.Size = new System.Drawing.Size(55, 19);
+            this.nmTextBoxDegI.Size = new System.Drawing.Size(89, 25);
             this.nmTextBoxDegI.TabIndex = 5;
             // 
             // nmTextBoxDegP
             // 
-            this.nmTextBoxDegP.Location = new System.Drawing.Point(47, 21);
+            this.nmTextBoxDegP.Location = new System.Drawing.Point(78, 32);
+            this.nmTextBoxDegP.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.nmTextBoxDegP.Name = "nmTextBoxDegP";
-            this.nmTextBoxDegP.Size = new System.Drawing.Size(55, 19);
+            this.nmTextBoxDegP.Size = new System.Drawing.Size(89, 25);
             this.nmTextBoxDegP.TabIndex = 4;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(24, 25);
+            this.label1.Location = new System.Drawing.Point(40, 38);
+            this.label1.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(12, 12);
+            this.label1.Size = new System.Drawing.Size(19, 18);
             this.label1.TabIndex = 7;
             this.label1.Text = "P";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(24, 87);
+            this.label2.Location = new System.Drawing.Point(40, 130);
+            this.label2.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(13, 12);
+            this.label2.Size = new System.Drawing.Size(20, 18);
             this.label2.TabIndex = 8;
             this.label2.Text = "D";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(25, 56);
+            this.label3.Location = new System.Drawing.Point(42, 84);
+            this.label3.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(8, 12);
+            this.label3.Size = new System.Drawing.Size(12, 18);
             this.label3.TabIndex = 9;
             this.label3.Text = "I";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(28, 55);
+            this.label4.Location = new System.Drawing.Point(47, 82);
+            this.label4.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(8, 12);
+            this.label4.Size = new System.Drawing.Size(12, 18);
             this.label4.TabIndex = 12;
             this.label4.Text = "I";
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(27, 87);
+            this.label5.Location = new System.Drawing.Point(45, 130);
+            this.label5.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(13, 12);
+            this.label5.Size = new System.Drawing.Size(20, 18);
             this.label5.TabIndex = 11;
             this.label5.Text = "D";
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(27, 24);
+            this.label6.Location = new System.Drawing.Point(45, 36);
+            this.label6.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(12, 12);
+            this.label6.Size = new System.Drawing.Size(19, 18);
             this.label6.TabIndex = 10;
             this.label6.Text = "P";
             // 
@@ -224,9 +237,11 @@
             this.groupSpd.Controls.Add(this.nmTextBoxSpdD);
             this.groupSpd.Controls.Add(this.nmTextBoxSpdI);
             this.groupSpd.Controls.Add(this.nmTextBoxSpdP);
-            this.groupSpd.Location = new System.Drawing.Point(46, 100);
+            this.groupSpd.Location = new System.Drawing.Point(30, 150);
+            this.groupSpd.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.groupSpd.Name = "groupSpd";
-            this.groupSpd.Size = new System.Drawing.Size(120, 116);
+            this.groupSpd.Padding = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.groupSpd.Size = new System.Drawing.Size(200, 174);
             this.groupSpd.TabIndex = 13;
             this.groupSpd.TabStop = false;
             this.groupSpd.Text = "SPEED";
@@ -239,9 +254,11 @@
             this.groupDeg.Controls.Add(this.nmTextBoxDegD);
             this.groupDeg.Controls.Add(this.nmTextBoxDegI);
             this.groupDeg.Controls.Add(this.nmTextBoxDegP);
-            this.groupDeg.Location = new System.Drawing.Point(179, 100);
+            this.groupDeg.Location = new System.Drawing.Point(251, 150);
+            this.groupDeg.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.groupDeg.Name = "groupDeg";
-            this.groupDeg.Size = new System.Drawing.Size(120, 116);
+            this.groupDeg.Padding = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.groupDeg.Size = new System.Drawing.Size(200, 174);
             this.groupDeg.TabIndex = 14;
             this.groupDeg.TabStop = false;
             this.groupDeg.Text = "DEGREE";
@@ -260,23 +277,24 @@
             this.RIdxCoundValue,
             this.RIdxActNo,
             this.RIdxNextNo});
-            this.righitStateDataGrid.Location = new System.Drawing.Point(21, 23);
+            this.righitStateDataGrid.Location = new System.Drawing.Point(35, 34);
+            this.righitStateDataGrid.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.righitStateDataGrid.Name = "righitStateDataGrid";
             this.righitStateDataGrid.RowTemplate.Height = 21;
-            this.righitStateDataGrid.Size = new System.Drawing.Size(368, 150);
+            this.righitStateDataGrid.Size = new System.Drawing.Size(613, 225);
             this.righitStateDataGrid.TabIndex = 15;
             this.righitStateDataGrid.CellParsing += new System.Windows.Forms.DataGridViewCellParsingEventHandler(this.righitStateDataGrid_CellParsing);
             // 
             // RIdxNo
             // 
             this.RIdxNo.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
-            dataGridViewCellStyle2.Format = "0";
-            dataGridViewCellStyle2.NullValue = "0";
-            this.RIdxNo.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle22.Format = "0";
+            dataGridViewCellStyle22.NullValue = "0";
+            this.RIdxNo.DefaultCellStyle = dataGridViewCellStyle22;
             this.RIdxNo.HeaderText = "No";
             this.RIdxNo.Name = "RIdxNo";
             this.RIdxNo.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.RIdxNo.Width = 25;
+            this.RIdxNo.Width = 35;
             // 
             // RIdxNextCond
             // 
@@ -291,7 +309,7 @@
             this.RIdxCoundValue.HeaderText = "CoundValue";
             this.RIdxCoundValue.Name = "RIdxCoundValue";
             this.RIdxCoundValue.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.RIdxCoundValue.Width = 72;
+            this.RIdxCoundValue.Width = 104;
             // 
             // RIdxActNo
             // 
@@ -299,7 +317,7 @@
             this.RIdxActNo.HeaderText = "ActNo";
             this.RIdxActNo.Name = "RIdxActNo";
             this.RIdxActNo.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.RIdxActNo.Width = 43;
+            this.RIdxActNo.Width = 61;
             // 
             // RIdxNextNo
             // 
@@ -307,24 +325,27 @@
             this.RIdxNextNo.HeaderText = "NextNo";
             this.RIdxNextNo.Name = "RIdxNextNo";
             this.RIdxNextNo.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.RIdxNextNo.Width = 49;
+            this.RIdxNextNo.Width = 70;
             // 
             // groupRighitIndex
             // 
             this.groupRighitIndex.Controls.Add(this.RIdxSortSw);
             this.groupRighitIndex.Controls.Add(this.righitStateDataGrid);
-            this.groupRighitIndex.Location = new System.Drawing.Point(582, 12);
+            this.groupRighitIndex.Location = new System.Drawing.Point(970, 18);
+            this.groupRighitIndex.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.groupRighitIndex.Name = "groupRighitIndex";
-            this.groupRighitIndex.Size = new System.Drawing.Size(412, 208);
+            this.groupRighitIndex.Padding = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.groupRighitIndex.Size = new System.Drawing.Size(687, 312);
             this.groupRighitIndex.TabIndex = 16;
             this.groupRighitIndex.TabStop = false;
             this.groupRighitIndex.Text = "RIGHIT_INDEX";
             // 
             // RIdxSortSw
             // 
-            this.RIdxSortSw.Location = new System.Drawing.Point(314, 179);
+            this.RIdxSortSw.Location = new System.Drawing.Point(523, 268);
+            this.RIdxSortSw.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.RIdxSortSw.Name = "RIdxSortSw";
-            this.RIdxSortSw.Size = new System.Drawing.Size(75, 23);
+            this.RIdxSortSw.Size = new System.Drawing.Size(125, 34);
             this.RIdxSortSw.TabIndex = 16;
             this.RIdxSortSw.Text = "ReSORT";
             this.RIdxSortSw.UseVisualStyleBackColor = true;
@@ -334,18 +355,21 @@
             // 
             this.groupLeftIndex.Controls.Add(this.LIdxSortSw);
             this.groupLeftIndex.Controls.Add(this.leftStateDataGrid);
-            this.groupLeftIndex.Location = new System.Drawing.Point(582, 230);
+            this.groupLeftIndex.Location = new System.Drawing.Point(970, 345);
+            this.groupLeftIndex.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.groupLeftIndex.Name = "groupLeftIndex";
-            this.groupLeftIndex.Size = new System.Drawing.Size(412, 208);
+            this.groupLeftIndex.Padding = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.groupLeftIndex.Size = new System.Drawing.Size(687, 312);
             this.groupLeftIndex.TabIndex = 17;
             this.groupLeftIndex.TabStop = false;
             this.groupLeftIndex.Text = "LEFT_INDEX";
             // 
             // LIdxSortSw
             // 
-            this.LIdxSortSw.Location = new System.Drawing.Point(314, 179);
+            this.LIdxSortSw.Location = new System.Drawing.Point(523, 268);
+            this.LIdxSortSw.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.LIdxSortSw.Name = "LIdxSortSw";
-            this.LIdxSortSw.Size = new System.Drawing.Size(75, 23);
+            this.LIdxSortSw.Size = new System.Drawing.Size(125, 34);
             this.LIdxSortSw.TabIndex = 17;
             this.LIdxSortSw.Text = "ReSORT";
             this.LIdxSortSw.UseVisualStyleBackColor = true;
@@ -362,10 +386,11 @@
             this.LIdxCoundValue,
             this.LIdxActNo,
             this.LIdxNextNo});
-            this.leftStateDataGrid.Location = new System.Drawing.Point(21, 23);
+            this.leftStateDataGrid.Location = new System.Drawing.Point(35, 34);
+            this.leftStateDataGrid.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.leftStateDataGrid.Name = "leftStateDataGrid";
             this.leftStateDataGrid.RowTemplate.Height = 21;
-            this.leftStateDataGrid.Size = new System.Drawing.Size(368, 150);
+            this.leftStateDataGrid.Size = new System.Drawing.Size(613, 225);
             this.leftStateDataGrid.TabIndex = 15;
             this.leftStateDataGrid.CellParsing += new System.Windows.Forms.DataGridViewCellParsingEventHandler(this.leftStateDataGrid_CellParsing);
             // 
@@ -390,7 +415,7 @@
             this.LIdxCoundValue.HeaderText = "CoundValue";
             this.LIdxCoundValue.Name = "LIdxCoundValue";
             this.LIdxCoundValue.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.LIdxCoundValue.Width = 72;
+            this.LIdxCoundValue.Width = 104;
             // 
             // LIdxActNo
             // 
@@ -398,7 +423,7 @@
             this.LIdxActNo.HeaderText = "ActNo";
             this.LIdxActNo.Name = "LIdxActNo";
             this.LIdxActNo.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.LIdxActNo.Width = 43;
+            this.LIdxActNo.Width = 61;
             // 
             // LIdxNextNo
             // 
@@ -406,13 +431,14 @@
             this.LIdxNextNo.HeaderText = "NextNo";
             this.LIdxNextNo.Name = "LIdxNextNo";
             this.LIdxNextNo.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.LIdxNextNo.Width = 49;
+            this.LIdxNextNo.Width = 70;
             // 
             // loadSW
             // 
-            this.loadSW.Location = new System.Drawing.Point(18, 454);
+            this.loadSW.Location = new System.Drawing.Point(30, 681);
+            this.loadSW.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.loadSW.Name = "loadSW";
-            this.loadSW.Size = new System.Drawing.Size(75, 23);
+            this.loadSW.Size = new System.Drawing.Size(125, 34);
             this.loadSW.TabIndex = 18;
             this.loadSW.Text = "LOAD";
             this.loadSW.UseVisualStyleBackColor = true;
@@ -427,9 +453,11 @@
             // groupRunningIndex
             // 
             this.groupRunningIndex.Controls.Add(this.runninngIndexGridView);
-            this.groupRunningIndex.Location = new System.Drawing.Point(305, 12);
+            this.groupRunningIndex.Location = new System.Drawing.Point(487, 18);
+            this.groupRunningIndex.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.groupRunningIndex.Name = "groupRunningIndex";
-            this.groupRunningIndex.Size = new System.Drawing.Size(271, 426);
+            this.groupRunningIndex.Padding = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.groupRunningIndex.Size = new System.Drawing.Size(452, 639);
             this.groupRunningIndex.TabIndex = 19;
             this.groupRunningIndex.TabStop = false;
             this.groupRunningIndex.Text = "RUNNINNG_INDEX";
@@ -445,10 +473,11 @@
             this.RunTrun,
             this.RunTailDeg,
             this.RunBalance});
-            this.runninngIndexGridView.Location = new System.Drawing.Point(16, 23);
+            this.runninngIndexGridView.Location = new System.Drawing.Point(27, 34);
+            this.runninngIndexGridView.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.runninngIndexGridView.Name = "runninngIndexGridView";
             this.runninngIndexGridView.RowTemplate.Height = 21;
-            this.runninngIndexGridView.Size = new System.Drawing.Size(240, 385);
+            this.runninngIndexGridView.Size = new System.Drawing.Size(400, 578);
             this.runninngIndexGridView.TabIndex = 0;
             this.runninngIndexGridView.CellParsing += new System.Windows.Forms.DataGridViewCellParsingEventHandler(this.runninngIndexeDataGrid_CellParsing);
             // 
@@ -461,7 +490,7 @@
             this.RunNo.ReadOnly = true;
             this.RunNo.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.RunNo.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.RunNo.Width = 25;
+            this.RunNo.Width = 35;
             // 
             // RunSpeed
             // 
@@ -470,7 +499,7 @@
             this.RunSpeed.Name = "RunSpeed";
             this.RunSpeed.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.RunSpeed.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.RunSpeed.Width = 42;
+            this.RunSpeed.Width = 61;
             // 
             // RunTrun
             // 
@@ -479,7 +508,7 @@
             this.RunTrun.Name = "RunTrun";
             this.RunTrun.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.RunTrun.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.RunTrun.Width = 34;
+            this.RunTrun.Width = 49;
             // 
             // RunTailDeg
             // 
@@ -488,7 +517,7 @@
             this.RunTailDeg.Name = "RunTailDeg";
             this.RunTailDeg.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.RunTailDeg.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.RunTailDeg.Width = 30;
+            this.RunTailDeg.Width = 42;
             // 
             // RunBalance
             // 
@@ -502,12 +531,12 @@
             this.ControlLabel.AutoEllipsis = true;
             this.ControlLabel.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.ControlLabel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.ControlLabel.Location = new System.Drawing.Point(216, 454);
+            this.ControlLabel.Location = new System.Drawing.Point(360, 681);
             this.ControlLabel.Margin = new System.Windows.Forms.Padding(0);
-            this.ControlLabel.MaximumSize = new System.Drawing.Size(800, 500);
+            this.ControlLabel.MaximumSize = new System.Drawing.Size(1333, 750);
             this.ControlLabel.Name = "ControlLabel";
-            this.ControlLabel.Padding = new System.Windows.Forms.Padding(10, 5, 10, 3);
-            this.ControlLabel.Size = new System.Drawing.Size(600, 22);
+            this.ControlLabel.Padding = new System.Windows.Forms.Padding(17, 8, 17, 4);
+            this.ControlLabel.Size = new System.Drawing.Size(1000, 33);
             this.ControlLabel.TabIndex = 20;
             this.ControlLabel.Text = "デバッグ：NULL";
             this.ControlLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -518,9 +547,11 @@
             this.groupTerget.Controls.Add(this.label9);
             this.groupTerget.Controls.Add(this.nmTextBoxTerRefLV);
             this.groupTerget.Controls.Add(this.nmTextBoxTerSpeed);
-            this.groupTerget.Location = new System.Drawing.Point(46, 46);
+            this.groupTerget.Location = new System.Drawing.Point(30, 69);
+            this.groupTerget.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.groupTerget.Name = "groupTerget";
-            this.groupTerget.Size = new System.Drawing.Size(253, 43);
+            this.groupTerget.Padding = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.groupTerget.Size = new System.Drawing.Size(422, 64);
             this.groupTerget.TabIndex = 14;
             this.groupTerget.TabStop = false;
             this.groupTerget.Text = "TERGET";
@@ -528,55 +559,59 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(136, 22);
+            this.label7.Location = new System.Drawing.Point(227, 33);
+            this.label7.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(37, 12);
+            this.label7.Size = new System.Drawing.Size(54, 18);
             this.label7.TabIndex = 9;
             this.label7.Text = "RefLV";
             // 
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(21, 22);
+            this.label9.Location = new System.Drawing.Point(35, 33);
+            this.label9.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(36, 12);
+            this.label9.Size = new System.Drawing.Size(55, 18);
             this.label9.TabIndex = 7;
             this.label9.Text = "Speed";
             // 
             // nmTextBoxTerRefLV
             // 
-            this.nmTextBoxTerRefLV.Location = new System.Drawing.Point(180, 18);
+            this.nmTextBoxTerRefLV.Location = new System.Drawing.Point(300, 27);
+            this.nmTextBoxTerRefLV.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.nmTextBoxTerRefLV.Name = "nmTextBoxTerRefLV";
-            this.nmTextBoxTerRefLV.Size = new System.Drawing.Size(55, 19);
+            this.nmTextBoxTerRefLV.Size = new System.Drawing.Size(89, 25);
             this.nmTextBoxTerRefLV.TabIndex = 2;
             // 
             // nmTextBoxTerSpeed
             // 
-            this.nmTextBoxTerSpeed.Location = new System.Drawing.Point(65, 18);
+            this.nmTextBoxTerSpeed.Location = new System.Drawing.Point(108, 27);
+            this.nmTextBoxTerSpeed.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.nmTextBoxTerSpeed.Name = "nmTextBoxTerSpeed";
-            this.nmTextBoxTerSpeed.Size = new System.Drawing.Size(55, 19);
+            this.nmTextBoxTerSpeed.Size = new System.Drawing.Size(89, 25);
             this.nmTextBoxTerSpeed.TabIndex = 1;
             // 
             // label8
             // 
-            this.label8.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label8.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.label8.Location = new System.Drawing.Point(16, 12);
+            this.label8.Location = new System.Drawing.Point(27, 18);
+            this.label8.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(100, 23);
+            this.label8.Size = new System.Drawing.Size(167, 34);
             this.label8.TabIndex = 21;
             this.label8.Text = "NormalMode";
             this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label10
             // 
-            this.label10.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label10.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.label10.Location = new System.Drawing.Point(16, 234);
+            this.label10.Location = new System.Drawing.Point(27, 345);
+            this.label10.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(100, 23);
+            this.label10.Size = new System.Drawing.Size(167, 34);
             this.label10.TabIndex = 25;
-            this.label10.Text = "SearchMode";
+            this.label10.Text = "SpeedMode";
             this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // groupBox1
@@ -585,9 +620,11 @@
             this.groupBox1.Controls.Add(this.label12);
             this.groupBox1.Controls.Add(this.scTextBoxTerRefLV);
             this.groupBox1.Controls.Add(this.scTextBoxTerSpeed);
-            this.groupBox1.Location = new System.Drawing.Point(46, 268);
+            this.groupBox1.Location = new System.Drawing.Point(30, 402);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(253, 43);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.groupBox1.Size = new System.Drawing.Size(422, 64);
             this.groupBox1.TabIndex = 23;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "TERGET";
@@ -595,33 +632,37 @@
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(136, 22);
+            this.label11.Location = new System.Drawing.Point(227, 33);
+            this.label11.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(37, 12);
+            this.label11.Size = new System.Drawing.Size(54, 18);
             this.label11.TabIndex = 9;
             this.label11.Text = "RefLV";
             // 
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(21, 22);
+            this.label12.Location = new System.Drawing.Point(35, 33);
+            this.label12.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(36, 12);
+            this.label12.Size = new System.Drawing.Size(55, 18);
             this.label12.TabIndex = 7;
             this.label12.Text = "Speed";
             // 
             // scTextBoxTerRefLV
             // 
-            this.scTextBoxTerRefLV.Location = new System.Drawing.Point(180, 18);
+            this.scTextBoxTerRefLV.Location = new System.Drawing.Point(300, 27);
+            this.scTextBoxTerRefLV.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.scTextBoxTerRefLV.Name = "scTextBoxTerRefLV";
-            this.scTextBoxTerRefLV.Size = new System.Drawing.Size(55, 19);
+            this.scTextBoxTerRefLV.Size = new System.Drawing.Size(89, 25);
             this.scTextBoxTerRefLV.TabIndex = 2;
             // 
             // scTextBoxTerSpeed
             // 
-            this.scTextBoxTerSpeed.Location = new System.Drawing.Point(65, 18);
+            this.scTextBoxTerSpeed.Location = new System.Drawing.Point(108, 27);
+            this.scTextBoxTerSpeed.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.scTextBoxTerSpeed.Name = "scTextBoxTerSpeed";
-            this.scTextBoxTerSpeed.Size = new System.Drawing.Size(55, 19);
+            this.scTextBoxTerSpeed.Size = new System.Drawing.Size(89, 25);
             this.scTextBoxTerSpeed.TabIndex = 1;
             // 
             // groupBox2
@@ -632,9 +673,11 @@
             this.groupBox2.Controls.Add(this.scTextBoxDegD);
             this.groupBox2.Controls.Add(this.scTextBoxDegI);
             this.groupBox2.Controls.Add(this.scTextBoxDegP);
-            this.groupBox2.Location = new System.Drawing.Point(179, 322);
+            this.groupBox2.Location = new System.Drawing.Point(251, 483);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(120, 116);
+            this.groupBox2.Padding = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.groupBox2.Size = new System.Drawing.Size(200, 174);
             this.groupBox2.TabIndex = 24;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "DEGREE";
@@ -642,49 +685,55 @@
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(28, 55);
+            this.label13.Location = new System.Drawing.Point(47, 82);
+            this.label13.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(8, 12);
+            this.label13.Size = new System.Drawing.Size(12, 18);
             this.label13.TabIndex = 12;
             this.label13.Text = "I";
             // 
             // label14
             // 
             this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(27, 87);
+            this.label14.Location = new System.Drawing.Point(45, 130);
+            this.label14.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(13, 12);
+            this.label14.Size = new System.Drawing.Size(20, 18);
             this.label14.TabIndex = 11;
             this.label14.Text = "D";
             // 
             // label15
             // 
             this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(27, 24);
+            this.label15.Location = new System.Drawing.Point(45, 36);
+            this.label15.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(12, 12);
+            this.label15.Size = new System.Drawing.Size(19, 18);
             this.label15.TabIndex = 10;
             this.label15.Text = "P";
             // 
             // scTextBoxDegD
             // 
-            this.scTextBoxDegD.Location = new System.Drawing.Point(47, 84);
+            this.scTextBoxDegD.Location = new System.Drawing.Point(78, 126);
+            this.scTextBoxDegD.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.scTextBoxDegD.Name = "scTextBoxDegD";
-            this.scTextBoxDegD.Size = new System.Drawing.Size(55, 19);
+            this.scTextBoxDegD.Size = new System.Drawing.Size(89, 25);
             this.scTextBoxDegD.TabIndex = 6;
             // 
             // scTextBoxDegI
             // 
-            this.scTextBoxDegI.Location = new System.Drawing.Point(47, 52);
+            this.scTextBoxDegI.Location = new System.Drawing.Point(78, 78);
+            this.scTextBoxDegI.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.scTextBoxDegI.Name = "scTextBoxDegI";
-            this.scTextBoxDegI.Size = new System.Drawing.Size(55, 19);
+            this.scTextBoxDegI.Size = new System.Drawing.Size(89, 25);
             this.scTextBoxDegI.TabIndex = 5;
             // 
             // scTextBoxDegP
             // 
-            this.scTextBoxDegP.Location = new System.Drawing.Point(47, 21);
+            this.scTextBoxDegP.Location = new System.Drawing.Point(78, 32);
+            this.scTextBoxDegP.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.scTextBoxDegP.Name = "scTextBoxDegP";
-            this.scTextBoxDegP.Size = new System.Drawing.Size(55, 19);
+            this.scTextBoxDegP.Size = new System.Drawing.Size(89, 25);
             this.scTextBoxDegP.TabIndex = 4;
             // 
             // groupBox3
@@ -695,9 +744,11 @@
             this.groupBox3.Controls.Add(this.scTextBoxSpdD);
             this.groupBox3.Controls.Add(this.scTextBoxSpdI);
             this.groupBox3.Controls.Add(this.scTextBoxSpdP);
-            this.groupBox3.Location = new System.Drawing.Point(46, 322);
+            this.groupBox3.Location = new System.Drawing.Point(30, 483);
+            this.groupBox3.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(120, 116);
+            this.groupBox3.Padding = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.groupBox3.Size = new System.Drawing.Size(200, 174);
             this.groupBox3.TabIndex = 22;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "SPEED";
@@ -705,56 +756,62 @@
             // label16
             // 
             this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(25, 56);
+            this.label16.Location = new System.Drawing.Point(42, 84);
+            this.label16.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(8, 12);
+            this.label16.Size = new System.Drawing.Size(12, 18);
             this.label16.TabIndex = 9;
             this.label16.Text = "I";
             // 
             // label17
             // 
             this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(24, 87);
+            this.label17.Location = new System.Drawing.Point(40, 130);
+            this.label17.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(13, 12);
+            this.label17.Size = new System.Drawing.Size(20, 18);
             this.label17.TabIndex = 8;
             this.label17.Text = "D";
             // 
             // label18
             // 
             this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(24, 25);
+            this.label18.Location = new System.Drawing.Point(40, 38);
+            this.label18.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(12, 12);
+            this.label18.Size = new System.Drawing.Size(19, 18);
             this.label18.TabIndex = 7;
             this.label18.Text = "P";
             // 
             // scTextBoxSpdD
             // 
-            this.scTextBoxSpdD.Location = new System.Drawing.Point(43, 84);
+            this.scTextBoxSpdD.Location = new System.Drawing.Point(72, 126);
+            this.scTextBoxSpdD.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.scTextBoxSpdD.Name = "scTextBoxSpdD";
-            this.scTextBoxSpdD.Size = new System.Drawing.Size(55, 19);
+            this.scTextBoxSpdD.Size = new System.Drawing.Size(89, 25);
             this.scTextBoxSpdD.TabIndex = 3;
             // 
             // scTextBoxSpdI
             // 
-            this.scTextBoxSpdI.Location = new System.Drawing.Point(43, 52);
+            this.scTextBoxSpdI.Location = new System.Drawing.Point(72, 78);
+            this.scTextBoxSpdI.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.scTextBoxSpdI.Name = "scTextBoxSpdI";
-            this.scTextBoxSpdI.Size = new System.Drawing.Size(55, 19);
+            this.scTextBoxSpdI.Size = new System.Drawing.Size(89, 25);
             this.scTextBoxSpdI.TabIndex = 2;
             // 
             // scTextBoxSpdP
             // 
-            this.scTextBoxSpdP.Location = new System.Drawing.Point(43, 21);
+            this.scTextBoxSpdP.Location = new System.Drawing.Point(72, 32);
+            this.scTextBoxSpdP.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.scTextBoxSpdP.Name = "scTextBoxSpdP";
-            this.scTextBoxSpdP.Size = new System.Drawing.Size(55, 19);
+            this.scTextBoxSpdP.Size = new System.Drawing.Size(89, 25);
             this.scTextBoxSpdP.TabIndex = 1;
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1006, 487);
+            this.ClientSize = new System.Drawing.Size(1678, 724);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.groupBox2);
@@ -769,6 +826,9 @@
             this.Controls.Add(this.groupDeg);
             this.Controls.Add(this.groupSpd);
             this.Controls.Add(this.createSW);
+            this.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            this.MaximumSize = new System.Drawing.Size(1700, 780);
+            this.MinimumSize = new System.Drawing.Size(1700, 780);
             this.Name = "Form1";
             this.Text = "EV3RT_FORM";
             this.groupSpd.ResumeLayout(false);

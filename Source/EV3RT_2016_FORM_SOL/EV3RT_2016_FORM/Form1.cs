@@ -17,7 +17,7 @@ namespace EV3RT_2016_FORM
         /* 定数定義 ----------------------------------------------------------- */
         public const byte RIGHIT_INDEX_NUM = 50;
         public const byte LEFT_INDEX_NUM = RIGHIT_INDEX_NUM;
-        public const byte RUNNING_INDEX_NUM = 20;
+        public const byte RUNNING_INDEX_NUM = 40;
 
         public const byte SC_CLM___NO = 0;
         public const byte SC_CLM_NXCD = 1;
@@ -45,6 +45,9 @@ namespace EV3RT_2016_FORM
         public const string _GYR_UST = "GYR_UST";
         public const string _EX_SLIP = "EX_SLIP";
         public const string _EX_END  = "EX_END";
+        public const string _CLS_LIN = "CLS_LIN";
+        public const string _EX_JUMP = "EX_JUMP";
+        public const string _RAXIS_T = "RAXIS_T";
 
         public string[] NEXT_COUND_STR = {  _CLS_BLK,
                                             _CLS_GRY,
@@ -55,7 +58,11 @@ namespace EV3RT_2016_FORM
                                             _GYR__ST,
                                             _GYR_UST,
                                             _EX_SLIP,
-                                            _EX_END };
+                                            _EX_END,
+                                            _CLS_LIN,
+                                            _EX_JUMP,
+                                            _RAXIS_T};
+
         /* イニシャライズ ----------------------------------------------------------- */
         public Form1()
         {
