@@ -1,19 +1,17 @@
 /**
  ******************************************************************************
- **	�t�@�C���� : balancer.h
+ **	ファイル名 : balancer.h
  **
- ** ���f���֘A����:
- **   ���f����   : balancer.mdl
- **   �o�[�W���� : 1.893
- **   ����       : y_yama - Tue Sep 25 11:37:09 2007
+ ** モデル関連情報:
+ **   モデル名   : balancer.mdl
+ **   バージョン : 1.893
+ **   履歴       : y_yama - Tue Sep 25 11:37:09 2007
  **                takashic - Sun Sep 28 17:50:53 2008
  **
- ** Copyright (c) 2009-2016 MathWorks, Inc.
+ ** Copyright (c) 2009-2015 MathWorks, Inc.
  ** All rights reserved.
  ******************************************************************************
  **/
-#ifndef _ETROBO_BALANCER_H_INCLUDED
-#define _ETROBO_BALANCER_H_INCLUDED
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,11 +30,11 @@ extern "C" {
 # define rtmGetStopRequested(rtm)      ((void*) 0)
 #endif
 
-#define CMD_MAX                        100.0F                    /* �O�i/���񖽗ߐ��΍ő��l */
-#define DEG2RAD                        0.01745329238F            /* �p�x�P�ʕϊ��W��(=pi/180) */
-//#define EXEC_PERIOD                    0.00400000019F            /* �o�����X�������s����(�b) */
-#define EXEC_PERIOD                    0.00300000000F            /* �o�����X�������s����(�b) */
-//#define EXEC_PERIOD                    0.00500000000F            /* �o�����X�������s����(�b) *//* forEV3 20141102koji */
+#define CMD_MAX                        100.0F                    /* 前進/旋回命令絶対最大値 */
+#define DEG2RAD                        0.01745329238F            /* 角度単位変換係数(=pi/180) */
+// #define EXEC_PERIOD                    0.00400000019F            /* バランス制御実行周期(秒) */
+#define EXEC_PERIOD                    0.00300000019F            /* バランス制御実行周期(秒) */
+// #define EXEC_PERIOD                    0.00500000000F            /* バランス制御実行周期(秒) *//* forEV3 20141102koji */
 
 /* Model entry point functions */
 extern void balance_init(void);
@@ -92,10 +90,7 @@ extern void balance_control(float args_cmd_forward, float args_cmd_turn,
  * rtw_embedded_coder                                                         *
  * simulink                                                                   *
  *============================================================================*/
-/******************************** END OF FILE ********************************/
-
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* ! _ETROBO_BALANCER_H_INCLUDED */
+/******************************** END OF FILE ********************************/

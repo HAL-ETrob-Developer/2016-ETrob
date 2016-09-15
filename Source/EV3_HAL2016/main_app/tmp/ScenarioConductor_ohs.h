@@ -6,7 +6,7 @@
 #include "EvStateAdmin_ohs.h"
 #include "LineTracer_ohs.h"
 #include "PatternSequencer_ohs.h"
-#include "TrackCompass_ohs.h"
+// #include "TrackCompass_ohs.h"
 
 //シナリオインデックス関連
 #define SCENARIO_MAX_NUM_R  (   _SCENARIO_MAX_NUM_R )
@@ -43,7 +43,7 @@
 class ScenarioConductor_ohs {
 public:
 //生成
-    ScenarioConductor_ohs( EvStateAdmin_ohs* ev_state_admin, LineTracer_ohs* line_tracer, PatternSequencer_ohs* pettern_sequencer, TrackCompass_ohs* track_compass );
+    ScenarioConductor_ohs( EvStateAdmin_ohs* ev_state_admin, LineTracer_ohs* line_tracer, PatternSequencer_ohs* pettern_sequencer );
     //デストラクタ
     ~ScenarioConductor_ohs();
 
@@ -71,7 +71,7 @@ private:
     EvStateAdmin_ohs* mEvStateAdmin;
     LineTracer_ohs* mLineTracer;
     PatternSequencer_ohs* mPatternSequencer;
-    TrackCompass_ohs* mTrackCompass;
+    // TrackCompass_ohs* mTrackCompass;
 
     UCHR    mScenarioID;
     SCENE_INDEX mScenario[SCENARIO_MAX_NUM];

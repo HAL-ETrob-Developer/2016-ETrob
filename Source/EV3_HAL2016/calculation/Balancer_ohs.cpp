@@ -35,6 +35,7 @@ BOOL Balancer_ohs::calcPWM( int8_t spd, int8_t deg, void* running_admin ) {
     RunningAdmin_ohs* RunningAdmin = ( RunningAdmin_ohs* )running_admin;
     //ジャイロ値の取得
     fGyroValue =   ( FLOT )mGyroAdmin->getValue();
+    // fGyroValue =   ( FLOT )mGyroAdmin->getFilterValue();
 
     //モータ回転値の取得
     fNowRDeg = ( FLOT )RunningAdmin->isRightRotary();

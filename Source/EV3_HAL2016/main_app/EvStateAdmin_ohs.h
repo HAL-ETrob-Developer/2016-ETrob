@@ -26,10 +26,10 @@ public:
 	~EvStateAdmin_ohs();
 
 	/* 本体状態の回収 */
-	void execStateCollection();
+	bool setStateCollection();
 
 	/* 本体状態のリフレッシュ */
-	void execStateRefresh();
+	void setStateRefresh();
 	
 	/* カラーセンサ状態取得 */
 	SENC_CLR getColorSensorState();

@@ -13,7 +13,7 @@
 #define INIT_BALANC (		 0 )/* 初期パターン：バランス有無 */
 
 #define INIT_PAT_ID (		 0 )/* 初期パターンを指し示す */
-#define PATTERN_NUM (		20 )/* パターンインデックスサイズ */
+#define PATTERN_NUM ( _PATTERN_NUM )/* パターンインデックスサイズ */
 
 class PatternSequencer_ohs {
 public:

@@ -15,6 +15,7 @@
 #define LT_MIN_SPEED (     -100 )
 #define LT_MAX_DEGRE (       50 )
 #define LT_MIN_DEGRE (      -50 )
+
 #define RISE         (      0.01)
 #define SEARCH_SW    (    10000 )
 
@@ -40,9 +41,9 @@ private:
     RunLineCalculator_ohs* mRunLineCalculator;
 
     SENC_CLR mGetColor;
-    BOOL   mLineTraceGo;
-    BOOL   mSearchMode;
     FLOT   mGain;
+    BOOL   mLineTraceGo;
+    BOOL   mRapidMode;
     int8_t mSpeed;
     int8_t mDeg;
 

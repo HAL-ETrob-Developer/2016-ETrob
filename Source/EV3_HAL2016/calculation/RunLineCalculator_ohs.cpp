@@ -8,8 +8,22 @@
  */
 RunLineCalculator_ohs::RunLineCalculator_ohs()
 {
+    mInitF = false;
+    setParametersInit();
+}
+
+/**
+ * デストラクタ
+ */
+RunLineCalculator_ohs::~RunLineCalculator_ohs() {
+}
+
+//パラメータの初期化
+void RunLineCalculator_ohs::setParametersInit()
+{
     mSpeed  = 0;
     mDeg    = 0;
+    mOffsetRef = OFFSET_REF;
 
     mPValue[SPEED_ID] = 0;
     mIValue[SPEED_ID] = 0;
@@ -50,22 +64,28 @@ RunLineCalculator_ohs::RunLineCalculator_ohs()
     mKP[DEGRE_ID_S] = K_P_DEG_S;
     mKI[DEGRE_ID_S] = K_I_DEG_S;
     mKD[DEGRE_ID_S] = K_D_DEG_S;
-}
 
-/**
- * デストラクタ
- */
-RunLineCalculator_ohs::~RunLineCalculator_ohs() {
+    mInitF = true;
 }
 
 /**
  * モータ出力値計算
  */
-void RunLineCalculator_ohs::calcRunLine( BOOL line_check, SSHT reflection_lv, int8_t* p_speed, int8_t* p_deg )
+BOOL RunLineCalculator_ohs::calcRunLine( BOOL speed_trac, SSHT reflection_lv, int8_t* p_speed, int8_t* p_deg )
 {
-    if( line_check ) { calcRunLineCheckLine( reflection_lv, p_speed, p_deg); }
+    BOOL CenterF = false;
+    reflection_lv += mOffsetRef;
+    
+    if( speed_trac ) { calcRunLineSpeedLine( reflection_lv, p_speed, p_deg); }
     else{ calcRunLineUseRefLv( reflection_lv, p_speed, p_deg); }
+
+    //中央値ならtrue
+	if((int)mDeg == 0 ) { CenterF = true; }
+
+    return CenterF;
 }
+
+
 //ライン計算通常PID制御
 void RunLineCalculator_ohs::calcRunLineUseRefLv( SSHT reflection_lv, int8_t* p_speed, int8_t* p_deg )
 {
@@ -76,6 +96,9 @@ void RunLineCalculator_ohs::calcRunLineUseRefLv( SSHT reflection_lv, int8_t* p_s
            FLOT fTempSpeed = 0.0F;
            FLOT fSpeedOfS  = 0.0F;
            FLOT fTempDeg   = 0.0F;
+
+    //イニットフラグのクリア
+    mInitF = false;
 
     //走行パラメータの取得*意味は無い
     mSpeed = *p_speed;
@@ -133,15 +156,18 @@ void RunLineCalculator_ohs::calcRunLineUseRefLv( SSHT reflection_lv, int8_t* p_s
     return;
 }
 //ライン探索用
-void RunLineCalculator_ohs::calcRunLineCheckLine( SSHT reflection_lv, int8_t* p_speed, int8_t* p_deg ) 
+void RunLineCalculator_ohs::calcRunLineSpeedLine( SSHT reflection_lv, int8_t* p_speed, int8_t* p_deg ) 
 {
-    static FLOT fOldDevPoint  = 0;
-    static FLOT fOldEV3Deg    = 0;
+    static FLOT fOldDevPoint  = 0.0F;
+    static FLOT fOldEV3Deg    = 0.0F;
            char cSpeedRev  = 1;
            FLOT fCvtRefLv  = 0.0F;
            FLOT fTempSpeed = 0.0F;
            FLOT fSpeedOfS  = 0.0F;
            FLOT fTempDeg   = 0.0F;
+
+    //イニットフラグのクリア
+    mInitF = false;
 
     //走行パラメータの取得*意味は無い
     mSpeed = *p_speed;
@@ -151,7 +177,6 @@ void RunLineCalculator_ohs::calcRunLineCheckLine( SSHT reflection_lv, int8_t* p_
     fCvtRefLv = ( FLOT )reflection_lv;
     
     /* 走行角度計算 ----------------------------------------------------------------------------- */
-    
     /* 比較値計算 */
     mPValue[DEGRE_ID_S] = mTergetRefLV[SCRCH__ID] - fCvtRefLv;
     /* 微分値計算 */
@@ -171,7 +196,6 @@ void RunLineCalculator_ohs::calcRunLineCheckLine( SSHT reflection_lv, int8_t* p_
     fOldDevPoint = mPValue[DEGRE_ID_S];
 
     /* 走行速度計算 ----------------------------------------------------------------------------- */
-
     /* 比較値計算 */
     mPValue[SPEED_ID_S] = TERGET_DEG - fTempDeg;
     /* 微分値計算 */
@@ -199,6 +223,8 @@ void RunLineCalculator_ohs::calcRunLineCheckLine( SSHT reflection_lv, int8_t* p_
     return;
 }
 
+int8_t RunLineCalculator_ohs::getDeg() { return mDeg; }
+
 FLOT RunLineCalculator_ohs::isP(void)
 {
     return mPValue[0];
@@ -220,7 +246,7 @@ void RunLineCalculator_ohs::setGain( PID_SETTING* p_set_file )
 
     //ライン計算通常PID制御
     mTergetSoeed[NORMAL_ID] = ( p_set_file + NORMAL_ID )->fTerSpeed;
-    mTergetSoeed[SCRCH__ID] = ( p_set_file + NORMAL_ID )->fTerRefLv;
+    mTergetRefLV[NORMAL_ID] = ( p_set_file + NORMAL_ID )->fTerRefLv;
     mKP[SPEED_ID]   = ( p_set_file + NORMAL_ID )->fSpdP;
     mKI[SPEED_ID]   = ( p_set_file + NORMAL_ID )->fSpdI;
     mKD[SPEED_ID]   = ( p_set_file + NORMAL_ID )->fSpdD;
@@ -229,7 +255,7 @@ void RunLineCalculator_ohs::setGain( PID_SETTING* p_set_file )
     mKD[DEGRE_ID]   = ( p_set_file + NORMAL_ID )->fDegD;
 
     //ライン探索用
-    mTergetRefLV[NORMAL_ID] = ( p_set_file + SCRCH__ID )->fTerSpeed;
+    mTergetSoeed[SCRCH__ID] = ( p_set_file + SCRCH__ID )->fTerSpeed;
     mTergetRefLV[SCRCH__ID] = ( p_set_file + SCRCH__ID )->fTerRefLv;
     mKP[SPEED_ID_S] = ( p_set_file + SCRCH__ID )->fSpdP;
     mKI[SPEED_ID_S] = ( p_set_file + SCRCH__ID )->fSpdI;
@@ -246,3 +272,10 @@ PID_SETTING* RunLineCalculator_ohs::isGain( void )
     return ( mPidGainF );
 }
 
+//オフセット設定
+BOOL RunLineCalculator_ohs::setOffsetREf( int16_t RefOffset )
+{
+    if(( RefOffset > 100 ) || ( RefOffset > -100 )) { return false; }
+    mOffsetRef = RefOffset;
+    return true;
+}

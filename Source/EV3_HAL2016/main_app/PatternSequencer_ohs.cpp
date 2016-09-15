@@ -17,7 +17,7 @@ PatternSequencer_ohs::PatternSequencer_ohs( RunningAdmin_ohs* running_admin, Tai
 	/* 初期値のセット */
 	mPatternIndex[INIT_PAT_ID].speed    = INIT__SPEED;
 	mPatternIndex[INIT_PAT_ID].ev3_deg  = INIT_EV_DEG;
-	mPatternIndex[INIT_PAT_ID].Tail_dee = INIT_TL_DEG;
+	mPatternIndex[INIT_PAT_ID].Tail_deg = INIT_TL_DEG;
 	mPatternIndex[INIT_PAT_ID].balance  = INIT_BALANC;
 }
 
@@ -45,11 +45,15 @@ BOOL PatternSequencer_ohs::callPatternRunning( UCHR uc_index )
 	/* 外部メソッドへ渡す引数の準備 */
 	cSpeed = mPatternIndex[mNowId].speed;
 	cDegre = mPatternIndex[mNowId].ev3_deg;
-	cTailD = mPatternIndex[mNowId].Tail_dee;
+	cTailD = mPatternIndex[mNowId].Tail_deg;
 	if( mPatternIndex[mNowId].balance == TRUE ) { BalanceF = true; }
 
 	/* 走行指示 */
-	mRunningAdmin->postRunning ( cSpeed, cDegre, BalanceF );
+	if( cSpeed > 50 ) {
+		mRunningAdmin->postRunning( cSpeed, cDegre, BalanceF, true );
+	} else {
+		mRunningAdmin->postRunning( cSpeed, cDegre, BalanceF, false );
+	}
 
 	/* 尻角度指示 */
 	mTailAdmin->postTailDegree( cTailD );
@@ -60,9 +64,9 @@ BOOL PatternSequencer_ohs::callPatternRunning( UCHR uc_index )
 void PatternSequencer_ohs::callSequencStop()
 {
 	/* 走行指示：しっぽはそのまま */
-	mRunningAdmin->postRunning ( 0, 0, false );
+	mRunningAdmin->postRunning ( 0, 0, false, false );
 	/* 尻角度指示 */
-	mTailAdmin->postTailDegree( mPatternIndex[mNowId].Tail_dee );
+	mTailAdmin->postTailDegree( mPatternIndex[mNowId].Tail_deg );
 }
 
 

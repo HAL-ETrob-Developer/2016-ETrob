@@ -39,14 +39,37 @@
 #define DUC_MODE			(		   4 )		/* UCHR  print_mode 		 */
 #define DSC_MODE			(		   5 )		/* USHR  print_mode 		 */
 
+/* 構造体要素数 */
+#define _PATTERN_NUM 		 (		 40 )/* パターンインデックスサイズ */
+#define _SCENARIO_MAX_NUM_R  (  	 50 )/* シナリオインデックスサイズ */
+#define _SCENARIO_MAX_NUM_L  (  	 50 )/* シナリオインデックスサイズ */
+#define _SCENARIO_MAX_NUM	 (  	100 )/* シナリオインデックスサイズ */
+
+//達成条件:enum化するとEV3RT_2016_FORMと連携取り辛いので
+#define _CLS_BLK    (     0 )
+#define _CLS_GRY    (     1 )
+#define _CLS_WHT    (     2 )
+#define _RUN_MLG    (     3 )
+#define _EV3_DEG    (     4 )
+#define _TIL_DEG    (     5 )
+#define _GYR__ST    (     6 )
+#define _GYR_UST    (     7 )
+#define _EX_SLIP    (     8 )
+#define _EX_END     (     9 )
+#define _CLS_LIN    (    10 )
+#define _EX_JUMP    (    11 )
+#define _RAXIS_T    (    12 )
+#define _EVENT_NUM  (    13 )
+
+
+
 /* 動作設定＠デバッグ */
 #define PRINT									/* プリント動作 ON/OFF		 */
 // #define INTERRUPT_CHK							/* メトロノーム ON/OFF		 */
-#define CHECK_STAY								/* 実行終了後停止			 */
-#define SOUND_ANSWER							/* アンサー音 ON/OFF		 */
-#define TRANSITION_SOUND						/* 状態遷移チェック音 ON/OFF		 */
-// #define REFST_DEBUG
-//#define LT_DEBUG
+// #define CHECK_STAY								/* 実行終了後停止			 */
+// #define SOUND_ANSWER							/* アンサー音 ON/OFF		 */
+// #define TRANSITION_SOUND						/* 状態遷移チェック音 ON/OFF		 */
+// #define FALLING_STOP							/* 本体の転倒を検知すると停止する */
 
 /* ------------------------------------------------------------------------- */
 /* typedef宣言																 */
@@ -120,15 +143,15 @@ typedef struct _SCENARIO_INDEX {
 typedef struct _PATTERN_INDEX{
 	SCHR speed;
 	SCHR ev3_deg;
-	SCHR Tail_dee;
+	SCHR Tail_deg;
 	UCHR balance;
 }PATTERN_INDEX;
 
 typedef struct _EV3_SETTING{
 	PID_SETTING   nmPidSetting;
 	PID_SETTING   scPidSetting;
-	SCENE_INDEX   sceneIndexS[100];
-	PATTERN_INDEX patrnIndexS[20];
+	SCENE_INDEX   sceneIndexS[_SCENARIO_MAX_NUM];
+	PATTERN_INDEX patrnIndexS[_PATTERN_NUM];
 }EV3_SETTING;
 /* ------------------------------------------------------------------------- */
 /*              Copyright HAL Collage of Technology & Design                 */

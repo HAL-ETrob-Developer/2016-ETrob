@@ -9,6 +9,7 @@ RunningAdmin_ohs.o \
 TailAdmin_ohs.o \
 RunLineCalculator_ohs.o \
 Balancer_ohs.o\
+TrackCompass_ohs.o\
 LineTracer_ohs.o \
 PatternSequencer_ohs.o\
 EvStateAdmin_ohs.o\

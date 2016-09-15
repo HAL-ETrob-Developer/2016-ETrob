@@ -15,7 +15,7 @@ extern "C" {
  *  各タスクの優先度の定義
  */
 
-#define MAIN_PRIORITY           ( TMIN_APP_TPRI )             // メインタスクの優先度
+#define MAIN_PRIORITY           (  TMIN_APP_TPRI )             // メインタスクの優先度
 #define INTERRUPT_PRIORITY      ( MAIN_PRIORITY + 1 )         // 割り込みタスクの優先度
 
 //#define TRACER_PRIORITY         ( INTERRUPT_PRIORITY + 1 )    // 基本動作タスクの優先度
@@ -36,6 +36,8 @@ extern "C" {
 #ifndef STACK_SIZE
 #define STACK_SIZE      4096        /* タスクのスタックサイズ */
 #endif /* STACK_SIZE */
+
+#define INTERRUPT_CYCLE      ( 3 )         // 割り込み周期（msec）
 
 /* 設定ファイル */
 #define PID_SET_FILE_PASS ( "/ev3rt/res/pid_settings" )

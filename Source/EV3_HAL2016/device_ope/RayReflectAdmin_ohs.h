@@ -14,11 +14,11 @@
 #define GAIN_OLD	( 0.9F )		/* 過去 */
 
 /* 閾値 */
-#define	THRESHOLD_BLACK	( 25 )		/* ブラック */
-#define	THRESHOLD_WHITE	( 45 )		/* ホワイト */
+#define	THRESHOLD_BLACK	( 15 )		/* ブラック */
+#define	THRESHOLD_WHITE	( 80 )		/* ホワイト */
 
 /* 反射値カット */
-#define	REY_MAX_REF	( 170 )		/* 最大反射値＠カット */
+#define	REY_MAX_REF	( 200.0F )		/* 最大反射値＠カット */
 
 class RayReflectAdmin_ohs
 {

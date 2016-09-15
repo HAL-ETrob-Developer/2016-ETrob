@@ -24,6 +24,7 @@
 #include "./main_app/PatternSequencer_ohs.h"
 #include "./main_app/EvStateAdmin_ohs.h"
 #include "./main_app/ScenarioConductor_ohs.h"
+#include "./main_app/TrackCompass_ohs.h"
 
 #include "./calculation/RunLineCalculator_ohs.h"
 #include "./calculation/Balancer_ohs.h"
@@ -32,6 +33,7 @@
 #include "./device_ope/GyroAdmin_ohs.h"
 #include "./device_ope/RayReflectAdmin_ohs.h"
 #include "./device_ope/TailAdmin_ohs.h"
+
 
 
 using namespace ev3api;
@@ -45,8 +47,9 @@ using namespace ev3api;
 #endif
 
 /* Bluetooth */
-static UCHR  bt_cmd    = 0;         /* Bluetoothコマンド 1:リモートスタート */
-static FILE* gBtHandle = NULL;      /* Bluetoothファイルハンドル */
+static UCHR  bt_cmd    = '0';         /* Bluetoothコマンド 1:リモートスタート */
+FILE* gBtHandle = NULL;      /* Bluetoothファイルハンドル */
+// static FILE* gBtHandle = NULL;      /* Bluetoothファイルハンドル */
 
 /* 下記のマクロは個体/環境に合わせて変更する必要があります */
 #define CMD_RIGHIT        ('1')    /* リモートスタートコマンド */
@@ -54,17 +57,18 @@ static FILE* gBtHandle = NULL;      /* Bluetoothファイルハンドル */
 #define CMD_LEFT          ('2')    /* リモートスタートコマンド */
 #define LEFT_ID           (50)    /* シナリオ指定ID */
 
-#define SCENE_Q    (45)
-#define SCENE_W    (46)
-#define SCENE_E    (47)
-#define SCENE_R    (48)
-#define SCENE_T    (49)
-#define SCENE_Y    (95)
-#define SCENE_U    (96)
-#define SCENE_I    (97)
-#define SCENE_O    (98)
-#define SCENE_P    (99)
-#define SCENE_Z    (100)
+#define SCENE_Q    (  45 )
+#define SCENE_W    (  46 )
+#define SCENE_E    (  47 )
+#define SCENE_R    (  48 )
+#define SCENE_T    (  49 )
+#define SCENE_Y    (  95 )
+#define SCENE_U    (  96 )
+#define SCENE_I    (  97 )
+#define SCENE_O    (  98 )
+#define SCENE_P    (  99 )
+#define SCENE_Z    ( 100 )
+#define SCENE_X    (  93 )
 
 /* LCDフォントサイズ */
 #define CALIB_FONT (EV3_FONT_SMALL)
@@ -92,7 +96,7 @@ static Balancer_ohs*           gBalancer;
 static RunningAdmin_ohs*       gRunningAdmin;
 static GyroAdmin_ohs*          gGyroAdmin;
 static TailAdmin_ohs*          gTailAdmin;
-
+static TrackCompass_ohs*       gTrackCompass;
 
 static void user_system_create( void );
 static void user_system_destroy( void );
@@ -152,11 +156,12 @@ static void user_system_create( void )
     gBalancer  = new Balancer_ohs( gGyroAdmin );
     gRunningAdmin = new RunningAdmin_ohs( *leftMotor, *rightMotor, gBalancer );
     gRayReflectAdmin = new RayReflectAdmin_ohs( *colorSensor );
-  
+
+    gTrackCompass = new TrackCompass_ohs( gRunningAdmin, gRunLineCalculator );
     gEvStateAdmin = new EvStateAdmin_ohs( gRayReflectAdmin, gGyroAdmin, gRunningAdmin, gTailAdmin );
     gLineTracer   = new LineTracer_ohs( gRunningAdmin, gRayReflectAdmin, gRunLineCalculator );
     gPatternSequencer  = new PatternSequencer_ohs( gRunningAdmin, gTailAdmin );
-    gScenarioConductor = new ScenarioConductor_ohs( gEvStateAdmin, gLineTracer, gPatternSequencer );
+    gScenarioConductor = new ScenarioConductor_ohs( gEvStateAdmin, gLineTracer, gPatternSequencer, gTrackCompass );
 
     //Bluetooth
     gBtHandle = ev3_serial_open_file( EV3_SERIAL_BT );
@@ -164,6 +169,8 @@ static void user_system_create( void )
 
     SetingFileload(( char* )PID_SET_FILE_PASS, &PidSetStract );
     ev3_memfile_free( &PidSetStract );
+
+    fprintf( gBtHandle,"[system_create]\r\n");
 
     return;
 }
@@ -180,8 +187,7 @@ static void user_system_destroy( void )
     if( gEvStateAdmin      ) { delete gEvStateAdmin;      gEvStateAdmin      = NULL; }
     if( gPatternSequencer  ) { delete gPatternSequencer;  gPatternSequencer  = NULL; }
     if( gScenarioConductor ) { delete gScenarioConductor; gScenarioConductor = NULL; }
-
-
+    if( gTrackCompass      ) { delete gTrackCompass;      gTrackCompass      = NULL; }
 
     if( touchSensor        ) { delete touchSensor;        touchSensor        = NULL; }
     if( colorSensor        ) { delete colorSensor;        colorSensor        = NULL; }
@@ -202,36 +208,40 @@ void ev3_cyc_tracer(intptr_t exinf) {
 }
 
 void interrupt_task(intptr_t exinf) {
-    volatile static FLOT dummy = 0;
+    volatile static int dummy = 0;
     //センシング
-    gGyroAdmin->callValueUpdate();
+    gGyroAdmin->callValueUpdate();//stop
     gRunningAdmin->callValueUpDate();
     gRayReflectAdmin->callValueUpDate();
     gTailAdmin->callValueUpDate();
 
     //制御
     gLineTracer->callLineTraceAct();
-    //gLineTracer->callSimplLineTraceAct();
+    ////gLineTracer->callSimplLineTraceAct();
+    gTrackCompass->callReferenceSearch();
 
     //アクチュエイト
     gRunningAdmin->callRunning();
     gTailAdmin->callActDegree();
 
     //OS最適化防止ダミー計算
-    dummy += 0.001;
-    if( dummy == 1 ) { dummy = 0; }
+    dummy++;
+
+    // fprintf( gBtHandle,"%d\r\n", (int)gRayReflectAdmin->getValue());
 
 #ifdef INTERRUPT_CHK
     static int tes = 0;
     tes++;
     if( tes > 100 ) {
-        ev3_speaker_play_tone( NOTE_E6, 10 );
+        ev3_speaker_play_tone( NOTE_AS5, 10 );
+        ev3_led_set_color(LED_RED);
         tes = 0;
+    } else if( tes == 50 ) {
+        ev3_led_set_color(LED_GREEN);
     }
 
-    // fprintf( gBtHandle,"getRef[%d]\r\n", (int)gRayReflectAdmin->getValue());
-
 #endif
+
     ext_tsk();
 }
 
@@ -240,6 +250,7 @@ void tracer_task(intptr_t exinf) {
     while( ev3_button_is_pressed( BACK_BUTTON ) == false ) {
         sceneGo = gScenarioConductor->execScenario();//メインタスク
         if( sceneGo == false ) { break; }
+        if( ev3_button_is_pressed(BACK_BUTTON)) { break; }
     }
     ev3_led_set_color(LED_RED);
     gScenarioConductor->quitCommand();
@@ -258,6 +269,8 @@ void bt_task(intptr_t unused)
 {
     int32_t lTilOfset = 0;
     memfile_t PidSetStract;
+    int16_t  cRefOfs  = OFFSET_REF;
+    SCHR bt_cmd_ = 0;
     memset( &PidSetStract, 0,sizeof( PidSetStract ));
 
     while( true )
@@ -266,7 +279,8 @@ void bt_task(intptr_t unused)
         ev3_speaker_play_tone( NOTE_C4, 80 );
 #endif
 
-        bt_cmd = fgetc(gBtHandle); /* 受信 */
+        bt_cmd_ = fgetc(gBtHandle); /* 受信 */
+        bt_cmd = bt_cmd_;
         // serial_rea_dat(SIO_PORT_BT, (char*)&bt_cmd, 1);
 
         switch( bt_cmd ) {
@@ -281,7 +295,7 @@ void bt_task(intptr_t unused)
                 SetingFileload(( char* )PID_SET_FILE_PASS, &PidSetStract );
                 ev3_memfile_free( &PidSetStract );
                 break;
-            case 'b'://Bluetooth通信の終了
+            case 'B'://Bluetooth通信の終了
 #ifdef SOUND_ANSWER
                 ev3_speaker_play_tone( NOTE_C4, 240 );
 #endif
@@ -289,11 +303,18 @@ void bt_task(intptr_t unused)
                 break;
 
             case 'x':
-                gScenarioConductor->quitCommand();
+                gScenarioConductor->setScenario( SCENE_X );
                 break;
             case 'z':
                 gScenarioConductor->setScenario( SCENE_Z );
                 break;
+            // case 'h':
+            //     ev3_stp_cyc(EV3_CYC_TRACER);
+            //     gGyroAdmin->callValueUpdate();//stop
+            //     ev3_sta_cyc(EV3_CYC_TRACER);
+                
+            //     break;
+
             case 'q':
                 gScenarioConductor->setScenario( SCENE_Q );
                 break;
@@ -334,6 +355,16 @@ void bt_task(intptr_t unused)
                 fprintf( gBtHandle,"<%d>\r\n", (int)lTilOfset );
                 gTailAdmin->setOfsetDegree( lTilOfset );
                 break;
+            case 'N':
+                cRefOfs++;
+                fprintf( gBtHandle,"<%d>\r\n", (int)cRefOfs );
+                gRunLineCalculator->setOffsetREf( cRefOfs );
+                break;
+            case 'M':
+                cRefOfs--;
+                fprintf( gBtHandle,"<%d>\r\n", (int)cRefOfs );
+                gRunLineCalculator->setOffsetREf( cRefOfs );
+                break;
             default:
                 break;
         }
@@ -342,12 +373,14 @@ void bt_task(intptr_t unused)
         fprintf( gBtHandle,"Scenario[%3d]\r\n",gScenarioConductor->getID());
         fprintf( gBtHandle,"Pattern [%3d]\r\n",gPatternSequencer->getID());
         fprintf( gBtHandle,"Mileage [%d]\r\n",(int)gRunningAdmin->getMileage());
-        fprintf( gBtHandle,"Mileage [%d]\r\n",(int)gRunningAdmin->getAngle());
+        fprintf( gBtHandle,"Degree  [%d]\r\n",(int)gRunningAdmin->getAngle());
+        fprintf( gBtHandle,"Battery [%d]\r\n",(int)ev3_battery_voltage_mV());
         
         bt_cmd = 0;//リセット
     }
 
 EXIT:
+    fprintf( gBtHandle,"See you !\r\n");
     return;
 }
 

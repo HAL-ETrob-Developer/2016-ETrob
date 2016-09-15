@@ -8,11 +8,10 @@
 /**
  * コンストラクタ
  */
-ScenarioConductor_ohs::ScenarioConductor_ohs( EvStateAdmin_ohs* ev_state_admin, LineTracer_ohs* line_tracer, PatternSequencer_ohs* pettern_sequencer, TrackCompass_ohs* track_compass )
+ScenarioConductor_ohs::ScenarioConductor_ohs( EvStateAdmin_ohs* ev_state_admin, LineTracer_ohs* line_tracer, PatternSequencer_ohs* pettern_sequencer )
 :mEvStateAdmin( ev_state_admin ),
  mLineTracer( line_tracer ),
- mPatternSequencer( pettern_sequencer ),
- mTrackCompass( track_compass )
+ mPatternSequencer( pettern_sequencer )
 {
 	memset( mScenario, 0, sizeof(mScenario));
 	//初期待機状態の入力
@@ -85,10 +84,10 @@ BOOL ScenarioConductor_ohs::execScenario() {
 				mLineTracer->postLineTraceConduct( true );
 				break;
 			case TRACKCOMPASS_CHECK:				//方位想定回転＠原位置セット
-				mTrackCompass->setReferenceAxis();
+				// mTrackCompass->setReferenceAxis();
 				break;
 			case TRACKCOMPASS_ACT:					//方位想定回転＠回転
-				mTrackCompass->callRAxisTurn( mScenario[mScenarioID].event_value );
+				// mTrackCompass->callRAxisTurn( mScenario[mScenarioID].event_value );
 				break;
 			default:
 				break;
@@ -223,7 +222,7 @@ bool ScenarioConductor_ohs::checkJump() {
 
 /* 方位指定回転達成確認 */
 bool ScenarioConductor_ohs::checkRAxisTurn() {
-	return ( bool )mTrackCompass->getRAxisTurnFinish();
+	return true;//( bool )mTrackCompass->getRAxisTurnFinish();
 }
 
 // ../workspace/EV3_HAL2016/main_app/ScenarioConductor_ohs.cpp:33:24: error: cannot convert 'ScenarioConductor_ohs::checkSlip' from type 'bool (ScenarioConductor_ohs::)(int)' to type 'bool (ScenarioConductor_ohs::*)()'

@@ -6,10 +6,12 @@
 
 /* define file */
 
+#define OFFSET_REF   (      0 )/*(     25 )*/
+
 #define SPEED_ID     (      0 )
 #define DEGRE_ID     (      1 )
-#define SPEED_ID_S   (      0 )/*2*/
-#define DEGRE_ID_S   (      1 )/*3*/
+#define SPEED_ID_S   (      2 )
+#define DEGRE_ID_S   (      3 )
 
 #define NORMAL_ID    (      0 )
 #define SCRCH__ID    (      1 )
@@ -18,7 +20,7 @@
 
 #define TERGET_SPD   (      80.0F )
 #define TERGET_SPD_S (      30.0F )
-#define T_MIN_SPD    (       0.0F )
+#define T_MIN_SPD    (      20.0F )
 
 #define MAX_CW_DEG   (       0.0F )
 #define MAX_CCW_DEG  (       0.0F )
@@ -29,14 +31,15 @@
 #define TERGET_LV    (      70.0F )
 #define TERGET_LV_S  (      40.0F )
 
-/* ゲイン変更 ----------------------------------------------------------------------------------- */
+/* ゲイン ----------------------------------------------------------------------------------- */
+//PID N
 #define K_P_SPD     (       0.008F )
 #define K_I_SPD     (       0.001F )
 #define K_D_SPD     (       0.04F )
 #define K_P_DEG     (       0.2F )
 #define K_I_DEG     (       0.1F )
 #define K_D_DEG     (      15.0F )
-
+//PID S
 #define K_P_SPD_S   (       0.0F )
 #define K_I_SPD_S   (       0.0F )
 #define K_D_SPD_S   (       0.0F )
@@ -85,22 +88,29 @@ public:
     //デストラクタ
     ~RunLineCalculator_ohs();
 
-    void calcRunLine( BOOL line_check, SSHT reflection_lv, int8_t* p_speed, int8_t* p_deg );
+    BOOL calcRunLine( BOOL speed_trac, SSHT reflection_lv, int8_t* p_speed, int8_t* p_deg );
+    void setParametersInit();
+    
     //テスト用メソッド(非公開)
     FLOT isP(void);
     FLOT isI(void);
     FLOT isD(void);
+
     void setGain( PID_SETTING* p_set_file );
     PID_SETTING* isGain( void );
+    int8_t getDeg();
+
+    //デバッグ
+    BOOL setOffsetREf( int16_t degOffset );
 
 private:
 
     /* メソッド */
     void calcRunLineUseRefLv( SSHT reflection_lv, int8_t* p_speed, int8_t* p_deg );
-    void calcRunLineCheckLine( SSHT reflection_lv, int8_t* p_speed, int8_t* p_deg );
+    void calcRunLineSpeedLine( SSHT reflection_lv, int8_t* p_speed, int8_t* p_deg );
+
 	/* メンバ */
-    int8_t mSpeed;
-    int8_t mDeg;
+
     FLOT mPValue[4];
     FLOT mIValue[4];
     FLOT mDValue[4];
@@ -112,6 +122,13 @@ private:
     FLOT mKP[4];
     FLOT mKI[4];
     FLOT mKD[4];
+
+    int8_t mSpeed;
+    int8_t mDeg;
+    int8_t mOffsetRef;
+
+    BOOL mInitF;
+
 };
 
 #endif  // RUNLINECALCULATOR_OHS_H_

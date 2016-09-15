@@ -66,25 +66,16 @@ SENC_CLR RayReflectAdmin_ohs::getState( void )
 
 	//中間値範囲チェック
 	for( iIdx = 0; iIdx < R_QUEUE_MAX; iIdx++ ){
-		if( mQueue[iIdx] < THRESHOLD_BLACK ) { iBlackCount++; } 
-		if( mQueue[iIdx] > THRESHOLD_WHITE ) { iWhiteCount++; }
-		if( mQueue[iIdx] < THRESHOLD_BLACK || mQueue[iIdx] > THRESHOLD_WHITE ) {
+		if( mQueue[iIdx] < THRESHOLD_BLACK ) { iBlackCount++; continue; } 
+		if( mQueue[iIdx] > THRESHOLD_WHITE ) { iWhiteCount++; continue; }
+		if( mQueue[iIdx] > THRESHOLD_BLACK && mQueue[iIdx] < THRESHOLD_WHITE ) {
 			iGrayCount++;
 		}
 	}
 	//反射値チェック
-	if( iBlackCount > 0 ){
-		/* 状態：ブラック */
-		mState = SCLR_BLACK;
-	} else {
-		/* 状態：グレー */
-		mState = SCLR_GRAY;
-	}
-	
-	if( iWhiteCount == R_QUEUE_MAX ){
-		/* 状態：ホワイト */
-		mState = SCLR_WHITE;
-	}
+	if( iBlackCount > iGrayCount ) { mState = SCLR_BLACK; } 	/* 状態：ブラック */
+	else { mState = SCLR_GRAY; }								/* 状態：グレー */
+	if( iWhiteCount == R_QUEUE_MAX ){ mState = SCLR_WHITE; }	/* 状態：ホワイト */
 	
 	return mState;
 }
@@ -107,21 +98,30 @@ void RayReflectAdmin_ohs::calcLowPassFilter( void )
 int16_t RayReflectAdmin_ohs::getClrCvtBright( void )
 {
 	rgb_raw_t RgbRaw;
-	int32_t sBright = 0;
+	FLOT fRed = 0.0F;
+	FLOT fGre = 0.0F;
+	FLOT fBle = 0.0F;
+	FLOT fBright = 0;
 	memset( &RgbRaw, 0, sizeof(RgbRaw));
 
 	mColorSensor.getRawColor( RgbRaw );
 	/* 反射値の変換 */
-	sBright = RgbRaw.r + RgbRaw.g + RgbRaw.b;
-	if( sBright == 0 ) { sBright = 0; }
-	else { sBright = sBright / 3; }
-	if( sBright > REY_MAX_REF ) { sBright = REY_MAX_REF; }
+	fRed = ( FLOT )RgbRaw.r;
+	fGre = ( FLOT )RgbRaw.g;
+	fBle = ( FLOT )RgbRaw.b;
+	
+	//取得値の合成
+	fBright = ( fRed * 0.0F ) + ( fGre * 0.5F )+ ( fBle * 0.5F );
+	
+	if( fBright == 0.0F ) { fBright = 0.0F; }
+	else { fBright = fBright; }
+	if( fBright > REY_MAX_REF ) { fBright = REY_MAX_REF; }
     /* LCD画面表示 */
 #ifdef PRINT
     SCHR   cString[50];
     memset( cString , 0, sizeof(cString));
 
-	sprintf(( char* )cString, "Sam_Value[%3d]Red_Value[%3d]",(int)sBright,(int)RgbRaw.r);
+	sprintf(( char* )cString, "Sam_Value[%3d]Red_Value[%3d]",(int)fBright,(int)RgbRaw.r);
 	ev3_lcd_draw_string( cString, 0, 8*4);
 	sprintf(( char* )cString, "Sam_State[%3d]Gre_Value[%3d]",(int)mState,(int)RgbRaw.g);
 	ev3_lcd_draw_string( cString, 0, 8*5);
@@ -129,5 +129,5 @@ int16_t RayReflectAdmin_ohs::getClrCvtBright( void )
 	ev3_lcd_draw_string( cString, 0, 8*6);
 #endif
 
-	return (int16_t)sBright;
+	return (int16_t)fBright;
 }

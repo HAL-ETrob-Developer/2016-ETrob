@@ -11,7 +11,7 @@ LineTracer_ohs::LineTracer_ohs( RunningAdmin_ohs* running_admin, RayReflectAdmin
  mRunLineCalculator( run_line_calculator )
 {
     mLineTraceGo = false;
-    mSearchMode  = false;
+    mRapidMode  = false;
 
     mGetColor = SCLR_GRAY;
     mSpeed = 0;
@@ -28,9 +28,10 @@ LineTracer_ohs::~LineTracer_ohs() {
 /**
  * ライントレース指揮
  */
-void LineTracer_ohs::postLineTraceConduct( BOOL search_mode ) {
+void LineTracer_ohs::postLineTraceConduct( BOOL rapid_mode ) {
     mLineTraceGo = true;
-    mSearchMode  = search_mode;
+    mRapidMode   = rapid_mode;
+    return;
 }
 
 /**
@@ -38,9 +39,13 @@ void LineTracer_ohs::postLineTraceConduct( BOOL search_mode ) {
  */
 void LineTracer_ohs::postLineTraceStop() {
     mLineTraceGo = false;
+    mRunLineCalculator->setParametersInit();
+    return;
 }
 
-
+/**
+ * ライン探索実行 ＠死にメソッド
+ */
 void LineTracer_ohs::callSimplLineTraceAct() {
     //実行指揮の確認 
     if( mLineTraceGo == false ) { return; }//ライントレース指揮無し
@@ -57,7 +62,7 @@ void LineTracer_ohs::callSimplLineTraceAct() {
     mSpeed = LT_SPEED_SLT;
 
     //走行指示
-    mRunningAdmin->postRunning( mSpeed, mDeg, true );//(走行速度,走行角度,バランス制御の有無)
+    mRunningAdmin->postRunning( mSpeed, mDeg, true,false );//(走行速度,走行角度,バランス制御の有無)
 }
 
 /**
@@ -65,6 +70,7 @@ void LineTracer_ohs::callSimplLineTraceAct() {
  */
 void LineTracer_ohs::callLineTraceAct() {
     static ULNG ulClrCounter = 0;
+    BOOL BrakeF_ = mRapidMode;
 
     //実行指揮の確認 
     if( mLineTraceGo == false ) { return; }//ライントレース指揮無し
@@ -81,12 +87,11 @@ void LineTracer_ohs::callLineTraceAct() {
     } else {
         /* 一定以上白を連続して検出 */
         execLineEdgeTrace();
-      //  execLineSearch(); ラインサーチ停止test
-
     }
 
     //走行指示
-    mRunningAdmin->postRunning( mSpeed, mDeg, true );//(走行速度,走行角度,バランス制御の有無)
+    /* (走行速度,走行角度,バランス制御の有無,ブレーキ) */
+    mRunningAdmin->postRunning( mSpeed, mDeg, true, BrakeF_ );
 
     return;
 }
@@ -97,18 +102,21 @@ void LineTracer_ohs::callLineTraceAct() {
 void LineTracer_ohs::execLineEdgeTrace() {
     /* 光学反射値の取得 */
     int16_t sRefVal = mRayReflectAdmin->getValue();
+
     /* ライン探索ゲインのリセット */
     mGain = 0;
     /* 左右モータの実指示値を取得(保留) */
+    mSpeed = mRunningAdmin->getSpeed();
+    mDeg   = mRunningAdmin->getVector();
 
     /* PID計算 */
-    mRunLineCalculator->calcRunLine( mSearchMode ,sRefVal, &mSpeed, &mDeg );
+    mRunLineCalculator->calcRunLine( mRapidMode ,sRefVal, &mSpeed, &mDeg );
     /* 走行速度 */
-    if( mSpeed > LT_MAX_SPEED ){
-        mSpeed = LT_MAX_SPEED;
-    } else if( mSpeed < LT_MIN_SPEED ) {
-        mSpeed = LT_MIN_SPEED;
-    }
+    // if( mSpeed > LT_MAX_SPEED ){
+    //     mSpeed = LT_MAX_SPEED;
+    // } else if( mSpeed < LT_MIN_SPEED ) {
+    //     mSpeed = LT_MIN_SPEED;
+    // }
     /* 角度の決定 */
     if( mDeg > LT_MAX_DEGRE ){
         mDeg = LT_MAX_DEGRE;
@@ -118,7 +126,7 @@ void LineTracer_ohs::execLineEdgeTrace() {
 }
 
 /**
- * ラインサーチ
+ * ラインサーチ＠死にメソッド
  */
 void LineTracer_ohs::execLineSearch()
 {
