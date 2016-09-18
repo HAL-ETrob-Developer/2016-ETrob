@@ -46,15 +46,10 @@ using namespace ev3api;
 #define _debug(x)
 #endif
 
-/* Bluetooth */
-static UCHR  bt_cmd    = '0';         /* Bluetoothコマンド 1:リモートスタート */
-FILE* gBtHandle = NULL;      /* Bluetoothファイルハンドル */
-// static FILE* gBtHandle = NULL;      /* Bluetoothファイルハンドル */
-
 /* 下記のマクロは個体/環境に合わせて変更する必要があります */
-#define CMD_RIGHIT        ('1')    /* リモートスタートコマンド */
+#define CMD_RIGHIT        ('r')    /* リモートスタートコマンド */
 #define RIGHIT_ID         (0)    /* シナリオ指定ID */
-#define CMD_LEFT          ('2')    /* リモートスタートコマンド */
+#define CMD_LEFT          ('l')    /* リモートスタートコマンド */
 #define LEFT_ID           (50)    /* シナリオ指定ID */
 
 #define SCENE_Q    (  45 )
@@ -74,6 +69,24 @@ FILE* gBtHandle = NULL;      /* Bluetoothファイルハンドル */
 #define CALIB_FONT (EV3_FONT_SMALL)
 #define CALIB_FONT_WIDTH (6/*TODO: magic number*/)
 #define CALIB_FONT_HEIGHT (8/*TODO: magic number*/)
+
+/* ジャイロセンサ異常対策 ----------------------------------------------------------------------- */
+/* 概要:                                                                                          */
+/* 関数ポインター配列にダミーのメソッドと、ジャイロセンサアクセスを行う実際のメソッドを格納し、   */
+/* その関数ポインター配列の添え字の入れ替えでジャイロセンサのON/OFFを行う                         */
+/* （if文によるフラグ式にしないのは、クリティカル領域にif文入れたくないからです）                 */
+/* void ( GyroAdmin_ohs::*gGyroValueUpdate[GYRO_M_ID_NUM] )( void )                               */
+/* ---------------------------------------------------------------------------------------------- */
+#define GYRO_OFF        (0)    /* ジャイロセンサの動作OFF */
+#define GYRO_ON         (1)    /* ジャイロセンサの動作ON */
+#define GYRO_M_ID_NUM   (2)    /* callValueUpdate1メソッド格納用 */
+static int gGyroSwitch = GYRO_OFF;/* ジャイロセンサの動作スイッチ */
+
+
+/* Bluetooth */
+static UCHR  bt_cmd    = '0';         /* Bluetoothコマンド 1:リモートスタート */
+FILE* gBtHandle = NULL;      /* Bluetoothファイルハンドル＠static取りました */
+// static FILE* gBtHandle = NULL;      /* Bluetoothファイルハンドル */
 
 /* オブジェクトへのポインタ定義 */
 TouchSensor*    touchSensor;
@@ -97,6 +110,7 @@ static RunningAdmin_ohs*       gRunningAdmin;
 static GyroAdmin_ohs*          gGyroAdmin;
 static TailAdmin_ohs*          gTailAdmin;
 static TrackCompass_ohs*       gTrackCompass;
+void ( GyroAdmin_ohs::*gGyroValueUpdate[GYRO_M_ID_NUM] )( void );//ジャイロセンサ更新メソッド格納用
 
 static void user_system_create( void );
 static void user_system_destroy( void );
@@ -163,6 +177,10 @@ static void user_system_create( void )
     gPatternSequencer  = new PatternSequencer_ohs( gRunningAdmin, gTailAdmin );
     gScenarioConductor = new ScenarioConductor_ohs( gEvStateAdmin, gLineTracer, gPatternSequencer, gTrackCompass );
 
+    //ジャイロセンサ異常対策
+    gGyroValueUpdate[GYRO_OFF] = &GyroAdmin_ohs::callValueUpdateDummy;
+    gGyroValueUpdate[GYRO_ON]  = &GyroAdmin_ohs::callValueUpdate;
+
     //Bluetooth
     gBtHandle = ev3_serial_open_file( EV3_SERIAL_BT );
     assert( gBtHandle != NULL );
@@ -208,9 +226,9 @@ void ev3_cyc_tracer(intptr_t exinf) {
 }
 
 void interrupt_task(intptr_t exinf) {
-    volatile static int dummy = 0;
     //センシング
-    gGyroAdmin->callValueUpdate();//stop
+    // gGyroAdmin->callValueUpdate();//ジャイロセンサ異常対策＠20160918
+    ( gGyroAdmin->*gGyroValueUpdate[gGyroSwitch] )();//ジャイロセンサ異常対策＠20160918
     gRunningAdmin->callValueUpDate();
     gRayReflectAdmin->callValueUpDate();
     gTailAdmin->callValueUpDate();
@@ -223,11 +241,6 @@ void interrupt_task(intptr_t exinf) {
     //アクチュエイト
     gRunningAdmin->callRunning();
     gTailAdmin->callActDegree();
-
-    //OS最適化防止ダミー計算
-    dummy++;
-
-    // fprintf( gBtHandle,"%d\r\n", (int)gRayReflectAdmin->getValue());
 
 #ifdef INTERRUPT_CHK
     static int tes = 0;
@@ -269,7 +282,6 @@ void bt_task(intptr_t unused)
 {
     int32_t lTilOfset = 0;
     memfile_t PidSetStract;
-    int16_t  cRefOfs  = OFFSET_REF;
     SCHR bt_cmd_ = 0;
     memset( &PidSetStract, 0,sizeof( PidSetStract ));
 
@@ -285,9 +297,11 @@ void bt_task(intptr_t unused)
 
         switch( bt_cmd ) {
             case CMD_RIGHIT://右コースセット
+                gGyroSwitch = GYRO_ON;
                 gScenarioConductor->setScenario( RIGHIT_ID );
                 break;
             case CMD_LEFT://左コース
+                gGyroSwitch = GYRO_ON;
                 gScenarioConductor->setScenario( LEFT_ID );
                 break;
             case 'S'://ファイル読み込み
@@ -296,16 +310,13 @@ void bt_task(intptr_t unused)
                 ev3_memfile_free( &PidSetStract );
                 break;
             case 'B'://Bluetooth通信の終了
-#ifdef SOUND_ANSWER
-                ev3_speaker_play_tone( NOTE_C4, 240 );
-#endif
                 goto EXIT;
                 break;
-
             case 'X':
                 gScenarioConductor->setScenario( SCENE_X );
                 break;
             case 'z':
+                gGyroSwitch = GYRO_OFF;
                 gScenarioConductor->setScenario( SCENE_Z );
                 break;
             // case 'h':
@@ -316,35 +327,44 @@ void bt_task(intptr_t unused)
             //     break;
 
             case 'q':
+                gGyroSwitch = GYRO_ON;
                 gScenarioConductor->setScenario( SCENE_Q );
                 break;
             case 'w':
-                gScenarioConductor->setScenario( SCENE_W );
+                gGyroSwitch = GYRO_OFF;
+                gScenarioConductor->setScenario( SCENE_Q );
                 break;
-            case 'e':
-                gScenarioConductor->setScenario( SCENE_E );
-                break;
-            case 'r':
-                gScenarioConductor->setScenario( SCENE_R );
-                break;
-            case 't':
-                gScenarioConductor->setScenario( SCENE_T );
-                break;
-            case 'y':
-                gScenarioConductor->setScenario( SCENE_Y );
-                break;
-            case 'u':
-                gScenarioConductor->setScenario( SCENE_U );
-                break;
-            case 'i':
-                gScenarioConductor->setScenario( SCENE_I );
-                break;
+            // case 'q':
+            //     gScenarioConductor->setScenario( SCENE_Q );
+            //     break;
+            // case 'w':
+            //     gScenarioConductor->setScenario( SCENE_W );
+            //     break;
+            // case 'e':
+            //     gScenarioConductor->setScenario( SCENE_E );
+            //     break;
+            // case 'r':
+            //     gScenarioConductor->setScenario( SCENE_R );
+            //     break;
+            // case 't':
+            //     gScenarioConductor->setScenario( SCENE_T );
+            //     break;
+            // case 'y':
+            //     gScenarioConductor->setScenario( SCENE_Y );
+            //     break;
+            // case 'u':
+            //     gScenarioConductor->setScenario( SCENE_U );
+            //     break;
+            // case 'i':
+            //     gScenarioConductor->setScenario( SCENE_I );
+            //     break;
             case 'o':
+                gGyroSwitch = GYRO_OFF;
                 gScenarioConductor->setScenario( SCENE_O );
                 break;
-            case 'p':
-                gScenarioConductor->setScenario( SCENE_P );
-                break;
+            // case 'p':
+            //     gScenarioConductor->setScenario( SCENE_P );
+            //     break;
             case '<':
                 lTilOfset++;
                 fprintf( gBtHandle,"<%d>\r\n", (int)lTilOfset );
@@ -354,16 +374,6 @@ void bt_task(intptr_t unused)
                 lTilOfset--;
                 fprintf( gBtHandle,"<%d>\r\n", (int)lTilOfset );
                 gTailAdmin->setOfsetDegree( lTilOfset );
-                break;
-            case 'N':
-                cRefOfs++;
-                fprintf( gBtHandle,"<%d>\r\n", (int)cRefOfs );
-                gRunLineCalculator->setOffsetREf( cRefOfs );
-                break;
-            case 'M':
-                cRefOfs--;
-                fprintf( gBtHandle,"<%d>\r\n", (int)cRefOfs );
-                gRunLineCalculator->setOffsetREf( cRefOfs );
                 break;
             default:
                 break;
@@ -386,6 +396,9 @@ void bt_task(intptr_t unused)
 
 EXIT:
     fprintf( gBtHandle,"See you !\r\n");
+#ifdef SOUND_ANSWER
+    ev3_speaker_play_tone( NOTE_C4, 240 );
+#endif
     return;
 }
 

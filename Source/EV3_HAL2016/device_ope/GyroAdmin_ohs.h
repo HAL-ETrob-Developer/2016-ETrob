@@ -31,6 +31,7 @@ class GyroAdmin_ohs
 		/* メソッド */
 		bool        initDegree();
 		void 		callValueUpdate( void );	//ジャイロセンサの値の更新
+		void 		callValueUpdateDummy( void );	//ジャイロセンサ異常の為のダミーメソッド＠20160918
 		int16_t 	getValue( void );			//ジャイロセンサの値の取得
 		int16_t		getFilterValue( void );		//ジャイロセンサの値の取得(フィルタリング)
 		GYRO_STATE	getState( void );			//ジャイロセンサ状態の取得

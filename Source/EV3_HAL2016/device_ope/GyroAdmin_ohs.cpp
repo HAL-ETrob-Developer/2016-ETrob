@@ -40,23 +40,25 @@ bool GyroAdmin_ohs::initDegree()
 }
 
 /**
+ * ジャイロセンサの値の更新のダミーメソッド
+ */
+void GyroAdmin_ohs::callValueUpdateDummy( void ) { return; }
+
+/**
  * ジャイロセンサの値の更新
  */
 void GyroAdmin_ohs::callValueUpdate( void )
 {
-
 	mNowGyroValue =  mGyroSensor.getAnglerVelocity();
 	// mNowGyroValue =  ev3_gyro_sensor_get_rate( EV3_PORT_4 );//実験＠失敗
 	mNowGyroValue -= mOffSet;
 	
-
 	//記録キューの更新
 	mQNo = mQNo % QUEUE_MAX;
 	mQueue[mQNo] = mNowGyroValue;
 	mQNo++;
 
-	// mGyroSensor.reset();
-
+	// mGyroSensor.reset();//ここにこれを入れてはならないという戒め
 }
 
 /**

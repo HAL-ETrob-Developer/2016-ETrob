@@ -65,10 +65,10 @@
 
 /* 動作設定＠デバッグ */
 #define PRINT									/* プリント動作 ON/OFF		 */
-#define INTERRUPT_CHK							/* メトロノーム ON/OFF		 */
+// #define INTERRUPT_CHK							/* メトロノーム ON/OFF		 */
 #define CHECK_STAY								/* 実行終了後停止			 */
-#define SOUND_ANSWER							/* アンサー音 ON/OFF		 */
-#define TRANSITION_SOUND						/* 状態遷移チェック音 ON/OFF		 */
+// #define SOUND_ANSWER							/* アンサー音 ON/OFF		 */
+// #define TRANSITION_SOUND						/* 状態遷移チェック音 ON/OFF		 */
 // #define FALLING_STOP							/* 本体の転倒を検知すると停止する */
 
 /* ------------------------------------------------------------------------- */
