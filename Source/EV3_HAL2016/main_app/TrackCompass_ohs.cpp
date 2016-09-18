@@ -36,43 +36,70 @@ void TrackCompass_ohs::setReferenceAxis() { mNowRAxis = ( int32_t )mReferenceAxi
 
 //基軸中心からの指定角回転
 BOOL TrackCompass_ohs::callRAxisTurn( int32_t target ) {
-	FLOT    fSendDegree  = 0.0F;
-	FLOT    fTargetDev   = 0.0F;
-	FLOT    fNowAngle    = 0.0F;
-	int32_t iSendDegree_ = 0;
+	int8_t cSendDegree_ = 0;
 
 	//引数チェック
-	if(( target > RAT_TRN_MAX ) || ( target < RAT_TRN_MAX )) { return false; }
+	if(( target > RAT_TRN_MAX ) || ( target < -RAT_TRN_MAX )) { return false; }
 
 	//値の取得
 	mTargetDirection = target;
-	fNowAngle = ( FLOT )mRunningAdmin->getAngle();
 
-	//目標角の計算
-	fTargetDev = ( FLOT )( mTargetDirection + mNowRAxis );
-
-	//回転出力値の計算
-	fSendDegree = fTargetDev - fNowAngle;//現在地と目標値の差分
-	iSendDegree_ = ( int32_t )( fSendDegree * RA_PK );//係数付与
-
-	//指示値範囲チェック
-	if( iSendDegree_ < -SND_TRN_MAX ) { iSendDegree_ = -SND_TRN_MAX; }
-	else if( iSendDegree_ > SND_TRN_MAX ) { iSendDegree_ = SND_TRN_MAX; }
+	//走行角度計算
+	cSendDegree_ = calcFollowDegree( mTargetDirection );
 
 	//走行指示
-	mRunningAdmin->postRunning( RA_STD_SPD, ( int8_t )iSendDegree_, RA_STD_BRN, RA_STD_BRK );
-
-	//目標値達成確認
-	if( 0 == ( int32_t )fSendDegree ) { mRAxisTurnFinish = true; }
+	mRunningAdmin->postRunning( RA_STD_SPD, cSendDegree_, RA_STD_BRN, RA_STD_BRK );
 
 	return true;
 }
 
-//指定角回転達成確認
-BOOL TrackCompass_ohs::getRAxisTurnFinish()
+//指定角回転達成確認地点からの移動
+BOOL TrackCompass_ohs::callRAxisMove( int32_t move_length, BOOL balancer )
 {
+	int8_t cSendDegree = 0;
+	int8_t cMoveLength = 0;
+
+	/* 走行速度の決定 */
+	if( move_length < 0 ) {
+		if( balancer ) { cMoveLength = RA_ALT_RSPD; }//後進＠バランス有り
+		else { cMoveLength = RA_ALT_RT_SPD; }//後進＠支え走行
+	} else { cMoveLength = RA_ALT_SPD; }//前進＠バランス・支え共用
+
+	//走行角度計算
+	cSendDegree = calcFollowDegree( mTargetDirection );
+
+	//走行指示
+	mRunningAdmin->postRunning( cMoveLength, cSendDegree, balancer, RA_STD_BRK );
+
+	return true;
+}
+
+
+
+//指定角回転達成確認
+BOOL TrackCompass_ohs::getRAxisTurnFinish( int32_t target )
+{
+	int32_t iCompAngle = 0;//比較用本体方向
+	int32_t iNowAngle  = mRunningAdmin->getAngle();;
+
+	//引数チェック
+	if(( target > RAT_TRN_MAX ) || ( target < -RAT_TRN_MAX )) { return false; }
+
+	//比較本体角に目標本体角を代入
+	iCompAngle = target + mNowRAxis;
+	//目標本体角　－　現在本体角　＝　誤差
+	iCompAngle = iCompAngle - iNowAngle;
+
+	//目標値達成確認
+	if(( TC_TOLERANCE > iCompAngle ) && ( -TC_TOLERANCE < iCompAngle )) {
+		mRAxisTurnFinish = true;//達成
+	} else {
+		mRAxisTurnFinish = false;//未達
+	}
+
+	//達成確認
 	if( mRAxisTurnFinish ) {
-		mRAxisTurnFinish = false;
+		mRAxisTurnFinish = false;//フラグリセット
 		return true;
 	}
 	return false;
@@ -80,3 +107,32 @@ BOOL TrackCompass_ohs::getRAxisTurnFinish()
 
 //マップ基軸の取得
 int32_t TrackCompass_ohs::getReferenceAxis() { return ( int32_t )mReferenceAxis; }
+
+//指定角に沿う出力角度の計算
+int8_t TrackCompass_ohs::calcFollowDegree( int32_t target )
+{
+	FLOT    fSendDegree  = 0.0F;
+	FLOT    fTargetDev   = 0.0F;
+	FLOT    fNowAngle    = 0.0F;
+	int32_t iRetDegree_  = 0;
+
+	//引数チェック
+	if(( target > RAT_TRN_MAX ) || ( target < -RAT_TRN_MAX )) { return false; }
+	
+	fNowAngle = ( FLOT )mRunningAdmin->getAngle();
+
+	//目標角の計算
+	fTargetDev = ( FLOT )( target + mNowRAxis );
+
+	//回転出力値の計算
+	fSendDegree = fTargetDev - fNowAngle;//現在地と目標値の差分
+
+	//係数付与出力
+	iRetDegree_ = ( int32_t )( fSendDegree * RA_PK );
+
+	//指示値範囲チェック
+	if( iRetDegree_ < -SND_TRN_MAX ) { iRetDegree_ = -SND_TRN_MAX; }
+	else if( iRetDegree_ > SND_TRN_MAX ) { iRetDegree_ = SND_TRN_MAX; }
+	
+	return ( int8_t )iRetDegree_;
+}

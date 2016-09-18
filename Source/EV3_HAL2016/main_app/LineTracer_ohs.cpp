@@ -39,7 +39,7 @@ void LineTracer_ohs::postLineTraceConduct( BOOL rapid_mode ) {
  */
 void LineTracer_ohs::postLineTraceStop() {
     mLineTraceGo = false;
-    mRunLineCalculator->setParametersInit();
+    // mRunLineCalculator->setParametersInit();
     return;
 }
 

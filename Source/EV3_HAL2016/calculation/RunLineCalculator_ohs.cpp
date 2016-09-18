@@ -9,37 +9,9 @@
 RunLineCalculator_ohs::RunLineCalculator_ohs()
 {
     mInitF = false;
-    setParametersInit();
-}
-
-/**
- * デストラクタ
- */
-RunLineCalculator_ohs::~RunLineCalculator_ohs() {
-}
-
-//パラメータの初期化
-void RunLineCalculator_ohs::setParametersInit()
-{
     mSpeed  = 0;
     mDeg    = 0;
     mOffsetRef = OFFSET_REF;
-
-    mPValue[SPEED_ID] = 0;
-    mIValue[SPEED_ID] = 0;
-    mDValue[SPEED_ID] = 0;
-
-    mPValue[DEGRE_ID] = 0;
-    mIValue[DEGRE_ID] = 0;
-    mDValue[DEGRE_ID] = 0;
-
-    mPValue[SPEED_ID_S] = 0;
-    mIValue[SPEED_ID_S] = 0;
-    mDValue[SPEED_ID_S] = 0;
-
-    mPValue[DEGRE_ID_S] = 0;
-    mIValue[DEGRE_ID_S] = 0;
-    mDValue[DEGRE_ID_S] = 0;
 
     memset( mPidGainF, 0, sizeof( mPidGainF ));
 
@@ -64,6 +36,34 @@ void RunLineCalculator_ohs::setParametersInit()
     mKP[DEGRE_ID_S] = K_P_DEG_S;
     mKI[DEGRE_ID_S] = K_I_DEG_S;
     mKD[DEGRE_ID_S] = K_D_DEG_S;
+
+    setParametersInit();
+}
+
+/**
+ * デストラクタ
+ */
+RunLineCalculator_ohs::~RunLineCalculator_ohs() {
+}
+
+//パラメータの初期化
+void RunLineCalculator_ohs::setParametersInit()
+{
+    mPValue[SPEED_ID] = 0.0F;
+    mIValue[SPEED_ID] = 0.0F;
+    mDValue[SPEED_ID] = 0.0F;
+
+    mPValue[DEGRE_ID] = 0.0F;
+    mIValue[DEGRE_ID] = 0.0F;
+    mDValue[DEGRE_ID] = 0.0F;
+
+    mPValue[SPEED_ID_S] = 0.0F;
+    mIValue[SPEED_ID_S] = 0.0F;
+    mDValue[SPEED_ID_S] = 0.0F;
+
+    mPValue[DEGRE_ID_S] = 0.0F;
+    mIValue[DEGRE_ID_S] = 0.0F;
+    mDValue[DEGRE_ID_S] = 0.0F;
 
     mInitF = true;
 }

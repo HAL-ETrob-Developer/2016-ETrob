@@ -17,7 +17,7 @@
 /* 閾値 */
 #define	THRESHOLD_STABILITY		(    9 )	/* 安定 */
 #define	THRESHOLD_UNSTABILITY	(   40 )	/* 不安定 */
-#define	THRESHOLD_FALLING		(  150 )	/* 転倒 */
+#define	THRESHOLD_FALLING		(  200 )	/* 転倒 */
 
 class GyroAdmin_ohs
 {

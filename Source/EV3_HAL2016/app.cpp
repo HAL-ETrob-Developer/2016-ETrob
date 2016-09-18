@@ -302,7 +302,7 @@ void bt_task(intptr_t unused)
                 goto EXIT;
                 break;
 
-            case 'x':
+            case 'X':
                 gScenarioConductor->setScenario( SCENE_X );
                 break;
             case 'z':
@@ -372,8 +372,13 @@ void bt_task(intptr_t unused)
 
         fprintf( gBtHandle,"Scenario[%3d]\r\n",gScenarioConductor->getID());
         fprintf( gBtHandle,"Pattern [%3d]\r\n",gPatternSequencer->getID());
-        fprintf( gBtHandle,"Mileage [%d]\r\n",(int)gRunningAdmin->getMileage());
-        fprintf( gBtHandle,"Degree  [%d]\r\n",(int)gRunningAdmin->getAngle());
+        fprintf( gBtHandle,"Mileage [%d]\r\n",(int)gEvStateAdmin->getMileage());
+        fprintf( gBtHandle,"Angle   [%d]\r\n",(int)gEvStateAdmin->getBodyAngle());
+        fprintf( gBtHandle,"TailDeg [%d]\r\n",(int)gEvStateAdmin->getTailAngle());
+        fprintf( gBtHandle,"Color   [%d]\r\n",(int)gEvStateAdmin->getColorSensorState());
+        fprintf( gBtHandle,"Balance [%d]\r\n",(int)gEvStateAdmin->getBalanceState());
+        // fprintf( gBtHandle,"Mileage [%d]\r\n",(int)gRunningAdmin->getMileage());
+        // fprintf( gBtHandle,"Degree  [%d]\r\n",(int)gRunningAdmin->getAngle());
         fprintf( gBtHandle,"Battery [%d]\r\n",(int)ev3_battery_voltage_mV());
         
         bt_cmd = 0;//リセット

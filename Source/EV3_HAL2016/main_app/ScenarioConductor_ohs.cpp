@@ -3,7 +3,7 @@
 
 #include "ScenarioConductor_ohs.h"
 
-// extern FILE* gBtHandle;//デバッグ用
+extern FILE* gBtHandle;//デバッグ用
 
 /**
  * コンストラクタ
@@ -87,8 +87,17 @@ BOOL ScenarioConductor_ohs::execScenario() {
 			case TRACKCOMPASS_CHECK:				//方位想定回転＠原位置セット
 				mTrackCompass->setReferenceAxis();
 				break;
-			case TRACKCOMPASS_ACT:					//方位想定回転＠回転
-				mTrackCompass->callRAxisTurn( mScenario[mScenarioID].event_value );
+			case TRACKCOMPASS_TRUN:					//方位想定回転＠回転
+				mLineTracer->postLineTraceStop();//ライントレーサに終了通知を渡す
+				mTrackCompass->callRAxisTurn(( int32_t )( mScenario[mScenarioID].event_value ));
+				break;
+			case TRACKCOMPASS_MOVEB:					//方位想定前後進＠倒立
+				mLineTracer->postLineTraceStop();//ライントレーサに終了通知を渡す
+				mTrackCompass->callRAxisMove(( int32_t )( mScenario[mScenarioID].event_value ), true );
+				break;
+			case TRACKCOMPASS_MOVE:					//方位想定前後進＠支え有り
+				mLineTracer->postLineTraceStop();//ライントレーサに終了通知を渡す
+				mTrackCompass->callRAxisMove(( int32_t )( mScenario[mScenarioID].event_value ), false );
 				break;
 			default:
 				break;
@@ -106,11 +115,15 @@ BOOL ScenarioConductor_ohs::execScenario() {
 
 	//達成フラグのチェック
 	if( nextEventF == true ) { 
-		//シナリオ更新(異常値返却ならば終了)
-		if( setScenarioUpDate() == false ) { return false; }
 #ifdef TRANSITION_SOUND
         ev3_speaker_play_tone( NOTE_B6, 80 );
+
+        fprintf( gBtHandle,"ID      [%d]\r\n",(int)getID());
+        fprintf( gBtHandle,"Mileage [%d]\r\n",(int)mEvStateAdmin->getMileage());
+        fprintf( gBtHandle,"Angle   [%d]\r\n",(int)mEvStateAdmin->getBodyAngle());
 #endif
+		//シナリオ更新(異常値返却ならば終了)
+		if( setScenarioUpDate() == false ) { return false; }
 	}
 
 	//正常終了
@@ -223,7 +236,7 @@ bool ScenarioConductor_ohs::checkJump() {
 
 /* 方位指定回転達成確認 */
 bool ScenarioConductor_ohs::checkRAxisTurn() {
-	return ( bool )mTrackCompass->getRAxisTurnFinish();
+	return ( bool )mTrackCompass->getRAxisTurnFinish( mScenario[mScenarioID].event_value );
 }
 
 // ../workspace/EV3_HAL2016/main_app/ScenarioConductor_ohs.cpp:33:24: error: cannot convert 'ScenarioConductor_ohs::checkSlip' from type 'bool (ScenarioConductor_ohs::)(int)' to type 'bool (ScenarioConductor_ohs::*)()'

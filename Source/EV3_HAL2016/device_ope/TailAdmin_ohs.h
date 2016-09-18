@@ -6,8 +6,8 @@
 #include "Motor.h"
 
 #define TIL_P_GAIN		( 0.6F)
-#define TIL_I_GAIN		( 0.6F)
-#define TIL_D_GAIN		( 10.0F)
+#define TIL_I_GAIN		( 1.1F)
+#define TIL_D_GAIN		( 8.0F)
 
 #define MAX_TARGET	(  110)
 #define MIN_TARGET	(  -10)
