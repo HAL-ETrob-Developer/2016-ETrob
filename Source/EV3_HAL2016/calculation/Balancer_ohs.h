@@ -1,5 +1,5 @@
 /* ---------------------------------------------------------------------------------------------- */
-// Balancer_ohs.cpp
+// Balancer_ohs.h
 // EV3_HAL2016\計算機能\バランサー
 // EV3倒立振子制御を行う。大会提供API「balancer.c」を用いる。
 /* ---------------------------------------------------------------------------------------------- */
@@ -47,11 +47,11 @@ public:
     int8_t isRightPWM( void );// 右
     int8_t isLeftPWM( void ); // 左
     /* テスト用メソッド(非公開) */
-    void  setOffSet( FLOT set_offset );
+    void  setOffSet( FLOT set_offset );// ジャイロ値オフセット強制変更
 
     /* プライベート ----------------------------------------------------------------------------- */
 private:
-    GyroAdmin_ohs* mGyroAdmin;
+    GyroAdmin_ohs* mGyroAdmin;// ジャイロセンサ値取得用
     FLOT   mRdOffSet;   // balancer.c初期化後起動用右回転値オフセット
     FLOT   mLdOffSet;   // balancer.c初期化後起動用左回転値オフセット
     FLOT   mGyOffSet;   // 高速走行用ジャイロ値補完用オフセット
@@ -60,7 +60,7 @@ private:
     BOOL   mInit;       // 初期化完了フラグ
 };
 
-#endif/* MAINAPP_BALANCER_OHS_H_ */
+#endif/* CALCULATION_BALANCER_OHS_H_ */
 /* ---------------------------------------------------------------------------------------------- */
 /*                          Copyright HAL College of Technology & Design                          */
 /* ---------------------------------------------------------------------------------------------- */
