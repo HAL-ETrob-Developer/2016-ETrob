@@ -1,25 +1,45 @@
-#include "hal_ev3_std.h"
-#include <string.h>
+/* ---------------------------------------------------------------------------------------------- */
+// RunLineCalculator_ohs.cpp
+// EV3_HAL2016\計算機能\走行線計算器
+// ライントレース時の走行線計算を行う。PID制御を用いる。
+/* ---------------------------------------------------------------------------------------------- */
+// 番号    日付        氏名        更新履歴
+/* ---------------------------------------------------------------------------------------------- */
+// RL0000  2016/07/17  大塚　信晶  新規作成
+// RL0001  2016/07/23  大塚　信晶  ライントレース新機能実装＠光量直接使用＋シンプルライントレース
+// RL0002  2016/07/25  大塚　信晶  ゲイン値外部編集機能の実装
+// RL0003  2016/09/16  大塚　信晶  バグフィックス
+/* ---------------------------------------------------------------------------------------------- */
 
-#include "RunLineCalculator_ohs.h"
+/* ---------------------------------------------------------------------------------------------- */
+// includeファイル
+/* ---------------------------------------------------------------------------------------------- */
+#include "hal_ev3_std.h"            // HAL_EV3大会用　標準ヘッダ
+#include <string.h>                 // memcpy使用に必要
+#include "RunLineCalculator_ohs.h"  // 走行線計算器
 
-/**
- * コンストラクタ
- */
+/* ---------------------------------------------------------------------------------------------- */
+// クラス名     ：Balancer_ohs
+// 役割名       ：走行線計算器
+// 役割概要     ：ライントレースを行う為に光学センサ値より最適な走行速度・角度を算出する。
+//                PID制御を用い、各ゲイン値は設定ファイルにより管理される。
+// 作成日       ：2016/07/17  大塚　信晶＠新規作成
+/* ---------------------------------------------------------------------------------------------- */
 RunLineCalculator_ohs::RunLineCalculator_ohs()
 {
-    mInitF = false;
-    mSpeed  = 0;
-    mDeg    = 0;
-    mOffsetRef = OFFSET_REF;
+    mInitF = false;// パラメータ初期化状態フラグ＠未初期化
+    mSpeed  = 0;// 走行速度計算結果のクリア
+    mDeg    = 0;// 走行角度計算結果のクリア
+    mOffsetRef = OFFSET_REF;// 光学センサ値オフセット
 
-    memset( mPidGainF, 0, sizeof( mPidGainF ));
+    memset( mPidGainF, 0, sizeof( mPidGainF ));// PID制御設定ファイル取得用メンバのクリア
 
-    mTergetSoeed[NORMAL_ID] = TERGET_SPD;
-    mTergetSoeed[SCRCH__ID] = TERGET_SPD_S;
+    /* 角ゲイン値初期化＠for文とかでも良いけどこっちの方が明示的かなって */
+    mTergetSpeed[NORMAL_ID] = TERGET_SPD;
+    mTergetSpeed[SECOND_ID] = TERGET_SPD_S;
 
     mTergetRefLV[NORMAL_ID] = TERGET_LV;
-    mTergetRefLV[SCRCH__ID] = TERGET_LV_S;
+    mTergetRefLV[SECOND_ID] = TERGET_LV_S;
 
     mKP[SPEED_ID] = K_P_SPD;
     mKI[SPEED_ID] = K_I_SPD;
@@ -37,18 +57,32 @@ RunLineCalculator_ohs::RunLineCalculator_ohs()
     mKI[DEGRE_ID_S] = K_I_DEG_S;
     mKD[DEGRE_ID_S] = K_D_DEG_S;
 
-    setParametersInit();
+    setParametersInit();// パラメータのオールクリア
 }
 
-/**
- * デストラクタ
- */
+/* ---------------------------------------------------------------------------------------------- */
+// メソッド名   ：~RunLineCalculator_ohs
+// 機能名       ：デストラクタ
+// 機能概要     ：オブジェクトの破棄
+// 作成日       ：2016/07/17  大塚　信晶＠新規作成
+/* ---------------------------------------------------------------------------------------------- */
 RunLineCalculator_ohs::~RunLineCalculator_ohs() {
 }
 
-//パラメータの初期化
+/* パブリック ----------------------------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------------------------------------- */
+// メソッド名   ：setParametersInit
+// 機能名       ：パラメータオールリセット
+// 機能概要     ：フィードバック制御で保持中の全パラメータ値をゼロクリアする
+// 作成日       ：2016/07/25  大塚　信晶＠新規作成
+/* ---------------------------------------------------------------------------------------------- */
 void RunLineCalculator_ohs::setParametersInit()
 {
+    /* 光学センサ値オフセット */
+    mOffsetRef = OFFSET_REF;
+    
+    /* 通常 */
     mPValue[SPEED_ID] = 0.0F;
     mIValue[SPEED_ID] = 0.0F;
     mDValue[SPEED_ID] = 0.0F;
@@ -57,6 +91,7 @@ void RunLineCalculator_ohs::setParametersInit()
     mIValue[DEGRE_ID] = 0.0F;
     mDValue[DEGRE_ID] = 0.0F;
 
+    /* 特殊 */
     mPValue[SPEED_ID_S] = 0.0F;
     mIValue[SPEED_ID_S] = 0.0F;
     mDValue[SPEED_ID_S] = 0.0F;
@@ -65,134 +100,322 @@ void RunLineCalculator_ohs::setParametersInit()
     mIValue[DEGRE_ID_S] = 0.0F;
     mDValue[DEGRE_ID_S] = 0.0F;
 
-    mInitF = true;
-}
-
-/**
- * モータ出力値計算
- */
-BOOL RunLineCalculator_ohs::calcRunLine( BOOL speed_trac, SSHT reflection_lv, int8_t* p_speed, int8_t* p_deg )
-{
-    BOOL CenterF = false;
-    reflection_lv += mOffsetRef;
-    
-    if( speed_trac ) { calcRunLineSpeedLine( reflection_lv, p_speed, p_deg); }
-    else{ calcRunLineUseRefLv( reflection_lv, p_speed, p_deg); }
-
-    //中央値ならtrue
-	if((int)mDeg == 0 ) { CenterF = true; }
-
-    return CenterF;
-}
-
-
-//ライン計算通常PID制御
-void RunLineCalculator_ohs::calcRunLineUseRefLv( SSHT reflection_lv, int8_t* p_speed, int8_t* p_deg )
-{
-    static FLOT fOldDevPoint  = 0;
-    static FLOT fOldEV3Deg    = 0;
-           char cSpeedRev  = 1;
-           FLOT fCvtRefLv  = 0.0F;
-           FLOT fTempSpeed = 0.0F;
-           FLOT fSpeedOfS  = 0.0F;
-           FLOT fTempDeg   = 0.0F;
-
-    //イニットフラグのクリア
-    mInitF = false;
-
-    //走行パラメータの取得*意味は無い
-    mSpeed = *p_speed;
-    mDeg   = *p_deg;
-    
-    /* 反射値の取得 */
-    fCvtRefLv = ( FLOT )reflection_lv;
-    
-    /* 走行角度計算 ----------------------------------------------------------------------------- */
-    
-    /* 比較値計算 */
-    mPValue[DEGRE_ID] = mTergetRefLV[NORMAL_ID] - fCvtRefLv;
-    /* 微分値計算 */
-    mDValue[DEGRE_ID] = mPValue[DEGRE_ID] - fOldDevPoint;
-    /* 積分値計算 */
-    mIValue[DEGRE_ID] += mDValue[DEGRE_ID];
-
-    /* 走行角度計算 */
-    fTempDeg = ( mKP[DEGRE_ID] * mPValue[DEGRE_ID] ) + 
-                ( mKI[DEGRE_ID] * mIValue[DEGRE_ID] ) + 
-                ( mKD[DEGRE_ID] * mDValue[DEGRE_ID] );
-    
-    //結果の変換
-    mDeg = ( int8_t )fTempDeg;
-
-    //値の保存
-    fOldDevPoint = mPValue[DEGRE_ID];
-
-    /* 走行速度計算 ----------------------------------------------------------------------------- */
-
-    /* 比較値計算 */
-    mPValue[SPEED_ID] = TERGET_DEG - fTempDeg;
-    /* 微分値計算 */
-    mDValue[SPEED_ID] = mPValue[SPEED_ID] - fOldEV3Deg;
-    /* 積分値計算 */
-    mIValue[SPEED_ID] += mDValue[SPEED_ID];
-
-    fSpeedOfS = ( mKP[SPEED_ID] * mPValue[SPEED_ID] ) + 
-                ( mKI[SPEED_ID] * mIValue[SPEED_ID] ) + 
-                ( mKD[SPEED_ID] * mDValue[SPEED_ID] );
-    if( fSpeedOfS < 0.0F ) { cSpeedRev = -1; }//符号反転用
-    fTempSpeed = mTergetSoeed[NORMAL_ID] - ( fSpeedOfS * cSpeedRev );
-
-    if( T_MIN_SPD > fTempSpeed ){ fTempSpeed = T_MIN_SPD; }
-
-    mSpeed = ( int8_t )fTempSpeed;
-
-    //値の保存
-    fOldEV3Deg   = mPValue[SPEED_ID];
-    
-    //走行パラメータの返却
-    *p_speed = mSpeed;
-    *p_deg   = mDeg;
+    mInitF = true;// 初期化済み
 
     return;
 }
-//ライン探索用
-void RunLineCalculator_ohs::calcRunLineSpeedLine( SSHT reflection_lv, int8_t* p_speed, int8_t* p_deg ) 
-{
-    static FLOT fOldDevPoint  = 0.0F;
-    static FLOT fOldEV3Deg    = 0.0F;
-           char cSpeedRev  = 1;
-           FLOT fCvtRefLv  = 0.0F;
-           FLOT fTempSpeed = 0.0F;
-           FLOT fSpeedOfS  = 0.0F;
-           FLOT fTempDeg   = 0.0F;
 
-    //イニットフラグのクリア
+/* ---------------------------------------------------------------------------------------------- */
+// メソッド名   ：calcRunLine
+// 機能名       ：走行線計算
+// 機能概要     ：ライントレースに最適な走行速度・角度を算出する。
+//                通常と特殊の２モードを持つ。各使用用途は設定ファイルによる。
+// 作成日       ：2016/07/23  大塚　信晶＠新規作成
+/* 引数 ----------------------------------------------------------------------------------------- */
+// [I N]BOOL speed_trac    : 計算方法の選択＠true=特殊/false=通常（現状特殊は高速トレース用）
+// [I N]SSHT reflection_lv : 光学センサ取得値
+// [I/O]int8_t* p_speed    : 計算結果出力＠走行速度
+// [I/O]int8_t* p_deg      : 計算結果出力＠走行角度
+/* 戻り値 [BOOL] -------------------------------------------------------------------------------- */
+// true  : 正常終了
+// false : 異常終了
+/* ---------------------------------------------------------------------------------------------- */
+BOOL RunLineCalculator_ohs::calcRunLine( BOOL speed_trac, SSHT reflection_lv, int8_t* p_speed, int8_t* p_deg )
+{
+    /* ------------------------------------------------------------------------------------------ */
+    // 初期処理
+    /* ------------------------------------------------------------------------------------------ */
+    /* 変数宣言 --------------------------------------------------------------------------------- */
+    BOOL CenterF = false;// センター走行中フラグ
+
+    /* 引数取得 --------------------------------------------------------------------------------- */
+    reflection_lv += mOffsetRef;// 光学センサ値オフセット
+
+    /* ------------------------------------------------------------------------------------------ */
+    // ライントレース計算
+    /* ------------------------------------------------------------------------------------------ */
+    if( speed_trac ) { calcRunLineSecondLine( reflection_lv, p_speed, p_deg);/* 特殊仕様 */ }
+    else{ calcRunLineUseRefLv( reflection_lv, p_speed, p_deg);/* 通常仕様 */ }
+
+    //中央値ならtrue＠いらない処理
+	if((int)mDeg == 0 ) { CenterF = true; }
+
+    return CenterF;// 引数チェックよろ
+}
+
+/* ---------------------------------------------------------------------------------------------- */
+// メソッド名   ：getSpeed
+// 機能名       ：計算結果出力＠走行速度
+// 機能概要     ：calcRunLine計算結果を出力する
+// 作成日       ：2016/07/23  大塚　信晶＠新規作成
+/* 戻り値 [int8_t] ------------------------------------------------------------------------------ */
+// 最低走行速度 ～ 目標走行速度 : 走行速度計算結果
+/* ---------------------------------------------------------------------------------------------- */
+int8_t RunLineCalculator_ohs::getSpeed() { return mSpeed; }
+
+/* ---------------------------------------------------------------------------------------------- */
+// メソッド名   ：getSpeed
+// 機能名       ：計算結果出力＠走行角度
+// 機能概要     ：calcRunLine計算結果を出力する
+// 作成日       ：2016/07/23  大塚　信晶＠新規作成
+/* 戻り値 [int8_t] ------------------------------------------------------------------------------ */
+// 範囲制限なし : 走行角度計算結果
+/* ---------------------------------------------------------------------------------------------- */
+int8_t RunLineCalculator_ohs::getDeg() { return mDeg; }
+
+/* ---------------------------------------------------------------------------------------------- */
+// メソッド名   ：setGain
+// 機能名       ：PID制御設定ファイルの取得
+// 機能概要     ：PID制御に必要な各定数を設定する。/目標速度/目標光量/PID各ゲイン値
+// 作成日       ：2016/07/23  大塚　信晶＠新規作成
+/* 引数 ----------------------------------------------------------------------------------------- */
+// [I N]PID_SETTING* p_set_file : PID制御設定ファイル。hal_ev3_std.hにて宣言
+/* ---------------------------------------------------------------------------------------------- */
+void RunLineCalculator_ohs::setGain( PID_SETTING* p_set_file )
+{
+    /* ぬるぽチェック */
+    if( p_set_file == NULL ) { return; }
+
+    /* PID制御設定ファイル構造体の取得 */
+    memcpy( &mPidGainF[NORMAL_ID], p_set_file, sizeof( mPidGainF ));
+
+    /* 取得した設定ファイルの値を各メンバに登録 ------------------------------------------------- */
+    // ライン計算通常PID制御
+    mTergetSpeed[NORMAL_ID] = ( p_set_file + NORMAL_ID )->fTerSpeed;
+    mTergetRefLV[NORMAL_ID] = ( p_set_file + NORMAL_ID )->fTerRefLv;
+    mKP[SPEED_ID]   = ( p_set_file + NORMAL_ID )->fSpdP;
+    mKI[SPEED_ID]   = ( p_set_file + NORMAL_ID )->fSpdI;
+    mKD[SPEED_ID]   = ( p_set_file + NORMAL_ID )->fSpdD;
+    mKP[DEGRE_ID]   = ( p_set_file + NORMAL_ID )->fDegP;
+    mKI[DEGRE_ID]   = ( p_set_file + NORMAL_ID )->fDegI;
+    mKD[DEGRE_ID]   = ( p_set_file + NORMAL_ID )->fDegD;
+
+    // 特殊
+    mTergetSpeed[SECOND_ID] = ( p_set_file + SECOND_ID )->fTerSpeed;
+    mTergetRefLV[SECOND_ID] = ( p_set_file + SECOND_ID )->fTerRefLv;
+    mKP[SPEED_ID_S] = ( p_set_file + SECOND_ID )->fSpdP;
+    mKI[SPEED_ID_S] = ( p_set_file + SECOND_ID )->fSpdI;
+    mKD[SPEED_ID_S] = ( p_set_file + SECOND_ID )->fSpdD;
+    mKP[DEGRE_ID_S] = ( p_set_file + SECOND_ID )->fDegP;
+    mKI[DEGRE_ID_S] = ( p_set_file + SECOND_ID )->fDegI;
+    mKD[DEGRE_ID_S] = ( p_set_file + SECOND_ID )->fDegD;
+        
+    return;
+}
+
+/* ---------------------------------------------------------------------------------------------- */
+// メソッド名   ：isP
+// 機能名       ：現比例制御値の取得
+// 機能概要     ：フィードバック制御で使用中の比例制御値の値を取得する＠テスト用非公開
+// 作成日       ：2016/07/23  大塚　信晶＠新規作成
+/* 戻り値 [int8_t] ------------------------------------------------------------------------------ */
+// 制限なし : 比例制御値
+/* ---------------------------------------------------------------------------------------------- */
+FLOT RunLineCalculator_ohs::isP(void) { return mPValue[0]; }
+
+/* ---------------------------------------------------------------------------------------------- */
+// メソッド名   ：isI
+// 機能名       ：現積分御値の取得
+// 機能概要     ：フィードバック制御で使用中の積分制御値の値を取得する＠テスト用非公開
+// 作成日       ：2016/07/23  大塚　信晶＠新規作成
+/* 戻り値 [int8_t] ------------------------------------------------------------------------------ */
+// 制限なし : 積分制御値
+/* ---------------------------------------------------------------------------------------------- */
+FLOT RunLineCalculator_ohs::isI(void) { return mIValue[0]; }
+
+/* ---------------------------------------------------------------------------------------------- */
+// メソッド名   ：isD
+// 機能名       ：現微分制御値の取得
+// 機能概要     ：フィードバック制御で使用中の微分制御値の値を取得する＠テスト用非公開
+// 作成日       ：2016/07/23  大塚　信晶＠新規作成
+/* 戻り値 [int8_t] ------------------------------------------------------------------------------ */
+// 制限なし : 微分制御値
+/* ---------------------------------------------------------------------------------------------- */
+FLOT RunLineCalculator_ohs::isD(void) { return mDValue[0]; }
+
+/* ---------------------------------------------------------------------------------------------- */
+// メソッド名   ：isGain
+// 機能名       ：現PID制御設定ファイルの取得
+// 機能概要     ：フィードバック制御で使用中のPID制御設定を取得する＠テスト用非公開
+// 作成日       ：2016/07/23  大塚　信晶＠新規作成
+/* 戻り値 [PID_SETTING*] ------------------------------------------------------------------------ */
+// 構造体ポインター : 現PID制御設定ファイル。hal_ev3_std.hにて宣言
+/* ---------------------------------------------------------------------------------------------- */
+PID_SETTING* RunLineCalculator_ohs::isGain( void ) { return ( mPidGainF ); }
+
+
+/* ---------------------------------------------------------------------------------------------- */
+// メソッド名   ：setOffsetREf
+// 機能名       ：光学センサ値のオフセット設定
+// 機能概要     ：光学センサにオフセットを付けることで走行線の位置をずらす＠テスト用非公開
+// 作成日       ：2016/07/23  大塚　信晶＠新規作成
+/* 引数 ----------------------------------------------------------------------------------------- */
+// [I N]int16_t RefOffset : 光学センサオフセット値
+/* 戻り値 [BOOL] -------------------------------------------------------------------------------- */
+// true  : 正常終了
+// false : 異常終了
+/* ---------------------------------------------------------------------------------------------- */
+BOOL RunLineCalculator_ohs::setOffsetREf( int16_t RefOffset )
+{
+    if(( RefOffset > 100 ) || ( RefOffset < -100 )) { return false;/* 引数異常 */ }
+    mOffsetRef = RefOffset;// オフセット登録（setParametersInitメソッドクリア対象）
+    return true;// 正常終了
+}
+
+/* パブリック ----------------------------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------------------------------------- */
+// メソッド名   ：calcRunLineUseRefLv
+// 機能名       ：通常走行線計算
+// 機能概要     ：ライントレースに最適な走行速度・角度を算出する。基本的な計算
+// 作成日       ：2016/07/23  大塚　信晶＠新規作成
+/* 引数 ----------------------------------------------------------------------------------------- */
+// [I N]SSHT reflection_lv : 光学センサ取得値
+// [I/O]int8_t* p_speed    : 計算結果出力＠走行速度
+// [I/O]int8_t* p_deg      : 計算結果出力＠走行角度
+/* ---------------------------------------------------------------------------------------------- */
+void RunLineCalculator_ohs::calcRunLineUseRefLv( SSHT reflection_lv, int8_t* p_speed, int8_t* p_deg )
+{
+    /* ------------------------------------------------------------------------------------------ */
+    // 初期処理
+    /* ------------------------------------------------------------------------------------------ */
+    /* 変数宣言 --------------------------------------------------------------------------------- */
+    static FLOT fOldDevPoint  = 0;      // 微分フィードバック用保持＠角度用
+    static FLOT fOldEV3Deg    = 0;      // 微分フィードバック用保持＠速度用
+    /// static FLOT fOldIgrDeg    = 0;      // 微分フィードバック用保持＠角度用
+    /// static FLOT fOldIgrSpd    = 0;      // 微分フィードバック用保持＠速度用
+           char cSpeedRev  = 1;         // 符号反転計算用
+           FLOT fCvtRefLv  = 0.0F;      // 光学センサ値float変換用
+           FLOT fTempSpeed = 0.0F;      // 走行速度計算結果一次保存
+           FLOT fTempDeg   = 0.0F;      // 走行角度計算結果一次保存
+           FLOT fSpeedOfS  = 0.0F;      // 走行速度算出用目標偏差
+
+    /* イニットフラグのクリア */
     mInitF = false;
 
-    //走行パラメータの取得*意味は無い
+    /* 走行パラメータの取得*意味は無い */
     mSpeed = *p_speed;
     mDeg   = *p_deg;
     
-    /* 反射値の取得 */
+    /* 光学センサ値の取得 */
     fCvtRefLv = ( FLOT )reflection_lv;
+
+    /* ------------------------------------------------------------------------------------------ */
+    // PIDフィードバック計算
+    /* ------------------------------------------------------------------------------------------ */
+    /* 走行角度計算 ----------------------------------------------------------------------------- */
+    /* 比較値計算＠P = 目標 - 現在地 */
+    mPValue[DEGRE_ID] = mTergetRefLV[NORMAL_ID] - fCvtRefLv;
+    /* 微分値計算＠D = 現在積分値 - 過去積分値 */
+    /// mDValue[DEGRE_ID] = mIValue[DEGRE_ID] - fOldDevPoint;
+    mDValue[DEGRE_ID] = mPValue[DEGRE_ID] - fOldDevPoint;// 注意！この微分計算は正法じゃないです
+    /* 積分値計算＠I += 目標 - 現在地 */
+    /// mIValue[DEGRE_ID] += mPValue[DEGRE_ID];
+    mIValue[DEGRE_ID] += mDValue[DEGRE_ID];// 注意！この積分計算は正法じゃないです
+
+    /* C = P * Kp + I * Ki + D * Kd */
+    fTempDeg = ( mKP[DEGRE_ID] * mPValue[DEGRE_ID] ) + 
+               ( mKI[DEGRE_ID] * mIValue[DEGRE_ID] ) + 
+               ( mKD[DEGRE_ID] * mDValue[DEGRE_ID] );
     
+    // 計算結果の変換
+    mDeg = ( int8_t )fTempDeg;
+
+    // 値の保存
+    ///  fOldIgrDeg = mIValue[DEGRE_ID];
+    fOldDevPoint = mPValue[DEGRE_ID];// 注意！この微分計算は正法じゃないです
+
+    /* 走行速度計算 ----------------------------------------------------------------------------- */
+    /* 比較値計算 */
+    mPValue[SPEED_ID] = TERGET_DEG - fTempDeg;
+    /* 微分値計算 */
+    /// mDValue[SPEED_ID] = mIValue[SPEED_ID] - fOldIgrSpd;
+    mDValue[SPEED_ID] = mPValue[SPEED_ID] - fOldEV3Deg;
+    /* 積分値計算 */
+    /// mIValue[SPEED_ID] += mPValue[SPEED_ID];
+    mIValue[SPEED_ID] += mDValue[SPEED_ID];
+
+    /* C = P * Kp + I * Ki + D * Kd */
+    fSpeedOfS = ( mKP[SPEED_ID] * mPValue[SPEED_ID] ) + 
+                ( mKI[SPEED_ID] * mIValue[SPEED_ID] ) + 
+                ( mKD[SPEED_ID] * mDValue[SPEED_ID] );
+
+    /* 符号反転計算（ビット演算めんどいのでこれで） */
+    if( fSpeedOfS < 0.0F ) { cSpeedRev = -1; }// マイナス値判別
+    fTempSpeed = mTergetSpeed[NORMAL_ID] - ( fSpeedOfS * cSpeedRev );// 正数化して目標値より除算
+
+    if( T_MIN_SPD > fTempSpeed ){ fTempSpeed = T_MIN_SPD; }// 最低速度制限
+
+    //計算結果の変換
+    mSpeed = ( int8_t )fTempSpeed;
+
+    // 値の保存
+    /// fOldIgrSpd = mIValue[SPEED_ID];
+    fOldEV3Deg = mPValue[SPEED_ID];
+    
+    // 走行パラメータの返却
+    *p_speed = mSpeed;
+    *p_deg   = mDeg;
+
+    return;// 引数チェックつけてね♡
+}
+
+/* ---------------------------------------------------------------------------------------------- */
+// メソッド名   ：calcRunLineSecondLine
+// 機能名       ：特殊走行線計算
+// 機能概要     ：ライントレースに最適な走行速度・角度を算出する。メソッドの分割
+// 作成日       ：2016/07/23  大塚　信晶＠新規作成
+/* 引数 ----------------------------------------------------------------------------------------- */
+// [I N]SSHT reflection_lv : 光学センサ取得値
+// [I/O]int8_t* p_speed    : 計算結果出力＠走行速度
+// [I/O]int8_t* p_deg      : 計算結果出力＠走行角度
+/* ---------------------------------------------------------------------------------------------- */
+void RunLineCalculator_ohs::calcRunLineSecondLine( SSHT reflection_lv, int8_t* p_speed, int8_t* p_deg ) 
+{
+    /* ------------------------------------------------------------------------------------------ */
+    // 初期処理
+    /* ------------------------------------------------------------------------------------------ */
+    /* 変数宣言 --------------------------------------------------------------------------------- */
+    static FLOT fOldDevPoint  = 0;      // 微分フィードバック用保持＠角度用
+    static FLOT fOldEV3Deg    = 0;      // 微分フィードバック用保持＠速度用
+    /// static FLOT fOldIgrDeg    = 0;      // 微分フィードバック用保持＠角度用
+    /// static FLOT fOldIgrSpd    = 0;      // 微分フィードバック用保持＠速度用
+           char cSpeedRev  = 1;         // 符号反転計算用
+           FLOT fCvtRefLv  = 0.0F;      // 光学センサ値float変換用
+           FLOT fTempSpeed = 0.0F;      // 走行速度計算結果一次保存
+           FLOT fTempDeg   = 0.0F;      // 走行角度計算結果一次保存
+           FLOT fSpeedOfS  = 0.0F;      // 走行速度算出用目標偏差
+
+    /* イニットフラグのクリア */
+    mInitF = false;
+
+    /* 走行パラメータの取得*意味は無い */
+    mSpeed = *p_speed;
+    mDeg   = *p_deg;
+    
+    /* 光学センサ値の取得 */
+    fCvtRefLv = ( FLOT )reflection_lv;
+
+    /* ------------------------------------------------------------------------------------------ */
+    // PIDフィードバック計算
+    /* ------------------------------------------------------------------------------------------ */
     /* 走行角度計算 ----------------------------------------------------------------------------- */
     /* 比較値計算 */
-    mPValue[DEGRE_ID_S] = mTergetRefLV[SCRCH__ID] - fCvtRefLv;
+    mPValue[DEGRE_ID_S] = mTergetRefLV[SECOND_ID] - fCvtRefLv;
     /* 微分値計算 */
     mDValue[DEGRE_ID_S] = mPValue[DEGRE_ID_S] - fOldDevPoint;
     /* 積分値計算 */
     mIValue[DEGRE_ID_S] += mDValue[DEGRE_ID_S];
 
-    /* 走行角度計算 */
+    /* C = P * Kp + I * Ki + D * Kd */
     fTempDeg = ( mKP[DEGRE_ID_S] * mPValue[DEGRE_ID_S] ) + 
                 ( mKI[DEGRE_ID_S] * mIValue[DEGRE_ID_S] ) + 
                 ( mKD[DEGRE_ID_S] * mDValue[DEGRE_ID_S] );
     
-    //結果の変換
+    // 計算結果の変換
     mDeg = ( int8_t )fTempDeg;
 
-    //値の保存
+    // 値の保存
     fOldDevPoint = mPValue[DEGRE_ID_S];
 
     /* 走行速度計算 ----------------------------------------------------------------------------- */
@@ -203,79 +426,28 @@ void RunLineCalculator_ohs::calcRunLineSpeedLine( SSHT reflection_lv, int8_t* p_
     /* 積分値計算 */
     mIValue[SPEED_ID_S] += mDValue[SPEED_ID_S];
 
+    /* C = P * Kp + I * Ki + D * Kd */
     fSpeedOfS = ( mKP[SPEED_ID_S] * mPValue[SPEED_ID_S] ) + 
                 ( mKI[SPEED_ID_S] * mIValue[SPEED_ID_S] ) + 
                 ( mKD[SPEED_ID_S] * mDValue[SPEED_ID_S] );
-    if( fSpeedOfS < 0.0F ) { cSpeedRev = -1; }//符号反転用
-    fTempSpeed = mTergetSoeed[SCRCH__ID] - ( fSpeedOfS * cSpeedRev );
 
-    if( T_MIN_SPD > fTempSpeed ){ fTempSpeed = T_MIN_SPD; }
+    /* 符号反転計算（ビット演算めんどいのでこれで） */
+    if( fSpeedOfS < 0.0F ) { cSpeedRev = -1; }// マイナス値判別
+    fTempSpeed = mTergetSpeed[SECOND_ID] - ( fSpeedOfS * cSpeedRev );// 正数化して目標値より除算
+
+    if( T_MIN_SPD > fTempSpeed ){ fTempSpeed = T_MIN_SPD; }// 最低速度制限
 
     mSpeed = ( int8_t )fTempSpeed;
 
-    //値の保存
+    // 計算結果の変換
     fOldEV3Deg   = mPValue[SPEED_ID_S];
     
-    //走行パラメータの返却
+    // 走行パラメータの返却
     *p_speed = mSpeed;
     *p_deg   = mDeg;
 
-    return;
+    return;// 引数チェックつけてね♡
 }
-
-int8_t RunLineCalculator_ohs::getDeg() { return mDeg; }
-
-FLOT RunLineCalculator_ohs::isP(void)
-{
-    return mPValue[0];
-}
-FLOT RunLineCalculator_ohs::isI(void)
-{
-    return mIValue[0];
-}
-FLOT RunLineCalculator_ohs::isD(void)
-{
-    return mDValue[0];
-}
-
-void RunLineCalculator_ohs::setGain( PID_SETTING* p_set_file )
-{
-    if( p_set_file == NULL ) { return; }
-
-    memcpy( &mPidGainF[NORMAL_ID], p_set_file, sizeof( mPidGainF ));
-
-    //ライン計算通常PID制御
-    mTergetSoeed[NORMAL_ID] = ( p_set_file + NORMAL_ID )->fTerSpeed;
-    mTergetRefLV[NORMAL_ID] = ( p_set_file + NORMAL_ID )->fTerRefLv;
-    mKP[SPEED_ID]   = ( p_set_file + NORMAL_ID )->fSpdP;
-    mKI[SPEED_ID]   = ( p_set_file + NORMAL_ID )->fSpdI;
-    mKD[SPEED_ID]   = ( p_set_file + NORMAL_ID )->fSpdD;
-    mKP[DEGRE_ID]   = ( p_set_file + NORMAL_ID )->fDegP;
-    mKI[DEGRE_ID]   = ( p_set_file + NORMAL_ID )->fDegI;
-    mKD[DEGRE_ID]   = ( p_set_file + NORMAL_ID )->fDegD;
-
-    //ライン探索用
-    mTergetSoeed[SCRCH__ID] = ( p_set_file + SCRCH__ID )->fTerSpeed;
-    mTergetRefLV[SCRCH__ID] = ( p_set_file + SCRCH__ID )->fTerRefLv;
-    mKP[SPEED_ID_S] = ( p_set_file + SCRCH__ID )->fSpdP;
-    mKI[SPEED_ID_S] = ( p_set_file + SCRCH__ID )->fSpdI;
-    mKD[SPEED_ID_S] = ( p_set_file + SCRCH__ID )->fSpdD;
-    mKP[DEGRE_ID_S] = ( p_set_file + SCRCH__ID )->fDegP;
-    mKI[DEGRE_ID_S] = ( p_set_file + SCRCH__ID )->fDegI;
-    mKD[DEGRE_ID_S] = ( p_set_file + SCRCH__ID )->fDegD;
-        
-    return;
-}
-
-PID_SETTING* RunLineCalculator_ohs::isGain( void )
-{
-    return ( mPidGainF );
-}
-
-//オフセット設定
-BOOL RunLineCalculator_ohs::setOffsetREf( int16_t RefOffset )
-{
-    if(( RefOffset > 100 ) || ( RefOffset > -100 )) { return false; }
-    mOffsetRef = RefOffset;
-    return true;
-}
+/* ---------------------------------------------------------------------------------------------- */
+/*                          Copyright HAL College of Technology & Design                          */
+/* ---------------------------------------------------------------------------------------------- */
