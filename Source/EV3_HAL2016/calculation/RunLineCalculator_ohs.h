@@ -105,50 +105,50 @@
 // 作成日       ：2016/07/17  大塚　信晶＠新規作成
 /* ---------------------------------------------------------------------------------------------- */
 class RunLineCalculator_ohs {
-public:
-    /* パブリック ------------------------------------------------------------------------------- */
-    RunLineCalculator_ohs();// コンストラクタ
-    ~RunLineCalculator_ohs();// デストラクタ
+    public:/* ------------------------------------------------------------------------ パブリック */
+        RunLineCalculator_ohs();// コンストラクタ
+        ~RunLineCalculator_ohs();// デストラクタ
 
-    BOOL calcRunLine( BOOL speed_trac, SSHT reflection_lv, int8_t* p_speed, int8_t* p_deg );// 走行線計算
-    void setParametersInit();// 現在のPID値をすべてクリアする
-    void setGain( PID_SETTING* p_set_file );// 設定ファイルの読み込み
+        BOOL calcRunLine( BOOL speed_trac, SSHT reflection_lv, int8_t* p_speed, int8_t* p_deg );// 走行線計算
+        void setParametersInit();// 現在のPID値をすべてクリアする
+        void setGain( PID_SETTING* p_set_file );// 設定ファイルの読み込み
 
-    int8_t getSpeed();// 算出走行速度の出力
-    int8_t getDeg();// 算出走行角度の出力
+        int8_t getSpeed();// 算出走行速度の出力
+        int8_t getDeg();// 算出走行角度の出力
 
-    /* テスト用メソッド(非公開) */
-    BOOL setOffsetREf( int16_t degOffset );// 取得光量オフセット
-    PID_SETTING* isGain( void );// 現在使用中の各ゲイン値の出力
-    FLOT isP( void );// 現在基本比例値の出力＠Proportional
-    FLOT isI( void );// 現在基本積分値の出力＠Integral
-    FLOT isD( void );// 現在基本微分値の出力＠Differential
+        /* テスト用メソッド(非公開) */
+        BOOL setOffsetREf( int16_t degOffset );// 取得光量オフセット
+        PID_SETTING* isGain( void );// 現在使用中の各ゲイン値の出力
+        FLOT isP( void );// 現在基本比例値の出力＠Proportional
+        FLOT isI( void );// 現在基本積分値の出力＠Integral
+        FLOT isD( void );// 現在基本微分値の出力＠Differential
 
-private:
-    /* プライベート ----------------------------------------------------------------------------- */
-    /* メソッド */
-    void calcRunLineUseRefLv( SSHT reflection_lv, int8_t* p_speed, int8_t* p_deg );// 走行線計算＠通常
-    void calcRunLineSecondLine( SSHT reflection_lv, int8_t* p_speed, int8_t* p_deg );// 走行線計算＠特殊（特にメソッド分けてる意味は無いです。テストとかで活用してください。現状高速ライントレース用）
+    private:/* --------------------------------------------------------------------- プライベート */
 
-    /* メンバ */
-    FLOT mPValue[K_ID_NUM];// 比例値保持
-    FLOT mIValue[K_ID_NUM];// 積分値保持
-    FLOT mDValue[K_ID_NUM];// 微分値保持
+        /* メソッド */
+        void calcRunLineUseRefLv( SSHT reflection_lv, int8_t* p_speed, int8_t* p_deg );// 走行線計算＠通常
+        void calcRunLineSecondLine( SSHT reflection_lv, int8_t* p_speed, int8_t* p_deg );// 走行線計算＠特殊（特にメソッド分けてる意味は無いです。テストとかで活用してください。現状高速ライントレース用）
 
-    PID_SETTING mPidGainF[PID_SET_N];// ゲイン設定ファイル格納用
+        /* メンバ */
+        FLOT mPValue[K_ID_NUM];// 比例値保持
+        FLOT mIValue[K_ID_NUM];// 積分値保持
+        FLOT mDValue[K_ID_NUM];// 微分値保持
 
-    FLOT mTergetSpeed[RLT_SET_N];// 目標走行速度格納用
-    FLOT mTergetRefLV[RLT_SET_N];// 目標光学センサ反射値格納用
-    FLOT mKP[K_ID_NUM];// Pゲイン格納用
-    FLOT mKI[K_ID_NUM];// Iゲイン格納用
-    FLOT mKD[K_ID_NUM];// Dゲイン格納用
+        PID_SETTING mPidGainF[PID_SET_N];// ゲイン設定ファイル格納用
 
-    int8_t  mSpeed;// 走行速度計算結果
-    int8_t  mDeg;// 走行角度計算結果
-    int16_t mOffsetRef;// 取得光学値に対するオフセット値
+        FLOT mTergetSpeed[RLT_SET_N];// 目標走行速度格納用
+        FLOT mTergetRefLV[RLT_SET_N];// 目標光学センサ反射値格納用
+        FLOT mKP[K_ID_NUM];// Pゲイン格納用
+        FLOT mKI[K_ID_NUM];// Iゲイン格納用
+        FLOT mKD[K_ID_NUM];// Dゲイン格納用
 
-    BOOL mInitF;// パラメータ初期化フラグ
-};
+        int8_t  mSpeed;// 走行速度計算結果
+        int8_t  mDeg;// 走行角度計算結果
+        int16_t mOffsetRef;// 取得光学値に対するオフセット値
+
+        BOOL mInitF;// パラメータ初期化フラグ
+
+};// class RunLineCalculator_ohs
 
 #endif/* CALCULATION_RUNLINECALCULATOR_OHS_H_ */
 /* ---------------------------------------------------------------------------------------------- */

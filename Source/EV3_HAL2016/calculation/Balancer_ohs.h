@@ -33,30 +33,29 @@
 // 作成日       ：2016/06/12  大塚　信晶＠新規作成
 /* ---------------------------------------------------------------------------------------------- */
 class Balancer_ohs {
-public:
-    /* パブリック ------------------------------------------------------------------------------- */
-    Balancer_ohs( GyroAdmin_ohs* gyro_admin );// コンストラクタ
-    ~Balancer_ohs();// デストラクタ
+    public:/* ------------------------------------------------------------------------ パブリック */
+        Balancer_ohs( GyroAdmin_ohs* gyro_admin );// コンストラクタ
+        ~Balancer_ohs();// デストラクタ
 
-    BOOL calcPWM( int8_t spd, int8_t deg, void* running_admin );// 倒立振子モータ値計算
-    void init();// バランサー初期化
+        BOOL calcPWM( int8_t spd, int8_t deg, void* running_admin );// 倒立振子モータ値計算
+        void init();// バランサー初期化
 
-    /* 計算結果出力 */
-    int8_t isRightPWM( void );// 右
-    int8_t isLeftPWM( void ); // 左
-    /* テスト用メソッド(非公開) */
-    void  setOffSet( FLOT set_offset );// ジャイロ値オフセット強制変更
+        /* 計算結果出力 */
+        int8_t isRightPWM( void );// 右
+        int8_t isLeftPWM( void ); // 左
+        /* テスト用メソッド(非公開) */
+        void  setOffSet( FLOT set_offset );// ジャイロ値オフセット強制変更
 
-private:
-    /* プライベート ----------------------------------------------------------------------------- */
-    GyroAdmin_ohs* mGyroAdmin;// ジャイロセンサ値取得用
-    FLOT   mRdOffSet;   // balancer.c初期化後起動用右回転値オフセット
-    FLOT   mLdOffSet;   // balancer.c初期化後起動用左回転値オフセット
-    FLOT   mGyOffSet;   // 高速走行用ジャイロ値補完用オフセット
-    int8_t mRightPwm;   // 右モータ出力値の回転出力値計算結果
-    int8_t mLeftPwm;    // 左モータ出力値の回転出力値計算結果
-    BOOL   mInit;       // 初期化完了フラグ
-};
+    private:/* --------------------------------------------------------------------- プライベート */
+        GyroAdmin_ohs* mGyroAdmin;// ジャイロセンサ値取得用
+        FLOT   mRdOffSet;   // balancer.c初期化後起動用右回転値オフセット
+        FLOT   mLdOffSet;   // balancer.c初期化後起動用左回転値オフセット
+        FLOT   mGyOffSet;   // 高速走行用ジャイロ値補完用オフセット
+        int8_t mRightPwm;   // 右モータ出力値の回転出力値計算結果
+        int8_t mLeftPwm;    // 左モータ出力値の回転出力値計算結果
+        BOOL   mInit;       // 初期化完了フラグ
+
+};// class Balancer_ohs
 
 #endif/* CALCULATION_BALANCER_OHS_H_ */
 /* ---------------------------------------------------------------------------------------------- */

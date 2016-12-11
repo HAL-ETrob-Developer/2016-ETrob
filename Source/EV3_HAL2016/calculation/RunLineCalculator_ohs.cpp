@@ -378,8 +378,6 @@ void RunLineCalculator_ohs::calcRunLineSecondLine( SSHT reflection_lv, int8_t* p
     /* 変数宣言 --------------------------------------------------------------------------------- */
     static FLOT fOldDevPoint  = 0;      // 微分フィードバック用保持＠角度用
     static FLOT fOldEV3Deg    = 0;      // 微分フィードバック用保持＠速度用
-    /// static FLOT fOldIgrDeg    = 0;      // 微分フィードバック用保持＠角度用
-    /// static FLOT fOldIgrSpd    = 0;      // 微分フィードバック用保持＠速度用
            char cSpeedRev  = 1;         // 符号反転計算用
            FLOT fCvtRefLv  = 0.0F;      // 光学センサ値float変換用
            FLOT fTempSpeed = 0.0F;      // 走行速度計算結果一次保存
