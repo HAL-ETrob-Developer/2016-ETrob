@@ -19,9 +19,8 @@
 // includeファイル
 /* ---------------------------------------------------------------------------------------------- */
 
-#include <string.h>
-#include "ev3api.h"
-#include "GyroSensor.h"
+#include "ev3api.h"		// 大会提供API＠基本ヘッダー
+#include "GyroSensor.h" // ev3api：ジャイロセンサ
 
 /* ---------------------------------------------------------------------------------------------- */
 // 定数定義
@@ -49,32 +48,35 @@
 class GyroAdmin_ohs
 {
     public:/* ------------------------------------------------------------------------ パブリック */
+		/* オブジェクトの生成 */
 		GyroAdmin_ohs( ev3api::GyroSensor& gyro_sensor );// コンストラクタ
 		~GyroAdmin_ohs();// デストラクタ
 
 		/* メソッド */
-		bool        initDegree();
-		void 		callValueUpdate( void );//ジャイロセンサの値の更新
+		bool initDegree();// ジャイロセンサの初期化
+		void callValueUpdate( void );//ジャイロセンサの値の更新
+		void callValueUpdateDummy( void );//ジャイロセンサ異常の為のダミーメソッド＠20160918
 		
-		int16_t 	getValue( void );			//ジャイロセンサの値の取得
-		int16_t		getFilterValue( void );		//ジャイロセンサの値の取得(フィルタリング)
-		GYRO_STATE	getState( void );			//ジャイロセンサ状態の取得
-		/* テスト用メソッド(非公開) */
-		void 		callValueUpdateDummy( void );//ジャイロセンサ異常の為のダミーメソッド＠20160918
+		int16_t    getValue( void );      //ジャイロセンサの値の取得(直接値)
+		int16_t    getFilterValue( void );//ジャイロセンサの値の取得(フィルタリング)
+		GYRO_STATE　getState( void );      //ジャイロセンサ状態の取得
 	
     private:/* --------------------------------------------------------------------- プライベート */
 		/* メンバ */
-		ev3api::GyroSensor& mGyroSensor;
-		int16_t mNowGyroValue;
-		int16_t mOldGyroValue;
-		int16_t mVelocity;
+		ev3api::GyroSensor& mGyroSensor;// ジャイロセンサを扱う
+		int16_t mNowGyroValue;// フィルタリング用＠直近値
+		int16_t mOldGyroValue;// フィルタリング用＠過去値
+		int16_t mVelocity;    // フィルタリング後角速度値
 		
-		int16_t mOffSet;
-		GYRO_STATE	mState;
-		int16_t mQueue[QUEUE_MAX];
-		uint16_t mQNo;
-		bool mInit;
+		int16_t mOffSet;	  // 取得値オフセット＠個体差補正に重要です
+		GYRO_STATE mState;	  // 本体安定度の状態＠hal_ev3_std.hにて定義
+		int16_t mQueue[QUEUE_MAX];// フィルタリング用値保持領域
+		uint16_t mQNo;// キュー使用位置
+		bool mInit;   // 初期化状態
 
 };// class GyroAdmin_ohs
 
 #endif  // DEVICEOPE_GYROADMIN_OHS_H_
+/* ---------------------------------------------------------------------------------------------- */
+/*                          Copyright HAL College of Technology & Design                          */
+/* ---------------------------------------------------------------------------------------------- */
