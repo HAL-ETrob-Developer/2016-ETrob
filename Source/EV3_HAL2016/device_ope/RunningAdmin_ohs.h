@@ -1,54 +1,86 @@
-﻿/* by ohs50465 T.UENO */
+﻿/* ---------------------------------------------------------------------------------------------- */
+// RunningAdmin_ohs.h
+// EV3_HAL2016\デバイス制御\走行管理
+// 光学センサ値の取得値管理。フィルタリング。状態判断。
+/* ---------------------------------------------------------------------------------------------- */
+// 番号    日付        氏名        更新履歴
+/* ---------------------------------------------------------------------------------------------- */
+// RN0000  2016/07/15  葛巻　大樹  新規作成
+// RN0001  2016/07/17  大塚　信晶  コンパイルチェック単体テスト通過
+// RN0002  2016/07/19  大塚　信晶  結合テスト通過
+// RN0003  2016/08/18  大塚　信晶  バランス再起動に関する
+// RN0004  2016/09/16  大塚　信晶  高速バランス走行対策＠ブレーキ挙動
+/* ---------------------------------------------------------------------------------------------- */
+
 #ifndef DEVICEOPE_RUNNINGADMIN_OHS_H_
 #define DEVICEOPE_RUNNINGADMIN_OHS_H_
+
+/* ---------------------------------------------------------------------------------------------- */
+// includeファイル
+/* ---------------------------------------------------------------------------------------------- */
 
 #include "ev3api.h"
 #include "Motor.h"
 #include "../calculation/Balancer_ohs.h"
 
-#define BRAKE_INI ( 0.8F )
-#define BRAKE_MAX ( 0.001F )
-#define BRAKE_ADD ( 0.001F )
-#define PWM_MAX ( 100 )
-#define TURN_OFS ( 0 )
+/* ---------------------------------------------------------------------------------------------- */
+// 定数定義
+/* ---------------------------------------------------------------------------------------------- */
 
+#define BRAKE_INI (       0.8F )// 初期速度制限値
+#define BRAKE_MAX (     0.001F )// 最終速度制限値
+#define BRAKE_ADD (     0.001F )// 速度変化量
+#define PWM_MAX   (        100 )// モータ回転指示値最大
+#define TURN_OFS  (          0 )// 左右モータ差分オフセット
+
+/* ---------------------------------------------------------------------------------------------- */
+// クラス名     ：RunningAdmin_ohs
+// 役割名       ：走行モータ管理
+// 役割概要     ：走行モータへの指示・現在回転量の管理
+// 作成日       ：2016/07/15  葛巻　大樹  新規作成
+/* ---------------------------------------------------------------------------------------------- */
 class RunningAdmin_ohs
 {
-public:
-    // 生成
-    RunningAdmin_ohs( ev3api::Motor& leftwheel, ev3api::Motor& rightwheel, Balancer_ohs* balanser );
-    // デストラクタ 死ぬときあるよ
-    ~RunningAdmin_ohs( );
+    public:/* ------------------------------------------------------------------------ パブリック */
+        RunningAdmin_ohs( ev3api::Motor& leftwheel, ev3api::Motor& rightwheel, Balancer_ohs* balanser );// コンストラクタ
+        ~RunningAdmin_ohs( );// デストラクタ
 
-    void    callValueUpDate ( );
-    void    postRunning ( int32_t speed, int32_t deg, BOOL balancer, BOOL brake );
-    void    callRunning ( );
-    int32_t getMileage ( );
-    int32_t getAngle ( );
-    int8_t  getSpeed ( );
-    int8_t  getVector ( );
-    int32_t isRightRotary ( );
-    int32_t isLeftRotary ( );
+        /* 動作関連 */
+        void callValueUpDate( void );// モータ回転数更新
+        void postRunning( int32_t speed, int32_t deg, BOOL balancer, BOOL brake );// モータ運転指示
+        void callRunning( void );// モータ運転実行
 
-    //デバッグ用
-    bool    setTurnOffset ( int8_t offset  );
-    int8_t  getTurnOffset ();
+        /* 値取得関連 */
+        int32_t getMileage( void );   // モータ総回転数取得
+        int32_t getAngle( void );     // 総本体旋回角度取得
+        int8_t  getSpeed( void );     // 現実行走行値
+        int8_t  getVector( void );    // 現実行旋回量
+        int32_t isRightRotary( void );// 現モータ指示値＠右
+        int32_t isLeftRotary( void ); // 現モータ指示値＠左
 
-private:
-    int32_t mRightRotary;
-    int32_t mLeftRotary;
-    int8_t  mRightPwm;
-    int8_t  mLeftPwm;
+        //デバッグ用
+        bool    setTurnOffset( int8_t offset  );// 左右モータ指示差分オフセット
+        int8_t  getTurnOffset( void );// 指示オフセット値取得
 
-    int8_t  mFront;
-    int8_t  mTurn;
-    int8_t  mTurnOFS;
-    BOOL    mBalanceF;
-    BOOL    mBrakeF;
+    private:/* --------------------------------------------------------------------- プライベート */
+        ev3api::Motor& mLeftWheel; // 左モータ
+        ev3api::Motor& mRightWheel;// 右モータ
+        Balancer_ohs*  mBalancer;  // バランサー
 
-    ev3api::Motor& mLeftWheel;
-    ev3api::Motor& mRightWheel;
-    Balancer_ohs*  mBalancer;
-};
+        int32_t mRightRotary;// 右モータ回転数
+        int32_t mLeftRotary; // 左モータ回転数
+        int8_t  mRightPwm;   // 右モータ指示値
+        int8_t  mLeftPwm;    // 左モータ指示値
+
+        int8_t  mFront;      // 前進値
+        int8_t  mTurn;       // 旋回値
+        int8_t  mTurnOFS;    // 左右モータ差
+        BOOL    mBalanceF;   // バランス制御ON/OFFフラグ
+        BOOL    mBrakeF;     // ブレーキ制御ON/OFFフラグ
+
+};// class RunningAdmin_ohs
 
 #endif// DEVICEOPE_RUNNINGADMIN_OHS_H_
+/* ---------------------------------------------------------------------------------------------- */
+/*                          Copyright HAL College of Technology & Design                          */
+/* ---------------------------------------------------------------------------------------------- */

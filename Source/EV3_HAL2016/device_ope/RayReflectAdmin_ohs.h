@@ -25,18 +25,18 @@
 // 定数定義
 /* ---------------------------------------------------------------------------------------------- */
 
-#define R_QUEUE_MAX	(  200 )		/* キュー個数 */
+#define R_QUEUE_MAX		(        200 )	/* キュー個数 */
 
 /* ゲイン値 */
-#define GAIN_NOW	( 0.1F )		/* 現在 */
-#define GAIN_OLD	( 0.9F )		/* 過去 */
+#define GAIN_NOW		(       0.1F )	/* 現在 */
+#define GAIN_OLD		(       0.9F )	/* 過去 */
 
 /* 閾値 */
-#define	THRESHOLD_BLACK	( 15 )		/* ブラック */
-#define	THRESHOLD_WHITE	( 80 )		/* ホワイト */
+#define	THRESHOLD_BLACK	(         15 )	/* ブラック */
+#define	THRESHOLD_WHITE	(         80 )	/* ホワイト */
 
 /* 反射値カット */
-#define	REY_MAX_REF	( 200.0F )		/* 最大反射値＠カット */
+#define	REY_MAX_REF		(     200.0F )	/* 最大反射値＠カット */
 
 /* ---------------------------------------------------------------------------------------------- */
 // クラス名     ：RayReflectAdmin_ohs
