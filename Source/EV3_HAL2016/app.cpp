@@ -409,7 +409,7 @@ static bool SetingFileload( char* f_pass, memfile_t* ev3_file_stc )
     ER ret;
     memset( &strcEv3File, 0, sizeof(EV3_SETTING));
 
-    /* 異常終了：ぬるぽ */
+    /* 異常終了 : ぬるぽ */
     if( f_pass == NULL ) { return false; }
     if( ev3_file_stc == NULL ) { return false; }
 
@@ -450,7 +450,7 @@ static bool SetingFileWrite( char* f_pass, FILE* bt_handle )
     int8_t  cDummy[sizeof(EV3_SETTING)];
     memset( &cDummy[0], 0, 100);
 
-    /* 異常終了：ぬるぽ */
+    /* 異常終了 : ぬるぽ */
     if( f_pass == NULL ) { return false; }
     if( bt_handle == NULL ) { return false; }
 

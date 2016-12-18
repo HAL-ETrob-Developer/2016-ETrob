@@ -63,7 +63,7 @@ BOOL PatternSequencer_ohs::callPatternRunning( UCHR uc_index )
 
 void PatternSequencer_ohs::callSequencStop()
 {
-	/* 走行指示：しっぽはそのまま */
+	/* 走行指示 : しっぽはそのまま */
 	mRunningAdmin->postRunning ( 0, 0, false, false );
 	/* 尻角度指示 */
 	mTailAdmin->postTailDegree( mPatternIndex[mNowId].Tail_deg );

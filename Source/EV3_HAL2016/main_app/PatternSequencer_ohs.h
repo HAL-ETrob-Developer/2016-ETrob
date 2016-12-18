@@ -7,10 +7,10 @@
 #include "../device_ope/RunningAdmin_ohs.h"
 #include "../device_ope/TailAdmin_ohs.h"
 
-#define INIT__SPEED (		 0 )/* 初期パターン：速度 */
-#define INIT_EV_DEG (		 0 )/* 初期パターン：本体角度 */
-#define INIT_TL_DEG (		 0 )/* 初期パターン：尾角度 */
-#define INIT_BALANC (		 0 )/* 初期パターン：バランス有無 */
+#define INIT__SPEED (		 0 )/* 初期パターン : 速度 */
+#define INIT_EV_DEG (		 0 )/* 初期パターン : 本体角度 */
+#define INIT_TL_DEG (		 0 )/* 初期パターン : 尾角度 */
+#define INIT_BALANC (		 0 )/* 初期パターン : バランス有無 */
 
 #define INIT_PAT_ID (		 0 )/* 初期パターンを指し示す */
 #define PATTERN_NUM ( _PATTERN_NUM )/* パターンインデックスサイズ */
