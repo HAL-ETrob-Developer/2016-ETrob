@@ -1,39 +1,67 @@
-﻿/* by ohs50465 T.UENO */
+﻿/* ---------------------------------------------------------------------------------------------- */
+// TailAdmin_ohs.h
+// EV3_HAL2016\デバイス制御\尻尾管理
+// モータによる尻尾動作。尻尾角の取得管理。
+/* ---------------------------------------------------------------------------------------------- */
+// 番号    日付        氏名        更新履歴
+/* ---------------------------------------------------------------------------------------------- */
+// TL0000  2016/07/14  中嶋　椰真  新規作成
+// TL0001  2016/07/14  大塚　信晶  コンパイルチェック単体テスト通過
+// TL0002  2016/07/17  大塚　信晶  PID調整
+// TL0003  2016/07/19  大塚　信晶  結合テスト通過
+/* ---------------------------------------------------------------------------------------------- */
 
 #ifndef DEVICEOPE_TAILADMIN_OHS_H_
 #define DEVICEOPE_TAILADMIN_OHS_H_
 
+/* ---------------------------------------------------------------------------------------------- */
+// includeファイル
+/* ---------------------------------------------------------------------------------------------- */
+
 #include "Motor.h"
 
-#define TIL_P_GAIN		( 0.6F)
-#define TIL_I_GAIN		( 1.1F)
-#define TIL_D_GAIN		( 8.0F)
+/* ---------------------------------------------------------------------------------------------- */
+// 定数定義
+/* ---------------------------------------------------------------------------------------------- */
 
-#define MAX_TARGET	(  110)
-#define MIN_TARGET	(  -10)
+#define TIL_P_GAIN	(     0.6F )// Ｐゲイン
+#define TIL_I_GAIN	(     1.1F )// Ｉゲイン
+#define TIL_D_GAIN	(     8.0F )// Ｄゲイン
 
-#define MAX_VALUE	(  100)
-#define MIN_VALUE	( -100)
+#define MAX_TARGET	(      110 )// 尻尾角度最大解放角
+#define MIN_TARGET	(      -10 )// 尻尾角度最小復帰角
+
+#define MAX_VALUE	(      100 )// 尻尾モータ指示POW最大＠CW
+#define MIN_VALUE	(     -100 )// 尻尾モータ指示POW最大＠CCW
+
+/* ---------------------------------------------------------------------------------------------- */
+// クラス名     ：TailAdmin_ohs
+// 役割名       ：尻尾モータ管理
+// 役割概要     ：尻尾モータへの指示・現在回転量の管理。PID制御を内包する。
+// 作成日       ：2016/07/14  中嶋　椰真  新規作成
+/* ---------------------------------------------------------------------------------------------- */
 class TailAdmin_ohs
 {
-    public:
-    //生成
-    TailAdmin_ohs( ev3api::Motor& tail_wheel );
-    //デストラクタ 死ぬときあるよ
-    ~TailAdmin_ohs();
+    public:/* ------------------------------------------------------------------------ パブリック */
+    TailAdmin_ohs( ev3api::Motor& tail_wheel );// コンストラクタ
+    ~TailAdmin_ohs();// デストラクタ
 
-    void callValueUpDate();
-	BOOL postTailDegree( int32_t postTailDeg );
-    void callActDegree();
-    int32_t getTailDegree();
-    BOOL setOfsetDegree( int32_t ofset_tail_deg );
+    void callValueUpDate();// 尻尾角度値更新
+	BOOL postTailDegree( int32_t postTailDeg );// 尻尾角度指示
+    void callActDegree();// 尻尾動作
+    int32_t getTailDegree();// 尻尾角度取得
+    BOOL setOfsetDegree( int32_t ofset_tail_deg );// 尻尾角オフセット値の挿入
 
-	private:
-    ev3api::Motor& mTailWheel;
-    int32_t mTailDeg;
-    int32_t mExecutVal;
-    int32_t mTailTarget;
-    int32_t mOfsetDeg;
-};
+    private:/* --------------------------------------------------------------------- プライベート */
+    ev3api::Motor& mTailWheel;// 尻尾モータオブジェクト
+    int32_t mTailDeg;   // 尻尾角
+    int32_t mExecutVal; // 尻尾モータ実効値
+    int32_t mTailTarget;// 目標尻尾角
+    int32_t mOfsetDeg;  // 尻尾角オフセット
+
+};// class TailAdmin_ohs
 
 #endif  // DEVICEOPE_TAILADMIN_OHS_H_
+/* ---------------------------------------------------------------------------------------------- */
+/*                          Copyright HAL College of Technology & Design                          */
+/* ---------------------------------------------------------------------------------------------- */
