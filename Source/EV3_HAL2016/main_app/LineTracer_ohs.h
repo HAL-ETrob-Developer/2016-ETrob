@@ -1,52 +1,77 @@
-/* by ohs50465 T.Ueno */
-
+/* ---------------------------------------------------------------------------------------------- */
+// LineTracer_ohs.h
+// EV3_HAL2016\基本機能\ライントレーサー
+// コース上のラインを辿り走行する
+/* ---------------------------------------------------------------------------------------------- */
+// 番号    日付        氏名        更新履歴
+/* ---------------------------------------------------------------------------------------------- */
+// LT0000  2016/07/15  大塚　信晶  実験・構想
+// LT0001  2016/07/17  大塚　信晶  新規作成
+// LT0002  2016/07/19  大塚　信晶  結合テスト
+// LT0003  2016/07/23  大塚　信晶  PID制御の大幅変更
+// LT0004  2016/08/20  大塚　信晶  シナリオ構成の変更に伴う影響範囲の調整
+/* ---------------------------------------------------------------------------------------------- */
 #ifndef MAINAPP_LINETRACER_OHS_H_
 #define MAINAPP_LINETRACER_OHS_H_
+
+/* ---------------------------------------------------------------------------------------------- */
+// includeファイル
+/* ---------------------------------------------------------------------------------------------- */
 
 #include "../calculation/RunLineCalculator_ohs.h"
 #include "../device_ope/RunningAdmin_ohs.h"
 #include "../device_ope/RayReflectAdmin_ohs.h"
 
-#define LT_SPEED_SLT (       50 )
-#define LT_DEGRE_SLT (       15 )
+/* ---------------------------------------------------------------------------------------------- */
+// 定数定義
+/* ---------------------------------------------------------------------------------------------- */
 
-#define LT_REF_OFSET (       40 )
-#define LT_MAX_SPEED (      100 )
-#define LT_MIN_SPEED (     -100 )
-#define LT_MAX_DEGRE (       50 )
-#define LT_MIN_DEGRE (      -50 )
+#define LT_SPEED_SLT (       50 )// シンプルライントレース＠走行速度
+#define LT_DEGRE_SLT (       15 )// シンプルライントレース＠旋回角度
 
-#define RISE         (      0.01)
-#define SEARCH_SW    (    10000 )
+#define LT_MAX_SPEED (      100 )// 走行速度制限＠最大
+#define LT_MIN_SPEED (     -100 )// 走行速度制限＠最小
+#define LT_MAX_DEGRE (       50 )// 旋回角度制限＠最大
+#define LT_MIN_DEGRE (      -50 )// 旋回角度制限＠最小
 
+#define RISE         (     0.01 )// ライン探索＠カーブ増量
+#define SEARCH_SW    (    10000 )// ライン探索＠探索開始条件
+
+/* ---------------------------------------------------------------------------------------------- */
+// クラス名     : LineTracer_ohs
+// 役割名       : ライントレーサ
+// 役割概要     : 大会コースライン上をトレース走行する為、デバイスの指示とライン計算の指示を行う
+// 作成日       : 2016/07/17  大塚　信晶  新規作成
+/* ---------------------------------------------------------------------------------------------- */
 class LineTracer_ohs {
-public:
-    //生成
-    LineTracer_ohs( RunningAdmin_ohs* running_admin, RayReflectAdmin_ohs* ray_reflect_adomin, RunLineCalculator_ohs* running_line_calculator );
-    //デストラクタ 死ぬときあるよ
-    ~LineTracer_ohs();
+    public:/* ------------------------------------------------------------------------ パブリック */
+        LineTracer_ohs( RunningAdmin_ohs* running_admin, RayReflectAdmin_ohs* ray_reflect_adomin, RunLineCalculator_ohs* running_line_calculator );//コンストラクタ
+        ~LineTracer_ohs();//デストラクタ
 
-    void postLineTraceConduct( BOOL search_mode );
-    void postLineTraceStop();
-    void callLineTraceAct();
-    void callSimplLineTraceAct();
+        void postLineTraceConduct( BOOL search_mode );// ライントレース指示
+        void postLineTraceStop();    // ライントレース停止指示
+        void callLineTraceAct();     // ライントレースの実行
+        void callSimplLineTraceAct();// デバック＠2値制御ライントレース
 
-private:
-    //メソッド
-    void execLineEdgeTrace();
-    void execLineSearch();
-    //メンバ
-    RunningAdmin_ohs*      mRunningAdmin;
-    RayReflectAdmin_ohs*   mRayReflectAdmin;
-    RunLineCalculator_ohs* mRunLineCalculator;
+    private:/* --------------------------------------------------------------------- プライベート */
+        //メソッド
+        void execLineEdgeTrace();// ライントレース
+        void execLineSearch();   // ライン探索＠不使用
+        //メンバ
+        RunningAdmin_ohs*      mRunningAdmin;     // 走行管理
+        RayReflectAdmin_ohs*   mRayReflectAdmin;  // 光学センサ
+        RunLineCalculator_ohs* mRunLineCalculator;// 走行線計算
 
-    SENC_CLR mGetColor;
-    FLOT   mGain;
-    BOOL   mLineTraceGo;
-    BOOL   mRapidMode;
-    int8_t mSpeed;
-    int8_t mDeg;
+        SENC_CLR mGetColor; // 取得ラインカラー
+        FLOT   mGain;       // ライン探索用旋回ゲイン
+        BOOL   mLineTraceGo;// ライントレース実行フラグ
+        BOOL   mRapidMode;  // ライン探索モード
+        int8_t mSpeed;      // 走行速度
+        int8_t mDeg;        // 旋回角度
 
-};
+};// class LineTracer_ohs
 
 #endif  // MAINAPP_LINETRACER_OHS_H_
+/* ---------------------------------------------------------------------------------------------- */
+/*                          Copyright HAL College of Technology & Design                          */
+/* ---------------------------------------------------------------------------------------------- */
