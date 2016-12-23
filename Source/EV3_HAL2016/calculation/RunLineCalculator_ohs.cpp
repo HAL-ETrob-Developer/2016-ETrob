@@ -446,6 +446,7 @@ void RunLineCalculator_ohs::calcRunLineSecondLine( SSHT reflection_lv, int8_t* p
 
     return;// 引数チェックつけてね♡
 }
+
 /* ---------------------------------------------------------------------------------------------- */
 /*                          Copyright HAL College of Technology & Design                          */
 /* ---------------------------------------------------------------------------------------------- */

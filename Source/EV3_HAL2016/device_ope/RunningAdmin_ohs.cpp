@@ -25,9 +25,9 @@
 // 役割概要     : 走行モータへの指示・現在回転量の管理
 // 作成日       : 2016/07/15  葛巻　大樹  新規作成
 /* 引数 ----------------------------------------------------------------------------------------- */
-// [I N]ev3api::Motor& leftwheel  : ev3apiモータの使用＠左
-// [I N]ev3api::Motor& rightwheel : ev3apiモータの使用＠右
-// [I N]Balancer_ohs*  balancer   : 倒立振子バランス計算
+// [I/O]ev3api::Motor& leftwheel  : ev3apiモータの使用＠左
+// [I/O]ev3api::Motor& rightwheel : ev3apiモータの使用＠右
+// [I/O]Balancer_ohs*  balancer   : 倒立振子バランス計算
 /* ---------------------------------------------------------------------------------------------- */
 RunningAdmin_ohs::RunningAdmin_ohs( ev3api::Motor& leftwheel, ev3api::Motor& rightwheel,  Balancer_ohs* balancer )
 :mLeftWheel( leftwheel ),  /* 左モータ入出力＠コンストラクタ優先処理 */
