@@ -1,46 +1,71 @@
-/* by ohs50465 T.UENO */
-
+/* ---------------------------------------------------------------------------------------------- */
+// PatternSequencer_ohs.h
+// EV3_HAL2016\基本機能\定量走行者
+// 決められた順番・距離・角度で走行・旋回する
+/* ---------------------------------------------------------------------------------------------- */
+// 番号    日付        氏名        更新履歴
+/* ---------------------------------------------------------------------------------------------- */
+// PS0001  2016/08/06  上野　徹    新規作成
+// PS0002  2016/08/15  上野　徹    レビュー調整
+// PS0003  2016/08/20  大塚　信晶  設定ファイル対応化
+/* ---------------------------------------------------------------------------------------------- */
 #ifndef MAINAPP_PATTERNSEQUENCER_OHS_H_
 #define MAINAPP_PATTERNSEQUENCER_OHS_H_
 
-/* include file */
+/* ---------------------------------------------------------------------------------------------- */
+// includeファイル
+/* ---------------------------------------------------------------------------------------------- */
+
 #include "../device_ope/RunningAdmin_ohs.h"
 #include "../device_ope/TailAdmin_ohs.h"
 
-#define INIT__SPEED (		 0 )/* 初期パターン : 速度 */
-#define INIT_EV_DEG (		 0 )/* 初期パターン : 本体角度 */
-#define INIT_TL_DEG (		 0 )/* 初期パターン : 尾角度 */
-#define INIT_BALANC (		 0 )/* 初期パターン : バランス有無 */
+/* ---------------------------------------------------------------------------------------------- */
+// 定数定義
+/* ---------------------------------------------------------------------------------------------- */
 
-#define INIT_PAT_ID (		 0 )/* 初期パターンを指し示す */
-#define PATTERN_NUM ( _PATTERN_NUM )/* パターンインデックスサイズ */
+#define INIT__SPEED (		 0 )// 初期パターン : 速度
+#define INIT_EV_DEG (		 0 )// 初期パターン : 本体角度
+#define INIT_TL_DEG (		 0 )// 初期パターン : 尾角度
+#define INIT_BALANC (		 0 )// 初期パターン : バランス有無
 
+#define INIT_PAT_ID (		 0 )// 初期パターンを指し示す
+#define PATTERN_NUM ( _PATTERN_NUM )// パターンインデックスサイズ
+
+/* ---------------------------------------------------------------------------------------------- */
+// クラス名     : PatternSequencer_ohs
+// 役割名       : パターンシーケンサ
+// 役割概要     : あらかじめ用意したパラメータに従って各アクチュエータに動作指示を出す。
+// 作成日       : 2016/08/06  上野　徹    新規作成
+/* ---------------------------------------------------------------------------------------------- */
 class PatternSequencer_ohs {
-public:
-	//生成
-	PatternSequencer_ohs( RunningAdmin_ohs* running_admin, TailAdmin_ohs* tail_admin );
-	//デストラクタ
-	~PatternSequencer_ohs();
+    public:/* ------------------------------------------------------------------------ パブリック */
+		//コンストラクタ
+		PatternSequencer_ohs( RunningAdmin_ohs* running_admin, TailAdmin_ohs* tail_admin );
+		//デストラクタ
+		~PatternSequencer_ohs();
 
-	//定量走行指揮
-	BOOL callPatternRunning( UCHR uc_index );
+		//定量走行指揮
+		BOOL callPatternRunning( UCHR uc_index );
 
-	//定量走行指揮終了
-	void callSequencStop();
+		//定量走行指揮終了
+		void callSequencStop();
 
-	//現行インデックスNoの取得
-	UCHR getID();
+		//現行インデックスNoの取得
+		UCHR getID();
 
-	//インデックス外部登録
-	BOOL setPatternIndex( PATTERN_INDEX* p_pattern_index );
+		//インデックス外部登録
+		BOOL setPatternIndex( PATTERN_INDEX* p_pattern_index );
 
-private:
+    private:/* --------------------------------------------------------------------- プライベート */
+		RunningAdmin_ohs* mRunningAdmin;// 走行管理
+		TailAdmin_ohs*    mTailAdmin;// 尻尾管理
 
-	RunningAdmin_ohs* mRunningAdmin;
-	TailAdmin_ohs*    mTailAdmin;
-
-	UCHR 			  mNowId;//実行パターンD
-	PATTERN_INDEX     mPatternIndex[PATTERN_NUM];
-};
+		UCHR 			  mNowId;//実行パターンID
+		PATTERN_INDEX     mPatternIndex[PATTERN_NUM];// 走行パターン保存ファイル
+		
+};// class PatternSequencer_ohs
 
 #endif  // MAINAPP_PATTERNSEQUENCER_OHS_H_
+/* ---------------------------------------------------------------------------------------------- */
+/*                          Copyright HAL College of Technology & Design                          */
+/* ---------------------------------------------------------------------------------------------- */
