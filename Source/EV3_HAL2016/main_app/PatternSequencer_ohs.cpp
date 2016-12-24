@@ -22,6 +22,9 @@
 // 役割名       : パターンシーケンサ
 // 役割概要     : あらかじめ用意したパラメータに従って各アクチュエータに動作指示を出す。
 // 作成日       : 2016/08/06  上野　徹    新規作成
+/* 引数 ----------------------------------------------------------------------------------------- */
+// [I N]RunningAdmin_ohs* running_admin : 走行指示用
+// [I N]TailAdmin_ohs* tail_admin       : 尻尾指示用
 /* ---------------------------------------------------------------------------------------------- */
 PatternSequencer_ohs::PatternSequencer_ohs( RunningAdmin_ohs* running_admin, TailAdmin_ohs* tail_admin )
 :mRunningAdmin( running_admin ),/* 走行指示用＠コンストラクタ優先処理 */
