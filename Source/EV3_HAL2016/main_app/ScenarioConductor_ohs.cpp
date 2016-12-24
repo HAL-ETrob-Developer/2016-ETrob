@@ -1,3 +1,23 @@
+/* ---------------------------------------------------------------------------------------------- */
+// ScenarioConductor_ohs.cpp
+// EV3_HAL2016\基本機能\シナリオ指揮者
+// 競技内容を突破するシナリオを元に、「EvStateAdmin_ohs」「LineTracer_ohs」「PatternSequencer_ohs」
+// 「TrackCompass_ohs」に適切な指示を行う。
+/* ---------------------------------------------------------------------------------------------- */
+// 番号    日付        氏名        更新履歴
+/* ---------------------------------------------------------------------------------------------- */
+// SC0000  2016/08/06  上野　徹    新規作成
+// SC0001  2016/08/15  大塚　信晶  修正
+// SC0002  2016/08/16  大塚　信晶  関数ポインタ記述
+// SC0003  2016/08/20  大塚　信晶  設定ファイル取り込み対応化
+// SC0003  2016/09/13  大塚　信晶  シナリオ遷移条件の追加「CLS_LIN」
+// SC0003  2016/09/15  大塚　信晶  シナリオ遷移条件の追加「EX_JUMP」「RAXIS_T」
+/* ---------------------------------------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------------------------------------- */
+// includeファイル
+/* ---------------------------------------------------------------------------------------------- */
+
 #include "ev3api.h"
 #include "hal_ev3_std.h"
 
@@ -5,21 +25,30 @@
 
 extern FILE* gBtHandle;//デバッグ用
 
-/**
- * コンストラクタ
- */
+/* ---------------------------------------------------------------------------------------------- */
+// クラス名     : ScenarioConductor_ohs
+// 役割名       : パターンシーケンサ
+// 役割概要     : あらかじめ用意したパラメータに従って各アクチュエータに動作指示を出す。
+// 作成日       : 2016/08/06  上野　徹    新規作成
+/* 引数 ----------------------------------------------------------------------------------------- */
+// [I N]EvStateAdmin_ohs* ev_state_admin : 本体状態管理
+// [I N]LineTracer_ohs* line_tracer      : ライントレーサ
+// [I N]PatternSequencer_ohs* pettern_sequencer : 定量走行者
+// [I N]TrackCompass_ohs* track_compass  : コース基軸走行
+/* ---------------------------------------------------------------------------------------------- */
 ScenarioConductor_ohs::ScenarioConductor_ohs( EvStateAdmin_ohs* ev_state_admin, LineTracer_ohs* line_tracer, PatternSequencer_ohs* pettern_sequencer, TrackCompass_ohs* track_compass )
-:mEvStateAdmin( ev_state_admin ),
- mLineTracer( line_tracer ),
- mPatternSequencer( pettern_sequencer ),
- mTrackCompass( track_compass )
+:mEvStateAdmin( ev_state_admin ),       /* 本体状態管理＠コンストラクタ優先処理 */
+ mLineTracer( line_tracer ),            /* ライントレーサ＠コンストラクタ優先処理 */
+ mPatternSequencer( pettern_sequencer ),/* 定量走行者＠コンストラクタ優先処理 */
+ mTrackCompass( track_compass )         /* コース基軸走行＠コンストラクタ優先処理 */
 {
+	// シナリオ保存構造体のクリア
 	memset( mScenario, 0, sizeof(mScenario));
 	//初期待機状態の入力
-	mScenario[INIT_SCENARIO_ID].move_event = EX_SLIP;
-	mScenario[INIT_SCENARIO_ID].pattern_id = 0;
-	mScenario[INIT_SCENARIO_ID].next_scene = INIT_SCENARIO_ID;
-	mScenario[INIT_SCENARIO_ID].event_value = 0;
+	mScenario[INIT_SCENARIO_ID].move_event = EX_SLIP;// シナリオ保持
+	mScenario[INIT_SCENARIO_ID].pattern_id = 0;// 走行パターンIDを0番で開始
+	mScenario[INIT_SCENARIO_ID].next_scene = INIT_SCENARIO_ID;// 次のシナリオを自身へ（適当）
+	mScenario[INIT_SCENARIO_ID].event_value = 0;// シナリオ達成値は未指定（適当）
 
 	//実行シナリオID = 初期待機状態
 	mScenarioID = INIT_SCENARIO_ID;
@@ -40,9 +69,12 @@ ScenarioConductor_ohs::ScenarioConductor_ohs( EvStateAdmin_ohs* ev_state_admin, 
 	mCheckMethod[RAXIS_T] = &ScenarioConductor_ohs::checkRAxisTurn;//20160915追加
 }
 
-/**
- * デストラクタ
- */
+/* ---------------------------------------------------------------------------------------------- */
+// メソッド名   : ~ScenarioConductor_ohs
+// 機能名       : デストラクタ
+// 機能概要     : オブジェクトの破棄
+// 作成日       : 2016/08/06  上野　徹    新規作成
+/* ---------------------------------------------------------------------------------------------- */
 ScenarioConductor_ohs::~ScenarioConductor_ohs() {
 }
 
@@ -116,11 +148,11 @@ BOOL ScenarioConductor_ohs::execScenario() {
 	//達成フラグのチェック
 	if( nextEventF == true ) { 
 #ifdef TRANSITION_SOUND
-        ev3_speaker_play_tone( NOTE_B6, 80 );
-
-        fprintf( gBtHandle,"ID      [%d]\r\n",(int)getID());
-        fprintf( gBtHandle,"Mileage [%d]\r\n",(int)mEvStateAdmin->getMileage());
-        fprintf( gBtHandle,"Angle   [%d]\r\n",(int)mEvStateAdmin->getBodyAngle());
+		ev3_speaker_play_tone( NOTE_B6, 80 );
+		// デバック挿入
+		fprintf( gBtHandle,"ID      [%d]\r\n",(int)getID());
+		fprintf( gBtHandle,"Mileage [%d]\r\n",(int)mEvStateAdmin->getMileage());
+		fprintf( gBtHandle,"Angle   [%d]\r\n",(int)mEvStateAdmin->getBodyAngle());
 #endif
 		//シナリオ更新(異常値返却ならば終了)
 		if( setScenarioUpDate() == false ) { return false; }
@@ -307,3 +339,6 @@ BOOL ScenarioConductor_ohs::setScenarioIndex( SCENE_INDEX* p_scenx_index )
 //現行インデックス取得
 UCHR ScenarioConductor_ohs::getID() { return mScenarioID; }
 
+/* ---------------------------------------------------------------------------------------------- */
+/*                          Copyright HAL College of Technology & Design                          */
+/* ---------------------------------------------------------------------------------------------- */
