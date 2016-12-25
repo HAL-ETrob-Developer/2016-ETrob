@@ -1,69 +1,131 @@
-/* include file */
+/* ---------------------------------------------------------------------------------------------- */
+// TrackCompass_ohs.h
+// EV3_HAL2016\基本機能\走行路方位探索
+// コース上の前半の直線を基軸とした、直進・旋回を管理する。
+/* ---------------------------------------------------------------------------------------------- */
+// 番号    日付        氏名        更新履歴
+/* ---------------------------------------------------------------------------------------------- */
+// TC0001  2016/07/16  大塚　信晶  新規作成
+// TC0002  2016/07/18  大塚　信晶  バグフィックス・動作確認
+/* ---------------------------------------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------------------------------------- */
+// includeファイル
+/* ---------------------------------------------------------------------------------------------- */
+
 #include "ev3api.h"
 #include "hal_ev3_std.h"
 #include "TrackCompass_ohs.h"
 
-/**
-* コンストラクタ
-*/
+/* ---------------------------------------------------------------------------------------------- */
+// クラス名     : TrackCompass_ohs
+// 役割名       : 走行路方位探索
+// 役割概要     : コースの基軸探索、軸中心の移動・旋回
+// 作成日       : 2016/07/16  大塚　信晶  新規作成
+/* 引数 ----------------------------------------------------------------------------------------- */
+// [I/O]RunningAdmin_ohs* running_admin            : 光学センサ値取得用
+// [I/O]RunLineCalculator_ohs* run_line_calculator : 走行量取得用
+/* ---------------------------------------------------------------------------------------------- */
 TrackCompass_ohs::TrackCompass_ohs( RunningAdmin_ohs* running_admin, RunLineCalculator_ohs* running_line_calculator )
-:mRunningAdmin( running_admin ),
- mRunLineCalculator( running_line_calculator ) {
+:mRunningAdmin( running_admin ),/* 走行指示用＠コンストラクタ優先処理 */
+ mRunLineCalculator( running_line_calculator )/* 走行線計算＠コンストラクタ優先処理 */
+{
 	mReferenceAxis = 0.0F;
 	mNowRAxis = 0;
 	mTargetDirection = 0;
 	mRAxisTurnFinish = false;
 }
 
-/**
-* デストラクタ
-*/
-TrackCompass_ohs::~TrackCompass_ohs() {
-}
+/* ---------------------------------------------------------------------------------------------- */
+// メソッド名   : ~TrackCompass_ohs
+// 機能名       : デストラクタ
+// 機能概要     : オブジェクトの破棄
+// 作成日       : 2016/07/16  大塚　信晶  新規作成
+/* ---------------------------------------------------------------------------------------------- */
+TrackCompass_ohs::~TrackCompass_ohs() {}
 
-//マップ基軸算出のデータ収集
+/* パブリック ----------------------------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------------------------------------- */
+// メソッド名   : callReferenceSearch
+// 機能名       : マップ基軸収集
+// 機能概要     : mRunLineCalculatorよりラインエッジ検出（deg=0時）を確認し、
+//                その時点での本体旋回度を収集、蓄積する。
+// 作成日       : 2016/07/16  大塚　信晶  新規作成
+/* ---------------------------------------------------------------------------------------------- */
 void TrackCompass_ohs::callReferenceSearch()
 {
-	FLOT fAngle_    = ( FLOT )mRunningAdmin->getAngle();
-	FLOT fOldRAxis_ = mReferenceAxis;
-	if( mRunLineCalculator->getDeg() == 0 ) { return; }
-	mReferenceAxis = ( fAngle_ * RA_NOW_GAIN ) + ( fOldRAxis_ * RA_OLD_GAIN );
+	FLOT fAngle_    = ( FLOT )mRunningAdmin->getAngle();// 本体旋回度の取得
+	FLOT fOldRAxis_ = mReferenceAxis;// 蓄積基軸角度
+
+	if( mRunLineCalculator->getDeg() == 0 ) { return; }// ラインエッジ上以外なら収集しない
+
+	mReferenceAxis = ( fAngle_ * RA_NOW_GAIN ) + ( fOldRAxis_ * RA_OLD_GAIN );// 収集
+	
 	return;
 }
 
-//マップ基軸を現在地で固定
+/* ---------------------------------------------------------------------------------------------- */
+// メソッド名   : setReferenceAxis
+// 機能名       : マップ基軸決定
+// 機能概要     : callReferenceSearchメソッドで収集した本体旋回度をマップ基軸角度とし決定する。
+// 作成日       : 2016/07/16  大塚　信晶  新規作成
+/* ---------------------------------------------------------------------------------------------- */
 void TrackCompass_ohs::setReferenceAxis() { mNowRAxis = ( int32_t )mReferenceAxis; }
 
-//基軸中心からの指定角回転
+/* ---------------------------------------------------------------------------------------------- */
+// メソッド名   : callRAxisTurn
+// 機能名       : マップ基軸旋回
+// 機能概要     : setReferenceAxisメソッドで決定した基軸を始点とし、旋回を行う
+// 作成日       : 2016/07/16  大塚　信晶  新規作成
+/* 引数 ----------------------------------------------------------------------------------------- */
+// [I N]int32_t target : 目標旋回角度
+/* 戻り値 [BOOL] -------------------------------------------------------------------------------- */
+// true :正常終了
+// false:異常終了
+/* ---------------------------------------------------------------------------------------------- */
 BOOL TrackCompass_ohs::callRAxisTurn( int32_t target ) {
-	int8_t cSendDegree_ = 0;
+	int8_t cSendDegree_ = 0;// mRunningAdminに指示する旋回角度
 
-	//引数チェック
+	/* 引数チェック＠指定範囲 -360°（-1500）～360°（1500） */
 	if(( target > RAT_TRN_MAX ) || ( target < -RAT_TRN_MAX )) { return false; }
 
-	//値の取得
+	// 値の取得＠callRAxisMoveメソッドでの進行方向にもなります
 	mTargetDirection = target;
 
-	//走行角度計算
+	// 走行角度計算
 	cSendDegree_ = calcFollowDegree( mTargetDirection );
 
-	//走行指示
+	// 走行指示
 	mRunningAdmin->postRunning( RA_STD_SPD, cSendDegree_, RA_STD_BRN, RA_STD_BRK );
 
-	return true;
+	return true;// 正常終了
 }
 
-//指定角回転達成確認地点からの移動
+/* ---------------------------------------------------------------------------------------------- */
+// メソッド名   : callRAxisTurn
+// 機能名       : マップ基軸移動
+// 機能概要     : setReferenceAxisメソッドで決定した基軸を始点とし、移動を行う
+//                本体方向はcallRAxisTurnメソッドで指定した旋回角度で保持される。
+// 作成日       : 2016/07/16  大塚　信晶  新規作成
+/* 引数 ----------------------------------------------------------------------------------------- */
+// [I N]int32_t move_length : 目標旋回角度
+/* 戻り値 [BOOL] -------------------------------------------------------------------------------- */
+// true :正常終了
+// false:異常終了
+/* ---------------------------------------------------------------------------------------------- */
 BOOL TrackCompass_ohs::callRAxisMove( int32_t move_length, BOOL balancer )
 {
-	int8_t cSendDegree = 0;
-	int8_t cMoveLength = 0;
+	int8_t cSendDegree = 0;// mRunningAdminに指示する旋回角度
+	int8_t cMoveLength = 0;// mRunningAdminに指示する前後進速度
 
-	/* 走行速度の決定 */
+	/* 走行速度の決定 --------------------------------------------------------------------------- */
 	if( move_length < 0 ) {
 		if( balancer ) { cMoveLength = RA_ALT_RSPD; }//後進＠バランス有り
 		else { cMoveLength = RA_ALT_RT_SPD; }//後進＠支え走行
-	} else { cMoveLength = RA_ALT_SPD; }//前進＠バランス・支え共用
+	} else {
+		cMoveLength = RA_ALT_SPD;//前進＠バランス・支え共用
+	}
 
 	//走行角度計算
 	cSendDegree = calcFollowDegree( mTargetDirection );
@@ -71,26 +133,34 @@ BOOL TrackCompass_ohs::callRAxisMove( int32_t move_length, BOOL balancer )
 	//走行指示
 	mRunningAdmin->postRunning( cMoveLength, cSendDegree, balancer, RA_STD_BRK );
 
-	return true;
+	return true;// 引数チェックよろ
 }
 
-
-
-//指定角回転達成確認
+/* ---------------------------------------------------------------------------------------------- */
+// メソッド名   : getRAxisTurnFinish
+// 機能名       : マップ基軸旋回達成確認
+// 機能概要     : マップ基軸を中心とした目標本体方角に現在の本体方角が等しいかを確認する。
+// 作成日       : 2016/07/16  大塚　信晶  新規作成
+/* 引数 ----------------------------------------------------------------------------------------- */
+// [I N]int32_t target : 目標方角
+/* 戻り値 [BOOL] -------------------------------------------------------------------------------- */
+// true :目標角と一致
+// false:不一致または引数異常ｙ
+/* ---------------------------------------------------------------------------------------------- */
 BOOL TrackCompass_ohs::getRAxisTurnFinish( int32_t target )
 {
 	int32_t iCompAngle = 0;//比較用本体方向
-	int32_t iNowAngle  = mRunningAdmin->getAngle();;
+	int32_t iNowAngle  = mRunningAdmin->getAngle();// 現在の本体方角
 
-	//引数チェック
+	// 引数チェック
 	if(( target > RAT_TRN_MAX ) || ( target < -RAT_TRN_MAX )) { return false; }
 
-	//比較本体角に目標本体角を代入
+	// 比較本体方角に目標本体角を代入
 	iCompAngle = target + mNowRAxis;
-	//目標本体角　－　現在本体角　＝　誤差
+	// 誤差 ＝ 目標本体方角 － 現在本体方角
 	iCompAngle = iCompAngle - iNowAngle;
 
-	//目標値達成確認
+	// 目標値達成確認＠一致の誤差を許容
 	if(( TC_TOLERANCE > iCompAngle ) && ( -TC_TOLERANCE < iCompAngle )) {
 		mRAxisTurnFinish = true;//達成
 	} else {
@@ -99,40 +169,61 @@ BOOL TrackCompass_ohs::getRAxisTurnFinish( int32_t target )
 
 	//達成確認
 	if( mRAxisTurnFinish ) {
-		mRAxisTurnFinish = false;//フラグリセット
+		mRAxisTurnFinish = false;//フラグリセット＠消した方がよさそう？
 		return true;
 	}
 	return false;
 }
 
-//マップ基軸の取得
-int32_t TrackCompass_ohs::getReferenceAxis() { return ( int32_t )mReferenceAxis; }
+/* プライベート --------------------------------------------------------------------------------- */
 
-//指定角に沿う出力角度の計算
+/* ---------------------------------------------------------------------------------------------- */
+// メソッド名   : getReferenceAxis
+// 機能名       : マップ基軸の取得
+// 機能概要     : 現在のマップ基軸を取得する。（protectedとかで使うかな？と思ったのでおいてます）
+// 作成日       : 2016/07/16  大塚　信晶  新規作成
+/* 戻り値 [int32_t] ----------------------------------------------------------------------------- */
+// -2,147,483,648 ～ 2,147,483,647:現在のマップ基軸
+/* ---------------------------------------------------------------------------------------------- */
+int32_t TrackCompass_ohs::getReferenceAxis() { return mNowRAxis; }
+
+/* ---------------------------------------------------------------------------------------------- */
+// メソッド名   : calcFollowDegree
+// 機能名       : マップ基軸旋回指示出力計算
+// 機能概要     : マップ基軸から目標値までの適切な旋回値を算出する
+// 作成日       : 2016/07/16  大塚　信晶  新規作成
+/* 戻り値 [int8_t] ----------------------------------------------------------------------------- */
+// -SND_TRN_MAX ～ SND_TRN_MAX:旋回出力値
+/* ---------------------------------------------------------------------------------------------- */
 int8_t TrackCompass_ohs::calcFollowDegree( int32_t target )
 {
-	FLOT    fSendDegree  = 0.0F;
-	FLOT    fTargetDev   = 0.0F;
-	FLOT    fNowAngle    = 0.0F;
-	int32_t iRetDegree_  = 0;
+	FLOT    fSendDegree  = 0.0F;// 旋回出力値
+	FLOT    fTargetDeg   = 0.0F;// 目標本体方角
+	FLOT    fNowAngle    = 0.0F;// 現在の本体方角
+	int32_t iRetDegree_  = 0;   // 変換旋回出力値
 
-	//引数チェック
+	/* 引数チェック＠指定範囲 -360°（-1500）～360°（1500） */
 	if(( target > RAT_TRN_MAX ) || ( target < -RAT_TRN_MAX )) { return false; }
 	
+	// 現在の本体方角の取得
 	fNowAngle = ( FLOT )mRunningAdmin->getAngle();
 
-	//目標角の計算
-	fTargetDev = ( FLOT )( target + mNowRAxis );
+	// 目標角の計算
+	fTargetDeg = ( FLOT )( target + mNowRAxis );
 
-	//回転出力値の計算
-	fSendDegree = fTargetDev - fNowAngle;//現在地と目標値の差分
+	// 回転出力値の計算＠現在地と目標値の差分
+	fSendDegree = fTargetDeg - fNowAngle;
 
-	//係数付与出力
+	// 比例計算
 	iRetDegree_ = ( int32_t )( fSendDegree * RA_PK );
 
-	//指示値範囲チェック
+	// 指示値範囲チェック
 	if( iRetDegree_ < -SND_TRN_MAX ) { iRetDegree_ = -SND_TRN_MAX; }
 	else if( iRetDegree_ > SND_TRN_MAX ) { iRetDegree_ = SND_TRN_MAX; }
 	
-	return ( int8_t )iRetDegree_;
+	return ( int8_t )iRetDegree_;// int8_t変換出力
 }
+
+/* ---------------------------------------------------------------------------------------------- */
+/*                          Copyright HAL College of Technology & Design                          */
+/* ---------------------------------------------------------------------------------------------- */
