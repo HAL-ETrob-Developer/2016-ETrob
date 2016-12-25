@@ -119,40 +119,47 @@ enum TRACE_MODE {
 	TMODE_SEARCH								/* 探索						 */
 };
 
+/* ------------------------------------------------------------------------- */
+/* 構造体定義																 */
+/* ------------------------------------------------------------------------- */
 
+/* 構造体 PID制御設定ファイル */
 typedef struct _PID_SETTING{
-	float fTerSpeed;
-	float fTerRefLv;
-	float fSpdP;
-	float fSpdI;
-	float fSpdD;
-	float fDegP;
-	float fDegI;
-	float fDegD;
+	float fTerSpeed;   /* 目標速度 */
+	float fTerRefLv;   /* 目標光学値 */
+	float fSpdP;       /* 前進Pゲイン */
+	float fSpdI;       /* 前進Iゲイン */
+	float fSpdD;       /* 前進Dゲイン */
+	float fDegP;       /* 旋回Pゲイン */
+	float fDegI;       /* 旋回Iゲイン */
+	float fDegD;       /* 旋回Dゲイン */
 }PID_SETTING;
 
+/* 構造体 シナリオ */
 typedef struct _SCENARIO_INDEX {
-    UCHR move_event;   //達成条件
-    UCHR pattern_id;   //実行動作番号
-    UCHR next_scene;   //次の遷移番号
-    UCHR dummy;        //バウンダリ対策
-    SLNG event_value;  //達成条件に付随する値
+    UCHR move_event;   /* 達成条件 */
+    UCHR pattern_id;   /* 実行動作番号 */
+    UCHR next_scene;   /* 次の遷移番号 */
+    UCHR dummy;        /* バウンダリ対策 */
+    SLNG event_value;  /* 達成条件に付随する値 */
 }SCENE_INDEX;
 
 /* 構造体 実行動作インデックス */
 typedef struct _PATTERN_INDEX{
-	SCHR speed;
-	SCHR ev3_deg;
-	SCHR Tail_deg;
-	UCHR balance;
+	SCHR speed;        /* 前進速度 */
+	SCHR ev3_deg;      /* 旋回角度 */
+	SCHR Tail_deg;     /* 尻尾角度 */
+	UCHR balance;      /* バランス走行の有無 */
 }PATTERN_INDEX;
 
+/* 構造体 全設定ファイル統合 */
 typedef struct _EV3_SETTING{
-	PID_SETTING   nmPidSetting;
-	PID_SETTING   scPidSetting;
-	SCENE_INDEX   sceneIndexS[_SCENARIO_MAX_NUM];
-	PATTERN_INDEX patrnIndexS[_PATTERN_NUM];
+	PID_SETTING   nmPidSetting;/* 構造体 PID制御設定ファイル＠通常 */
+	PID_SETTING   scPidSetting;/* 構造体 PID制御設定ファイル＠第二設定 */
+	SCENE_INDEX   sceneIndexS[_SCENARIO_MAX_NUM];/* 構造体 シナリオ */
+	PATTERN_INDEX patrnIndexS[_PATTERN_NUM];/* 構造体 実行動作インデックス */
 }EV3_SETTING;
+
 /* ------------------------------------------------------------------------- */
 /*              Copyright HAL Collage of Technology & Design                 */
 /* ------------------------------------------------------------------------- */
