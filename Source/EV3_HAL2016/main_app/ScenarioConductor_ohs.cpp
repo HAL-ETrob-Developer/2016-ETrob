@@ -137,7 +137,7 @@ BOOL ScenarioConductor_ohs::execScenario()
 			case LINETRACER_SPEED://ライントレース指示＠高速
 				mLineTracer->postLineTraceConduct( true );
 				break;
-			case TRACKCOMPASS_CHECK//方位想定回転＠原位置セット
+			case TRACKCOMPASS_CHECK://方位想定回転＠原位置セット
 				mTrackCompass->setReferenceAxis();
 				break;
 			case TRACKCOMPASS_TRUN://方位想定回転＠回転

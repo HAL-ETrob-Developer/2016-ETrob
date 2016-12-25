@@ -16,6 +16,7 @@
 // includeファイル
 /* ---------------------------------------------------------------------------------------------- */
 
+#include <string.h>			// memset用
 #include "../device_ope/RunningAdmin_ohs.h"
 #include "../device_ope/TailAdmin_ohs.h"
 
